@@ -38,7 +38,7 @@ class LaporanController extends Controller
             'dipinjam'   => $peminjaman->where('status', 'dipinjam')->count(),
             'kembali'    => $peminjaman->where('status', 'kembali')->count(),
             'terlambat'  => $peminjaman->filter(fn($p) => $p->isTerlambat())->count(),
-            'total_denda'=> $peminjaman->sum('denda'),
+            'total_denda'=> $peminjaman->sum(fn($p) => $p->status === 'dipinjam' ? $p->hitungDenda() : $p->denda),
         ];
 
         return view('laporan.index', compact('peminjaman', 'stats', 'dari', 'sampai'));
@@ -71,7 +71,7 @@ class LaporanController extends Controller
             'dipinjam'   => $peminjaman->where('status', 'dipinjam')->count(),
             'kembali'    => $peminjaman->where('status', 'kembali')->count(),
             'terlambat'  => $peminjaman->filter(fn($p) => $p->isTerlambat())->count(),
-            'total_denda'=> $peminjaman->sum('denda'),
+            'total_denda'=> $peminjaman->sum(fn($p) => $p->status === 'dipinjam' ? $p->hitungDenda() : $p->denda),
         ];
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('laporan.pdf', compact('peminjaman', 'stats', 'dari', 'sampai'))

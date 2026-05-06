@@ -66,6 +66,8 @@ class LaporanPeminjamanExport implements
         static $no = 0;
         $no++;
 
+        $dendaAktual = $row->status === 'dipinjam' ? $row->hitungDenda() : $row->denda;
+
         return [
             $no,
             $row->tgl_pinjam?->format('d/m/Y') ?? '-',
@@ -77,7 +79,7 @@ class LaporanPeminjamanExport implements
             $row->tgl_harus_kembali?->format('d/m/Y') ?? '-',
             $row->tgl_realisasi_kembali?->format('d/m/Y') ?? '-',
             ucfirst($row->status),
-            $row->denda > 0 ? number_format($row->denda, 0, ',', '.') : '-',
+            $dendaAktual > 0 ? number_format($dendaAktual, 0, ',', '.') : '-',
         ];
     }
 

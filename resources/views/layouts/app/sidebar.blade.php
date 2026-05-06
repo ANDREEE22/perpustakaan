@@ -23,6 +23,15 @@
                     </flux:sidebar.item>
 
                     <flux:sidebar.item
+                        icon="identification"
+                        :href="route('kunjungan.index')"
+                        :current="request()->routeIs('kunjungan*')"
+                        wire:navigate
+                    >
+                        {{ __('Kunjungan') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item
                         icon="book-open"
                         :href="route('katalog')"
                         :current="request()->routeIs('katalog*')"
@@ -81,7 +90,7 @@
         :current="request()->routeIs('laporan.index')" 
         wire:navigate
     >
-        {{ __('Buku') }}
+        {{ __('Data Kunjungan') }}
     </flux:navlist.item>
 </flux:navlist.group>
 

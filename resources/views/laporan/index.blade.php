@@ -161,6 +161,9 @@
                 </thead>
                 <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                     @forelse($peminjaman as $i => $p)
+                    @php
+                        $dendaAktual = $p->status === 'dipinjam' ? $p->hitungDenda() : $p->denda;
+                    @endphp
                     <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors
                                {{ $p->isTerlambat() ? 'bg-red-50 dark:bg-red-900/10' : '' }}">
 
@@ -227,9 +230,9 @@
                         </td>
 
                         <td class="px-4 py-3 text-right font-mono text-sm">
-                            @if($p->denda > 0)
+                            @if($dendaAktual > 0)
                                 <span class="text-red-600 dark:text-red-400 font-semibold">
-                                    Rp{{ number_format($p->denda, 0, ',', '.') }}
+                                    Rp{{ number_format($dendaAktual, 0, ',', '.') }}
                                 </span>
                             @else
                                 <span class="text-zinc-400">—</span>
@@ -267,58 +270,34 @@
     </div>
 
     {{-- Info cetak --}}
-    <p class="text-xs text-zinc-400 text-center">
+    <p class="text-xs text-zinc-400 text-center print:text-[9px]">
         Dicetak pada: {{ now()->format('d/m/Y H:i') }} WIB &nbsp;·&nbsp;
         Perpustakaan SMP Negeri 4 Jember
     </p>
 
 </div>
 
-{{-- ══ Style khusus cetak ══ --}}
+{{-- ══ Print Style & Script ══ --}}
 <style>
-@media print {
-    /* Sembunyikan semua elemen kecuali area laporan */
-    body > * { display: none !important; }
-
-    /* Tampilkan hanya konten utama */
-    body::before {
-        display: block !important;
-        content: '';
+    @media print {
+        body > * { display: none !important; }
+        #tabel-laporan,
+        #stat-cards {
+            display: block !important;
+        }
+        nav, aside, header, form, button, a {
+            display: none !important;
+        }
+        table { width: 100% !important; font-size: 11px !important; }
+        th, td { padding: 4px 6px !important; }
     }
-
-    .print-area { display: block !important; }
-
-    /* Paksa tampilkan elemen laporan */
-    #tabel-laporan,
-    #stat-cards,
-    .laporan-header {
-        display: block !important;
-    }
-
-    /* Sembunyikan tombol, nav, sidebar */
-    nav, aside, header, .no-print,
-    [class*="sidebar"], [class*="navbar"],
-    form, button, a[href] {
-        display: none !important;
-    }
-
-    /* Tampilkan semua yang perlu dicetak */
-    #tabel-laporan,
-    #stat-cards {
-        display: block !important;
-        page-break-inside: avoid;
-    }
-
-    table { width: 100% !important; font-size: 11px !important; }
-    th, td { padding: 4px 6px !important; }
-    .animate-pulse { animation: none !important; }
-}
 </style>
 
+@pushOnce('scripts')
 <script>
-function cetakHalaman() {
-    // Buka window cetak hanya dengan bagian laporan
-    const konten = `
+(function() {
+    window.cetakHalaman = function() {
+        const konten = `
         <!DOCTYPE html>
         <html>
         <head>
@@ -385,6 +364,9 @@ function cetakHalaman() {
                 </thead>
                 <tbody>
                     @forelse($peminjaman as $i => $p)
+                    @php
+                        $dendaPrint = $p->status === 'dipinjam' ? $p->hitungDenda() : $p->denda;
+                    @endphp
                     <tr class="{{ $p->isTerlambat() ? 'terlambat' : '' }}">
                         <td>{{ $i + 1 }}</td>
                         <td><strong>{{ $p->anggota?->nama_lengkap ?? '—' }}</strong></td>
@@ -403,7 +385,7 @@ function cetakHalaman() {
                                 <span class="badge badge-amber">Dipinjam</span>
                             @endif
                         </td>
-                        <td style="text-align:right">{{ $p->denda > 0 ? 'Rp'.number_format($p->denda,0,',','.') : '—' }}</td>
+                        <td style="text-align:right">{{ $dendaPrint > 0 ? 'Rp'.number_format($dendaPrint,0,',','.') : '—' }}</td>
                     </tr>
                     @empty
                     <tr><td colspan="10" style="text-align:center;padding:20px;color:#9ca3af">Tidak ada data</td></tr>
@@ -424,14 +406,16 @@ function cetakHalaman() {
             </div>
         </body>
         </html>
-    `;
+        `;
 
-    const win = window.open('', '_blank', 'width=1100,height=700');
-    win.document.write(konten);
-    win.document.close();
-    win.focus();
-    setTimeout(() => { win.print(); }, 500);
-}
+        const win = window.open('', '_blank', 'width=1100,height=700');
+        win.document.write(konten);
+        win.document.close();
+        win.focus();
+        setTimeout(() => { win.print(); }, 500);
+    };
+})();
 </script>
+@endPushOnce
 
 </x-layouts::app>

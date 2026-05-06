@@ -101,6 +101,9 @@
         </thead>
         <tbody>
             @forelse($peminjaman as $i => $p)
+            @php
+                $dendaPdf = $p->status === 'dipinjam' ? $p->hitungDenda() : $p->denda;
+            @endphp
             <tr class="{{ $p->isTerlambat() ? 'terlambat' : '' }}">
                 <td class="text-center" style="color:#9ca3af">{{ $i + 1 }}</td>
                 <td>
@@ -132,9 +135,9 @@
                     @endif
                 </td>
                 <td class="text-right font-mono">
-                    @if($p->denda > 0)
+                    @if($dendaPdf > 0)
                         <span style="color:#dc2626; font-weight:bold">
-                            Rp{{ number_format($p->denda, 0, ',', '.') }}
+                            Rp{{ number_format($dendaPdf, 0, ',', '.') }}
                         </span>
                     @else
                         <span style="color:#9ca3af">—</span>
