@@ -152,7 +152,7 @@
             <div class="text-right hidden md:block">
                 <div class="clock-time" id="lib-time">--:--:--</div>
                 <div class="clock-date" id="lib-date"></div>
-                <div style="color:rgba(254,243,199,0.35);font-size:0.7rem;margin-top:4px">TA 2024/2025</div>
+                <div style="color:rgba(254,243,199,0.35);font-size:0.7rem;margin-top:4px">TA 2026/2027</div>
             </div>
         </div>
     </div>
