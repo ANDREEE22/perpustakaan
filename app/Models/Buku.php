@@ -10,6 +10,7 @@ class Buku extends Model
     
     // Tentukan kolom mana yang boleh diisi secara massal
     protected $fillable = [
+        'kode_buku',
         'judul',
         'isbn',
         'kategori_id',
@@ -26,5 +27,11 @@ class Buku extends Model
     public function kategori()
     {
         return $this->belongsTo(Kategori::class);
+    }
+
+    // Relasi ke QR
+    public function qr()
+    {
+        return $this->hasOne(Qr::class, 'buku_id');
     }
 }

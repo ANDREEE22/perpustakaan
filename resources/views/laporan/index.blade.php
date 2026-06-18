@@ -1,4 +1,10 @@
 <x-layouts::app :title="__('Laporan Peminjaman')">
+<style>
+    :root {
+        --lib-teal:    #0f766e;
+        --lib-emerald: #10b981;
+    }
+</style>
 <div class="flex flex-col gap-6">
 
     {{-- ── Header ── --}}
@@ -13,7 +19,7 @@
             </flux:subheading>
         </div>
 
-        {{-- Tombol Export --}}
+        {{-- Tombol Export (Warna disamakan menggunakan tema Hijau) --}}
         <div class="flex gap-2 flex-wrap">
             <a href="{{ route('laporan.export.pdf', request()->query()) }}"
                target="_blank"
@@ -22,13 +28,15 @@
                 Unduh PDF
             </a>
             <a href="{{ route('laporan.export.excel', request()->query()) }}"
-               class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition-colors">
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-colors"
+               style="background: var(--lib-teal);">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Unduh Excel
             </a>
-            <button onclick="cetakHalaman()"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-800 text-white text-sm font-semibold transition-colors">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <button type="button" id="btn-cetak"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-colors"
+                    style="background: var(--lib-teal);">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                 Cetak
             </button>
         </div>
@@ -64,7 +72,8 @@
 
         <div class="flex gap-2">
             <button type="submit"
-                    class="px-4 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition-colors flex items-center gap-2">
+                    class="px-4 py-2 rounded-xl text-white text-sm font-semibold transition-colors flex items-center gap-2"
+                    style="background: var(--lib-teal);">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
                 Tampilkan
             </button>
@@ -87,38 +96,48 @@
         </div>
     </form>
 
-    {{-- ── Stat Cards ── --}}
+    {{-- ── Stat Cards (Emoji Diganti SVG Minimalis & Clean) ── --}}
     <div class="grid grid-cols-2 sm:grid-cols-5 gap-4" id="stat-cards">
         <div class="p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-xl">📋</div>
+            <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
             <div>
                 <p class="text-2xl font-bold text-zinc-800 dark:text-zinc-100">{{ $stats['total'] }}</p>
                 <p class="text-[11px] text-zinc-400 uppercase tracking-wide">Total Transaksi</p>
             </div>
         </div>
         <div class="p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-xl">📤</div>
+            <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </div>
             <div>
                 <p class="text-2xl font-bold text-amber-600">{{ $stats['dipinjam'] }}</p>
                 <p class="text-[11px] text-zinc-400 uppercase tracking-wide">Sedang Dipinjam</p>
             </div>
         </div>
         <div class="p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-xl">✅</div>
+            <div class="w-10 h-10 rounded-xl bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
             <div>
                 <p class="text-2xl font-bold text-green-600">{{ $stats['kembali'] }}</p>
                 <p class="text-[11px] text-zinc-400 uppercase tracking-wide">Sudah Kembali</p>
             </div>
         </div>
         <div class="p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-xl">⏰</div>
+            <div class="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
             <div>
                 <p class="text-2xl font-bold text-red-600">{{ $stats['terlambat'] }}</p>
                 <p class="text-[11px] text-zinc-400 uppercase tracking-wide">Terlambat</p>
             </div>
         </div>
         <div class="p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center text-xl">💰</div>
+            <div class="w-10 h-10 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center text-yellow-600 dark:text-yellow-400">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
             <div>
                 <p class="text-xl font-bold text-yellow-600">
                     Rp{{ number_format($stats['total_denda'], 0, ',', '.') }}
@@ -134,7 +153,7 @@
         {{-- Header tabel --}}
         <div class="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
             <p class="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-                Ditemukan <span class="text-green-600">{{ $stats['total'] }}</span> transaksi
+                Ditemukan <span class="text-green-600">All {{ $stats['total'] }}</span> transaksi
             </p>
             @if($stats['terlambat'] > 0)
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs font-semibold">
@@ -213,18 +232,19 @@
                             {{ $p->tgl_realisasi_kembali?->format('d/m/Y') ?? '—' }}
                         </td>
 
+                        {{-- Status Badges (Emoji warna-warni dibersihkan) --}}
                         <td class="px-4 py-3 text-center">
                             @if($p->status === 'kembali')
                                 <span class="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold">
-                                    ✅ Kembali
+                                    Kembali
                                 </span>
                             @elseif($p->isTerlambat())
-                                <span class="px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-semibold animate-pulse">
-                                    ⏰ Terlambat
+                                <span class="px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-semibold">
+                                    Terlambat
                                 </span>
                             @else
                                 <span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-semibold">
-                                    📤 Dipinjam
+                                    Dipinjam
                                 </span>
                             @endif
                         </td>
@@ -244,7 +264,7 @@
                     <tr>
                         <td colspan="9" class="px-4 py-16 text-center">
                             <div class="flex flex-col items-center gap-2 text-zinc-400">
-                                <span class="text-4xl">📭</span>
+                                <svg class="w-10 h-10 text-zinc-300 dark:text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m16.5 0a1.5 1.5 0 00-1.5-1.5H5.25A1.5 1.5 0 003.75 7.5m16.5 0c0 .12-.007.24-.02.358M3.75 7.5c0 .12.007.24.02.358M3.75 7.5h16.5m-16.5 0l1.107-4.15A1.5 1.5 0 015.82 2.25h12.36a1.5 1.5 0 011.463 1.2l1.107 4.15"/></svg>
                                 <p class="font-medium text-zinc-500">Tidak ada data peminjaman</p>
                                 <p class="text-sm">pada periode yang dipilih.</p>
                             </div>
@@ -295,126 +315,138 @@
 
 @pushOnce('scripts')
 <script>
-(function() {
-    window.cetakHalaman = function() {
-        const konten = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Laporan Peminjaman - SMPN 4 Jember</title>
-            <meta charset="utf-8">
-            <style>
-                * { box-sizing: border-box; margin: 0; padding: 0; }
-                body { font-family: Arial, sans-serif; font-size: 11px; color: #111; padding: 20px; }
+document.addEventListener('DOMContentLoaded', function() {
+    const btnCetak = document.getElementById('btn-cetak');
+    if (btnCetak) {
+        btnCetak.addEventListener('click', function(e) {
+            e.preventDefault();
+            cetakHalaman();
+        });
+    }
+});
 
-                .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1a5c3a; padding-bottom: 12px; }
-                .header h1 { font-size: 16px; color: #1a5c3a; font-weight: bold; }
-                .header p  { font-size: 11px; color: #555; margin-top: 4px; }
+function cetakHalaman() {
+    const konten = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Laporan Peminjaman - SMPN 4 Jember</title>
+        <meta charset="utf-8">
+        <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { font-family: Arial, sans-serif; font-size: 11px; color: #111; padding: 20px; }
 
-                .stats { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-                .stat  { border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 14px; min-width: 100px; }
-                .stat .angka { font-size: 20px; font-weight: bold; color: #1a5c3a; }
-                .stat .label { font-size: 9px; color: #6b7280; text-transform: uppercase; }
+            .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1a5c3a; padding-bottom: 12px; }
+            .header h1 { font-size: 16px; color: #1a5c3a; font-weight: bold; }
+            .header p  { font-size: 11px; color: #555; margin-top: 4px; }
 
-                table { width: 100%; border-collapse: collapse; font-size: 10px; }
-                thead th { background: #1a5c3a; color: white; padding: 6px 8px; text-align: left; font-size: 9px; text-transform: uppercase; }
-                tbody tr:nth-child(even) { background: #f0fdf4; }
-                tbody tr.terlambat { background: #fef2f2; color: #991b1b; }
-                td { padding: 5px 8px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
-                tfoot td { font-weight: bold; border-top: 2px solid #d1d5db; background: #fefce8; }
+            .stats { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+            .stat  { border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 14px; min-width: 100px; }
+            .stat .angka { font-size: 20px; font-weight: bold; color: #1a5c3a; }
+            .stat .label { font-size: 9px; color: #6b7280; text-transform: uppercase; }
 
-                .badge { display: inline-block; padding: 1px 6px; border-radius: 9999px; font-size: 9px; font-weight: bold; }
-                .badge-green  { background: #dcfce7; color: #166534; }
-                .badge-amber  { background: #fef3c7; color: #92400e; }
-                .badge-red    { background: #fee2e2; color: #991b1b; }
+            table { width: 100%; border-collapse: collapse; font-size: 10px; }
+            thead th { background: #1a5c3a; color: white; padding: 6px 8px; text-align: left; font-size: 9px; text-transform: uppercase; }
+            tbody tr:nth-child(even) { background: #f0fdf4; }
+            tbody tr.terlambat { background: #fef2f2; color: #991b1b; }
+            td { padding: 5px 8px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+            tfoot td { font-weight: bold; border-top: 2px solid #d1d5db; background: #fefce8; }
 
-                .footer { text-align: center; margin-top: 20px; font-size: 9px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 10px; }
-                @page { margin: 1.5cm; size: A4 landscape; }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>LAPORAN PEMINJAMAN BUKU PERPUSTAKAAN</h1>
-                <p>SMP Negeri 4 Jember &nbsp;|&nbsp;
-                   Periode: {{ $dari->format('d/m/Y') }} s.d. {{ $sampai->format('d/m/Y') }}</p>
-            </div>
+            .badge { display: inline-block; padding: 1px 6px; border-radius: 9999px; font-size: 9px; font-weight: bold; }
+            .badge-green  { background: #dcfce7; color: #166534; }
+            .badge-amber  { background: #fef3c7; color: #92400e; }
+            .badge-red    { background: #fee2e2; color: #991b1b; }
 
-            <div class="stats">
-                <div class="stat"><div class="angka">{{ $stats['total'] }}</div><div class="label">Total Transaksi</div></div>
-                <div class="stat"><div class="angka" style="color:#d97706">{{ $stats['dipinjam'] }}</div><div class="label">Dipinjam</div></div>
-                <div class="stat"><div class="angka" style="color:#16a34a">{{ $stats['kembali'] }}</div><div class="label">Kembali</div></div>
-                <div class="stat"><div class="angka" style="color:#dc2626">{{ $stats['terlambat'] }}</div><div class="label">Terlambat</div></div>
-                <div class="stat"><div class="angka" style="color:#ca8a04;font-size:14px">Rp{{ number_format($stats['total_denda'],0,',','.') }}</div><div class="label">Total Denda</div></div>
-            </div>
+            .footer { text-align: center; margin-top: 20px; font-size: 9px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 10px; }
+            @page { margin: 1.5cm; size: A4 landscape; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>LAPORAN PEMINJAMAN BUKU PERPUSTAKAAN</h1>
+            <p>SMP Negeri 4 Jember &nbsp;|&nbsp;
+               Periode: {{ $dari->format('d/m/Y') }} s.d. {{ $sampai->format('d/m/Y') }}</p>
+        </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width:30px">No</th>
-                        <th>Nama Anggota</th>
-                        <th>NISN/Kelas</th>
-                        <th>Judul Buku</th>
-                        <th>Kategori</th>
-                        <th>Tgl Pinjam</th>
-                        <th>Harus Kembali</th>
-                        <th>Tgl Kembali</th>
-                        <th>Status</th>
-                        <th>Denda</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($peminjaman as $i => $p)
-                    @php
-                        $dendaPrint = $p->status === 'dipinjam' ? $p->hitungDenda() : $p->denda;
-                    @endphp
-                    <tr class="{{ $p->isTerlambat() ? 'terlambat' : '' }}">
-                        <td>{{ $i + 1 }}</td>
-                        <td><strong>{{ $p->anggota?->nama_lengkap ?? '—' }}</strong></td>
-                        <td style="font-size:9px">{{ $p->anggota?->nomor_induk ?? '' }}{{ $p->anggota?->kelas ? ' / '.$p->anggota->kelas : '' }}</td>
-                        <td>{{ $p->buku?->judul ?? '—' }}</td>
-                        <td>{{ $p->buku?->kategori?->nama ?? '—' }}</td>
-                        <td>{{ $p->tgl_pinjam?->format('d/m/Y') ?? '—' }}</td>
-                        <td>{{ $p->tgl_harus_kembali?->format('d/m/Y') ?? '—' }}</td>
-                        <td>{{ $p->tgl_realisasi_kembali?->format('d/m/Y') ?? '—' }}</td>
-                        <td>
-                            @if($p->status === 'kembali')
-                                <span class="badge badge-green">Kembali</span>
-                            @elseif($p->isTerlambat())
-                                <span class="badge badge-red">Terlambat +{{ $p->hariTerlambat() }}h</span>
-                            @else
-                                <span class="badge badge-amber">Dipinjam</span>
-                            @endif
-                        </td>
-                        <td style="text-align:right">{{ $dendaPrint > 0 ? 'Rp'.number_format($dendaPrint,0,',','.') : '—' }}</td>
-                    </tr>
-                    @empty
-                    <tr><td colspan="10" style="text-align:center;padding:20px;color:#9ca3af">Tidak ada data</td></tr>
-                    @endforelse
-                </tbody>
-                @if($peminjaman->count() > 0)
-                <tfoot>
-                    <tr>
-                        <td colspan="9" style="text-align:right">Total Denda:</td>
-                        <td style="text-align:right;color:#dc2626">Rp{{ number_format($stats['total_denda'],0,',','.') }}</td>
-                    </tr>
-                </tfoot>
-                @endif
-            </table>
+        <div class="stats">
+            <div class="stat"><div class="angka">{{ $stats['total'] }}</div><div class="label">Total Transaksi</div></div>
+            <div class="stat"><div class="angka" style="color:#d97706">{{ $stats['dipinjam'] }}</div><div class="label">Dipinjam</div></div>
+            <div class="stat"><div class="angka" style="color:#16a34a">{{ $stats['kembali'] }}</div><div class="label">Kembali</div></div>
+            <div class="stat"><div class="angka" style="color:#dc2626">{{ $stats['terlambat'] }}</div><div class="label">Terlambat</div></div>
+            <div class="stat"><div class="angka" style="color:#ca8a04;font-size:14px">Rp{{ number_format($stats['total_denda'],0,',','.') }}</div><div class="label">Total Denda</div></div>
+        </div>
 
-            <div class="footer">
-                Dicetak pada: {{ now()->format('d/m/Y H:i') }} WIB &nbsp;·&nbsp; Perpustakaan SMP Negeri 4 Jember
-            </div>
-        </body>
-        </html>
-        `;
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:30px">No</th>
+                    <th>Nama Anggota</th>
+                    <th>NISN/Kelas</th>
+                    <th>Judul Buku</th>
+                    <th>Kategori</th>
+                    <th>Tgl Pinjam</th>
+                    <th>Harus Kembali</th>
+                    <th>Tgl Kembali</th>
+                    <th>Status</th>
+                    <th>Denda</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($peminjaman as $i => $p)
+                @php
+                    $dendaPrint = $p->status === 'dipinjam' ? $p->hitungDenda() : $p->denda;
+                @endphp
+                <tr class="{{ $p->isTerlambat() ? 'terlambat' : '' }}">
+                    <td>{{ $i + 1 }}</td>
+                    <td><strong>{{ $p->anggota?->nama_lengkap ?? '—' }}</strong></td>
+                    <td style="font-size:9px">{{ $p->anggota?->nomor_induk ?? '' }}{{ $p->anggota?->kelas ? ' / '.$p->anggota->kelas : '' }}</td>
+                    <td>{{ $p->buku?->judul ?? '—' }}</td>
+                    <td>{{ $p->buku?->kategori?->nama ?? '—' }}</td>
+                    <td>{{ $p->tgl_pinjam?->format('d/m/Y') ?? '—' }}</td>
+                    <td>{{ $p->tgl_harus_kembali?->format('d/m/Y') ?? '—' }}</td>
+                    <td>{{ $p->tgl_realisasi_kembali?->format('d/m/Y') ?? '—' }}</td>
+                    <td>
+                        @if($p->status === 'kembali')
+                            <span class="badge badge-green">Kembali</span>
+                        @elseif($p->isTerlambat())
+                            <span class="badge badge-red">Terlambat +{{ $p->hariTerlambat() }}h</span>
+                        @else
+                            <span class="badge badge-amber">Dipinjam</span>
+                        @endif
+                    </td>
+                    <td style="text-align:right">{{ $dendaPrint > 0 ? 'Rp'.number_format($dendaPrint,0,',','.') : '—' }}</td>
+                </tr>
+                @empty
+                <tr><td colspan="10" style="text-align:center;padding:20px;color:#9ca3af">Tidak ada data</td></tr>
+                @endforelse
+            </tbody>
+            @if($peminjaman->count() > 0)
+            <tfoot>
+                <tr>
+                    <td colspan="9" style="text-align:right">Total Denda:</td>
+                    <td style="text-align:right;color:#dc2626">Rp{{ number_format($stats['total_denda'],0,',','.') }}</td>
+                </tr>
+            </tfoot>
+            @endif
+        </table>
 
-        const win = window.open('', '_blank', 'width=1100,height=700');
+        <div class="footer">
+            Dicetak pada: {{ now()->format('d/m/Y H:i') }} WIB &nbsp;·&nbsp; Perpustakaan SMP Negeri 4 Jember
+        </div>
+    </body>
+    </html>
+    `;
+
+    const win = window.open('', '_blank', 'width=1100,height=700');
+    if (win) {
         win.document.write(konten);
         win.document.close();
         win.focus();
         setTimeout(() => { win.print(); }, 500);
-    };
-})();
+    } else {
+        alert('Pop-up browser diblokir. Silahkan izinkan pop-up untuk fitur cetak.');
+    }
+}
 </script>
 @endPushOnce
 

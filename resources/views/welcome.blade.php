@@ -4,869 +4,483 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Perpustakaan Digital - SMP Negeri 4 Jember</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --hijau: #1a5c3a;
-            --hijau-tua: #0e3d26;
-            --hijau-muda: #2d7a52;
-            --kuning: #f5c842;
-            --krem: #fdf6e3;
-            --krem-gelap: #f0e6c8;
-            --teks: #1c1c1c;
-            --abu: #6b7280;
-            --putih: #ffffff;
+        .hero-backdrop {
+            background-image:
+                linear-gradient(90deg, rgba(12, 10, 9, 0.94), rgba(12, 10, 9, 0.76) 48%, rgba(12, 10, 9, 0.52)),
+                url('{{ asset('images/skh.png') }}');
+            background-position: center;
+            background-size: cover;
         }
 
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--krem);
-            color: var(--teks);
-            min-height: 100vh;
-        }
-
-        /* ===== NAVBAR ===== */
-        .navbar {
-            background: var(--hijau-tua);
-            padding: 0 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 64px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-emblem {
-            width: 40px;
-            height: 40px;
-            background: var(--kuning);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Playfair Display', serif;
-            font-weight: 900;
-            font-size: 16px;
-            color: var(--hijau-tua);
-            flex-shrink: 0;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo-text .sekolah {
-            font-size: 11px;
-            color: rgba(255,255,255,0.6);
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        .logo-text .nama {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--putih);
-            line-height: 1.2;
-        }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .btn-login {
-            background: var(--kuning);
-            color: var(--hijau-tua);
-            border: none;
-            padding: 8px 20px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-
-        .btn-login:hover {
-            background: #e8b800;
-            transform: translateY(-1px);
-        }
-
-        /* ===== HERO ===== */
-        .hero {
-            background: linear-gradient(135deg, var(--hijau-tua) 0%, var(--hijau) 50%, var(--hijau-muda) 100%);
-            padding: 60px 2rem 80px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -60px;
-            right: -60px;
-            width: 300px;
-            height: 300px;
-            border: 60px solid rgba(245,200,66,0.08);
-            border-radius: 50%;
-        }
-
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: -80px;
-            left: -80px;
-            width: 400px;
-            height: 400px;
-            border: 80px solid rgba(245,200,66,0.05);
-            border-radius: 50%;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            background: rgba(245,200,66,0.15);
-            border: 1px solid rgba(245,200,66,0.3);
-            color: var(--kuning);
-            font-size: 12px;
-            font-weight: 500;
-            padding: 5px 16px;
-            border-radius: 20px;
-            margin-bottom: 20px;
-            letter-spacing: 0.05em;
-        }
-
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 900;
-            color: var(--putih);
-            line-height: 1.15;
-            margin-bottom: 16px;
-        }
-
-        .hero h1 span {
-            color: var(--kuning);
-        }
-
-        .hero p {
-            font-size: 1rem;
-            color: rgba(255,255,255,0.75);
-            max-width: 520px;
-            margin: 0 auto 36px;
-            line-height: 1.6;
-        }
-
-        .search-wrapper {
-            max-width: 560px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .search-box {
-            display: flex;
-            background: var(--putih);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
-        }
-
-        .search-icon {
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            color: var(--abu);
-        }
-
-        .search-input {
-            flex: 1;
-            border: none;
-            outline: none;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 15px;
-            padding: 16px 0;
-            color: var(--teks);
-            background: transparent;
-        }
-
-        .search-input::placeholder { color: #aaa; }
-
-        .search-btn {
-            background: var(--hijau);
-            color: white;
-            border: none;
-            padding: 0 24px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .search-btn:hover { background: var(--hijau-tua); }
-
-        /* ===== STATS ===== */
-        .stats-bar {
-            background: var(--putih);
-            border-bottom: 1px solid var(--krem-gelap);
-            padding: 20px 2rem;
-        }
-
-        .stats-inner {
-            max-width: 960px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            gap: 60px;
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--hijau);
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--abu);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 48px 2rem;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 28px;
-        }
-
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--hijau-tua);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title::before {
-            content: '';
-            display: block;
-            width: 4px;
-            height: 24px;
-            background: var(--kuning);
-            border-radius: 2px;
-        }
-
-        .lihat-semua {
-            font-size: 13px;
-            color: var(--hijau);
-            text-decoration: none;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: gap 0.2s;
-        }
-
-        .lihat-semua:hover { gap: 8px; }
-
-        /* ===== KATEGORI CHIP ===== */
-        .kategori-chips {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-        }
-
-        .chip {
-            padding: 8px 18px;
-            border-radius: 24px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-            user-select: none;
-        }
-
-        .chip.aktif {
-            background: var(--hijau);
-            color: var(--putih);
-            border-color: var(--hijau);
-        }
-
-        .chip:not(.aktif) {
-            background: var(--putih);
-            color: var(--abu);
-            border-color: var(--krem-gelap);
-        }
-
-        .chip:not(.aktif):hover {
-            border-color: var(--hijau);
-            color: var(--hijau);
-        }
-
-        /* ===== BUKU GRID ===== */
-        .buku-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 24px;
-            margin-bottom: 56px;
-        }
-
-        .buku-card {
-            background: var(--putih);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-            transition: all 0.25s;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .buku-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.15);
-        }
-
-        .buku-cover {
-            width: 100%;
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 56px;
-            position: relative;
-        }
-
-        .buku-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: var(--kuning);
-            color: var(--hijau-tua);
-            font-size: 10px;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-
-        .buku-badge.tersedia {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .buku-badge.dipinjam {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .buku-info {
-            padding: 14px;
-        }
-
-        .buku-judul {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--teks);
-            line-height: 1.4;
-            margin-bottom: 4px;
+        .book-title {
             display: -webkit-box;
-            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
             overflow: hidden;
         }
 
-        .buku-penulis {
-            font-size: 12px;
-            color: var(--abu);
-            margin-bottom: 8px;
+        .shelf-line {
+            background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.65), transparent);
         }
 
-        .buku-kategori-tag {
-            display: inline-block;
-            background: rgba(26,92,58,0.08);
-            color: var(--hijau);
-            font-size: 11px;
-            font-weight: 500;
-            padding: 2px 8px;
-            border-radius: 4px;
-        }
+        @media (prefers-reduced-motion: no-preference) {
+            .rise-in {
+                animation: riseIn 0.55s ease both;
+            }
 
-        /* ===== PENGUMUMAN ===== */
-        .pengumuman-list {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin-bottom: 56px;
-        }
+            @keyframes riseIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(18px);
+                }
 
-        .pengumuman-item {
-            background: var(--putih);
-            border-radius: 10px;
-            padding: 18px 22px;
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            border-left: 4px solid var(--hijau);
-            transition: box-shadow 0.2s;
-        }
-
-        .pengumuman-item:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-        }
-
-        .pengumuman-ikon {
-            font-size: 24px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .pengumuman-konten h4 {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--teks);
-            margin-bottom: 4px;
-        }
-
-        .pengumuman-konten p {
-            font-size: 13px;
-            color: var(--abu);
-            line-height: 1.5;
-        }
-
-        .pengumuman-tanggal {
-            font-size: 11px;
-            color: #aaa;
-            margin-top: 6px;
-        }
-
-        /* ===== MODAL DETAIL BUKU ===== */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-overlay.aktif {
-            display: flex;
-            animation: fadeIn 0.2s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .modal {
-            background: var(--putih);
-            border-radius: 16px;
-            max-width: 480px;
-            width: 100%;
-            overflow: hidden;
-            animation: slideUp 0.25s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-header {
-            padding: 24px 24px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .modal-tutup {
-            background: var(--krem-gelap);
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--abu);
-            transition: background 0.2s;
-            flex-shrink: 0;
-        }
-
-        .modal-tutup:hover { background: #e0d4b0; }
-
-        .modal-body { padding: 20px 24px 28px; }
-
-        .modal-cover {
-            font-size: 80px;
-            text-align: center;
-            padding: 20px;
-            background: var(--krem);
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .modal-judul {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--teks);
-            margin-bottom: 4px;
-        }
-
-        .modal-penulis {
-            font-size: 14px;
-            color: var(--abu);
-            margin-bottom: 16px;
-        }
-
-        .modal-meta {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .meta-item label {
-            font-size: 11px;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .meta-item span {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--teks);
-        }
-
-        .modal-deskripsi {
-            font-size: 13px;
-            color: var(--abu);
-            line-height: 1.6;
-            padding-top: 16px;
-            border-top: 1px solid var(--krem-gelap);
-        }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            background: var(--hijau-tua);
-            color: rgba(255,255,255,0.6);
-            text-align: center;
-            padding: 32px 2rem;
-            font-size: 13px;
-        }
-
-        .footer strong { color: var(--putih); }
-        .footer .divider { margin: 0 10px; opacity: 0.4; }
-
-        /* ===== NO RESULT ===== */
-        .no-result {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--abu);
-            display: none;
-            grid-column: 1 / -1;
-        }
-
-        .no-result.tampil { display: block; }
-        .no-result-ikon { font-size: 48px; margin-bottom: 12px; }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 600px) {
-            .stats-inner { gap: 30px; }
-            .buku-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-            .nav-actions .btn-login span { display: none; }
-            .logo-text .sekolah { display: none; }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen bg-stone-50 font-sans text-stone-950 antialiased">
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-white/15 bg-stone-950/80 text-white backdrop-blur">
+        <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+            <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-3">
+                <img src="{{ asset('images/smp.png') }}" alt="Logo SMP Negeri 4 Jember" class="h-10 w-10 shrink-0 rounded-md bg-white object-contain p-1">
+                <div class="min-w-0">
+                    <p class="truncate text-sm font-semibold">Perpustakaan Digital</p>
+                    <p class="truncate text-xs text-white/60">SMP Negeri 4 Jember</p>
+                </div>
+            </a>
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="logo-area">
-            <div class="logo-emblem">S4</div>
-            <div class="logo-text">
-                <span class="sekolah">Perpustakaan Digital</span>
-                <span class="nama">SMP Negeri 4 Jember</span>
-            </div>
-        </div>
-        <div class="nav-actions">
-            <a href="{{ route('login') }}" class="btn-login">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                <span>Login Admin</span>
+            <nav class="hidden items-center gap-6 text-sm font-medium text-white/70 md:flex">
+                <a href="#koleksi" class="transition hover:text-white">Koleksi</a>
+                <a href="#layanan" class="transition hover:text-white">Layanan</a>
+                <a href="#pengumuman" class="transition hover:text-white">Info</a>
+            </nav>
+
+            <a href="{{ route('login') }}" class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 text-sm font-semibold text-stone-950 transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:ring-offset-2 focus:ring-offset-stone-950">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m10 17 5-5-5-5" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H3" />
+                </svg>
+                <span class="hidden sm:inline">Login Admin</span>
             </a>
         </div>
-    </nav>
+    </header>
 
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-badge">📚 Perpustakaan Digital Sekolah</div>
-        <h1>Temukan Buku <span>Favoritmu</span><br>di Sini</h1>
-        <p>Akses ribuan koleksi buku pelajaran, fiksi, dan non-fiksi perpustakaan SMP Negeri 4 Jember kapan saja dan di mana saja.</p>
-        <div class="search-wrapper">
-            <div class="search-box">
-                <span class="search-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                </span>
-                <input type="text" class="search-input" id="searchInput" placeholder="Cari judul buku, penulis, atau kategori..." oninput="cariБuku()">
-                <button class="search-btn" onclick="cariБuku()">Cari</button>
-            </div>
-        </div>
-    </section>
+    <main>
+        <section class="hero-backdrop relative isolate min-h-[690px] overflow-hidden pt-24 text-white">
+            <div class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,transparent,rgba(250,250,249,0.08)_70%,#fafaf9_100%)]"></div>
 
-    <!-- STATS BAR -->
-    <div class="stats-bar">
-        <div class="stats-inner">
-            <div class="stat-item">
-                <div class="stat-number">1.240</div>
-                <div class="stat-label">Total Koleksi</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">48</div>
-                <div class="stat-label">Dipinjam Bulan Ini</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">12</div>
-                <div class="stat-label">Kategori</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">98%</div>
-                <div class="stat-label">Tersedia</div>
-            </div>
-        </div>
-    </div>
+            <div class="mx-auto flex max-w-7xl flex-col gap-10 px-4 pb-14 pt-14 sm:px-6 lg:px-8 lg:pt-20">
+                <div class="max-w-4xl rise-in">
+                    <div class="inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-amber-200 backdrop-blur">
+                        <img src="{{ asset('images/smp.png') }}" alt="" class="h-8 w-8 rounded-full bg-white object-contain p-1">
+                        Katalog digital sekolah
+                    </div>
 
-    <!-- MAIN CONTENT -->
-    <main class="main">
+                    <h1 class="mt-8 max-w-4xl text-4xl font-semibold leading-[1.06] sm:text-6xl lg:text-7xl">
+                        Perpustakaan Digital SMPN 4 Jember
+                    </h1>
+                    <p class="mt-6 max-w-2xl text-base leading-8 text-white/75 sm:text-lg">
+                        Jelajahi koleksi pelajaran, fiksi, sains, sejarah, agama, dan bahasa dalam satu ruang baca yang cepat, rapi, dan nyaman untuk siswa.
+                    </p>
 
-        <!-- KATEGORI -->
-        <div class="kategori-chips" id="kategoriChips">
-            <div class="chip aktif" onclick="filterKategori('semua', this)">Semua</div>
-            <div class="chip" onclick="filterKategori('Pelajaran', this)">📖 Pelajaran</div>
-            <div class="chip" onclick="filterKategori('Fiksi', this)">🌟 Fiksi</div>
-            <div class="chip" onclick="filterKategori('Sains', this)">🔬 Sains</div>
-            <div class="chip" onclick="filterKategori('Sejarah', this)">🏛️ Sejarah</div>
-            <div class="chip" onclick="filterKategori('Agama', this)">🕌 Agama</div>
-            <div class="chip" onclick="filterKategori('Bahasa', this)">✏️ Bahasa</div>
-        </div>
+                    <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+                        <a href="#koleksi" class="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-5 text-sm font-semibold text-white transition hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:ring-offset-2 focus:ring-offset-stone-950">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+                            </svg>
+                            Jelajahi Koleksi
+                        </a>
+                        <a href="#pengumuman" class="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-white/25 bg-white/10 px-5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-stone-950">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.73 21a2 2 0 0 1-3.46 0" />
+                            </svg>
+                            Lihat Info
+                        </a>
+                    </div>
+                </div>
 
-        <!-- KOLEKSI TERBARU -->
-        <div class="section-header">
-            <h2 class="section-title">Koleksi Buku</h2>
-            <a href="#" class="lihat-semua">Lihat semua →</a>
-        </div>
+                <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
+                    <div class="rounded-lg border border-white/20 bg-white p-2 shadow-2xl shadow-stone-950/25 rise-in" style="animation-delay: 0.12s">
+                        <div class="flex flex-col gap-2 sm:flex-row">
+                            <label for="searchInput" class="sr-only">Cari koleksi buku</label>
+                            <div class="flex min-h-12 flex-1 items-center gap-3 rounded-md bg-stone-50 px-4 text-stone-500">
+                                <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path stroke-linecap="round" d="m21 21-4.35-4.35" />
+                                </svg>
+                                <input id="searchInput" type="search" class="h-12 w-full bg-transparent text-sm text-stone-900 outline-none placeholder:text-stone-400" placeholder="Cari judul, penulis, atau kategori..." oninput="cariBuku()">
+                            </div>
+                            <button type="button" onclick="scrollToCollection()" class="inline-flex h-12 items-center justify-center rounded-lg bg-stone-950 px-6 text-sm font-semibold text-white transition hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-stone-300">
+                                Cari Buku
+                            </button>
+                        </div>
+                    </div>
 
-        <div class="buku-grid" id="bukuGrid">
-            <!-- Diisi JS -->
-        </div>
-
-        <!-- PENGUMUMAN -->
-        <div class="section-header">
-            <h2 class="section-title">Pengumuman Perpustakaan</h2>
-        </div>
-
-        <div class="pengumuman-list">
-            <div class="pengumuman-item">
-                <div class="pengumuman-ikon">📢</div>
-                <div class="pengumuman-konten">
-                    <h4>Jam Operasional Perpustakaan</h4>
-                    <p>Perpustakaan buka Senin–Jumat pukul 07.00–15.00 WIB. Sabtu buka pukul 08.00–12.00 WIB.</p>
-                    <div class="pengumuman-tanggal">Diperbarui: 20 April 2026</div>
+                    <div class="hidden rounded-lg border border-white/20 bg-stone-950/60 p-5 backdrop-blur lg:block rise-in" style="animation-delay: 0.2s">
+                        <div class="flex items-end gap-2">
+                            <div class="h-28 w-10 rounded-md bg-amber-400"></div>
+                            <div class="h-36 w-12 rounded-md bg-emerald-500"></div>
+                            <div class="h-24 w-10 rounded-md bg-cyan-400"></div>
+                            <div class="h-40 w-12 rounded-md bg-rose-400"></div>
+                            <div class="h-32 w-10 rounded-md bg-lime-300"></div>
+                            <div class="h-44 w-12 rounded-md bg-sky-400"></div>
+                        </div>
+                        <div class="shelf-line mt-5 h-px"></div>
+                        <p class="mt-4 text-sm font-semibold text-white">Rak pilihan minggu ini</p>
+                        <p class="mt-1 text-xs leading-5 text-white/60">10 koleksi contoh siap difilter dan dibuka detailnya.</p>
+                    </div>
                 </div>
             </div>
-            <div class="pengumuman-item" style="border-color: var(--kuning);">
-                <div class="pengumuman-ikon">📚</div>
-                <div class="pengumuman-konten">
-                    <h4>Koleksi Buku Baru Telah Tiba!</h4>
-                    <p>Sebanyak 85 judul buku baru telah ditambahkan ke koleksi perpustakaan. Segera kunjungi untuk membacanya.</p>
-                    <div class="pengumuman-tanggal">24 April 2026</div>
-                </div>
-            </div>
-            <div class="pengumuman-item" style="border-color: #ef4444;">
-                <div class="pengumuman-ikon">⚠️</div>
-                <div class="pengumuman-konten">
-                    <h4>Pengingat Pengembalian Buku</h4>
-                    <p>Batas waktu pengembalian buku semester ini adalah 30 Mei 2026. Denda keterlambatan Rp500/hari/buku.</p>
-                    <div class="pengumuman-tanggal">25 April 2026</div>
-                </div>
-            </div>
-        </div>
+        </section>
 
+        <section class="border-b border-stone-200 bg-white">
+            <div class="mx-auto grid max-w-7xl grid-cols-2 gap-px bg-stone-200 px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
+                <div class="bg-white py-6">
+                    <p class="text-3xl font-semibold text-stone-950">1.240</p>
+                    <p class="mt-1 text-sm text-stone-500">Total koleksi</p>
+                </div>
+                <div class="bg-white py-6 pl-4 sm:pl-6">
+                    <p class="text-3xl font-semibold text-emerald-700">48</p>
+                    <p class="mt-1 text-sm text-stone-500">Dipinjam bulan ini</p>
+                </div>
+                <div class="bg-white py-6 lg:pl-6">
+                    <p class="text-3xl font-semibold text-amber-600">12</p>
+                    <p class="mt-1 text-sm text-stone-500">Kategori buku</p>
+                </div>
+                <div class="bg-white py-6 pl-4 sm:pl-6">
+                    <p class="text-3xl font-semibold text-cyan-700">98%</p>
+                    <p class="mt-1 text-sm text-stone-500">Koleksi tersedia</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="layanan" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+            <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+                <div>
+                    <p class="text-sm font-semibold text-emerald-700">Layanan cepat</p>
+                    <h2 class="mt-2 text-3xl font-semibold text-stone-950">Ruang baca yang siap dipakai</h2>
+                </div>
+                <p class="max-w-xl text-sm leading-6 text-stone-500">
+                    Halaman depan ini membantu siswa menemukan buku, melihat status koleksi, dan membaca informasi perpustakaan tanpa masuk ke panel admin.
+                </p>
+            </div>
+
+            <div class="mt-8 grid gap-4 md:grid-cols-3">
+                <article class="rounded-lg border border-stone-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10" />
+                        </svg>
+                    </div>
+                    <h3 class="mt-5 text-lg font-semibold">Katalog ringkas</h3>
+                    <p class="mt-2 text-sm leading-6 text-stone-500">Cari koleksi berdasarkan judul, penulis, atau kategori dari daftar buku unggulan.</p>
+                </article>
+
+                <article class="rounded-lg border border-stone-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-amber-300 hover:shadow-lg">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-md bg-amber-50 text-amber-700">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" />
+                            <circle cx="12" cy="12" r="9" />
+                        </svg>
+                    </div>
+                    <h3 class="mt-5 text-lg font-semibold">Info operasional</h3>
+                    <p class="mt-2 text-sm leading-6 text-stone-500">Pengumuman jam layanan, koleksi baru, dan pengingat pengembalian tampil jelas.</p>
+                </article>
+
+                <article class="rounded-lg border border-stone-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-md bg-cyan-50 text-cyan-700">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12 11 14 15 10" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                    </div>
+                    <h3 class="mt-5 text-lg font-semibold">Status buku</h3>
+                    <p class="mt-2 text-sm leading-6 text-stone-500">Label tersedia dan dipinjam membuat siswa cepat memilih buku yang bisa dibaca.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="koleksi" class="bg-stone-100/80 py-16">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-emerald-700">Koleksi pilihan</p>
+                        <h2 class="mt-2 text-3xl font-semibold text-stone-950">Temukan buku yang kamu butuhkan</h2>
+                    </div>
+                    <div class="flex flex-wrap gap-2" id="kategoriChips">
+                        <button type="button" class="category-chip inline-flex h-10 items-center rounded-full border px-4 text-sm font-semibold transition bg-emerald-950 text-white border-emerald-950" onclick="filterKategori('semua', this)">Semua</button>
+                        <button type="button" class="category-chip inline-flex h-10 items-center rounded-full border px-4 text-sm font-semibold transition bg-white text-stone-600 border-stone-200 hover:border-emerald-300" onclick="filterKategori('Pelajaran', this)">Pelajaran</button>
+                        <button type="button" class="category-chip inline-flex h-10 items-center rounded-full border px-4 text-sm font-semibold transition bg-white text-stone-600 border-stone-200 hover:border-emerald-300" onclick="filterKategori('Fiksi', this)">Fiksi</button>
+                        <button type="button" class="category-chip inline-flex h-10 items-center rounded-full border px-4 text-sm font-semibold transition bg-white text-stone-600 border-stone-200 hover:border-emerald-300" onclick="filterKategori('Sains', this)">Sains</button>
+                        <button type="button" class="category-chip inline-flex h-10 items-center rounded-full border px-4 text-sm font-semibold transition bg-white text-stone-600 border-stone-200 hover:border-emerald-300" onclick="filterKategori('Sejarah', this)">Sejarah</button>
+                        <button type="button" class="category-chip inline-flex h-10 items-center rounded-full border px-4 text-sm font-semibold transition bg-white text-stone-600 border-stone-200 hover:border-emerald-300" onclick="filterKategori('Agama', this)">Agama</button>
+                        <button type="button" class="category-chip inline-flex h-10 items-center rounded-full border px-4 text-sm font-semibold transition bg-white text-stone-600 border-stone-200 hover:border-emerald-300" onclick="filterKategori('Bahasa', this)">Bahasa</button>
+                    </div>
+                </div>
+
+                <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5" id="bukuGrid"></div>
+            </div>
+        </section>
+
+        <section id="pengumuman" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+            <div class="grid gap-8 lg:grid-cols-[360px_minmax(0,1fr)]">
+                <div>
+                    <p class="text-sm font-semibold text-emerald-700">Pengumuman</p>
+                    <h2 class="mt-2 text-3xl font-semibold text-stone-950">Informasi perpustakaan</h2>
+                    <p class="mt-4 text-sm leading-6 text-stone-500">Pantau jadwal layanan, koleksi baru, dan pengingat pengembalian buku dari perpustakaan sekolah.</p>
+                </div>
+
+                <div class="grid gap-3">
+                    <article class="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+                        <div class="flex gap-4">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" />
+                                    <circle cx="12" cy="12" r="9" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-stone-950">Jam Operasional Perpustakaan</h3>
+                                <p class="mt-1 text-sm leading-6 text-stone-500">Senin-Jumat pukul 07.00-15.00 WIB. Sabtu pukul 08.00-12.00 WIB.</p>
+                                <p class="mt-2 text-xs text-stone-400">Diperbarui: 20 April 2026</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+                        <div class="flex gap-4">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-amber-50 text-amber-700">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-stone-950">Koleksi Buku Baru Telah Tiba</h3>
+                                <p class="mt-1 text-sm leading-6 text-stone-500">Sebanyak 85 judul buku baru telah ditambahkan ke koleksi perpustakaan.</p>
+                                <p class="mt-2 text-xs text-stone-400">24 April 2026</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+                        <div class="flex gap-4">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-rose-50 text-rose-700">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 17h.01" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-stone-950">Pengingat Pengembalian Buku</h3>
+                                <p class="mt-1 text-sm leading-6 text-stone-500">Batas pengembalian buku semester ini adalah 30 Mei 2026. Denda keterlambatan Rp500/hari/buku.</p>
+                                <p class="mt-2 text-xs text-stone-400">25 April 2026</p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- MODAL DETAIL BUKU -->
-    <div class="modal-overlay" id="modalOverlay" onclick="tutupModal(event)">
-        <div class="modal">
-            <div class="modal-header">
-                <div></div>
-                <button class="modal-tutup" onclick="tutupModalBtn()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-cover" id="modalCover">📖</div>
-                <div class="modal-judul" id="modalJudul">-</div>
-                <div class="modal-penulis" id="modalPenulis">-</div>
-                <div class="modal-meta">
-                    <div class="meta-item">
-                        <label>Kategori</label>
-                        <span id="modalKategori">-</span>
-                    </div>
-                    <div class="meta-item">
-                        <label>Tahun Terbit</label>
-                        <span id="modalTahun">-</span>
-                    </div>
-                    <div class="meta-item">
-                        <label>Penerbit</label>
-                        <span id="modalPenerbit">-</span>
-                    </div>
-                    <div class="meta-item">
-                        <label>Status</label>
-                        <span id="modalStatus">-</span>
-                    </div>
+    <div class="fixed inset-0 z-[60] hidden items-center justify-center bg-stone-950/70 p-4 backdrop-blur-sm" id="modalOverlay" onclick="tutupModal(event)" aria-hidden="true">
+        <div class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white shadow-2xl">
+            <div class="flex items-start justify-between gap-4 border-b border-stone-200 p-5">
+                <div>
+                    <p class="text-sm font-semibold text-emerald-700" id="modalKategori">Kategori</p>
+                    <h2 class="mt-1 text-2xl font-semibold text-stone-950" id="modalJudul">Judul buku</h2>
                 </div>
-                <div class="modal-deskripsi" id="modalDeskripsi">-</div>
+                <button type="button" onclick="tutupModalBtn()" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-stone-200 text-stone-500 transition hover:bg-stone-100 hover:text-stone-900" aria-label="Tutup detail buku">
+                    &times;
+                </button>
+            </div>
+            <div class="grid gap-6 p-5 md:grid-cols-[180px_minmax(0,1fr)]">
+                <div class="flex h-64 items-center justify-center rounded-lg p-5 text-white" id="modalCover">
+                    <span class="text-center text-5xl font-semibold" id="modalInitial">BK</span>
+                </div>
+                <div>
+                    <p class="text-sm text-stone-500" id="modalPenulis">oleh Penulis</p>
+                    <div class="mt-5 grid grid-cols-2 gap-3">
+                        <div class="rounded-lg border border-stone-200 p-3">
+                            <p class="text-xs font-semibold text-stone-400">Tahun</p>
+                            <p class="mt-1 font-semibold text-stone-900" id="modalTahun">-</p>
+                        </div>
+                        <div class="rounded-lg border border-stone-200 p-3">
+                            <p class="text-xs font-semibold text-stone-400">Status</p>
+                            <p class="mt-1 font-semibold text-stone-900" id="modalStatus">-</p>
+                        </div>
+                        <div class="col-span-2 rounded-lg border border-stone-200 p-3">
+                            <p class="text-xs font-semibold text-stone-400">Penerbit</p>
+                            <p class="mt-1 font-semibold text-stone-900" id="modalPenerbit">-</p>
+                        </div>
+                    </div>
+                    <p class="mt-5 text-sm leading-7 text-stone-600" id="modalDeskripsi">-</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <strong>SMP Negeri 4 Jember</strong>
-        <span class="divider">|</span>
-        Jl. Hayam Wuruk No. 56, Jember, Jawa Timur
-        <br><br>
-        &copy; 2026 Perpustakaan Digital SMPN 4 Jember. Seluruh hak cipta dilindungi.
+    <footer class="border-t border-stone-200 bg-white py-8">
+        <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 text-sm text-stone-500 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+            <p><strong class="font-semibold text-stone-950">SMP Negeri 4 Jember</strong> - Jl. Nusa Indah, Jember, Jawa Timur</p>
+            <p>&copy; 2026 Perpustakaan Digital SMPN 4 Jember.</p>
+        </div>
     </footer>
 
     <script>
         const dataBuku = [
-            { id:1, judul:"Matematika untuk SMP Kelas VII", penulis:"Abdur Rahman As'ari", kategori:"Pelajaran", tahun:2022, penerbit:"Kemendikbud", status:"tersedia", ikon:"📐", warna:"#e8f5e9", deskripsi:"Buku teks Matematika kurikulum Merdeka untuk siswa SMP kelas VII. Dilengkapi latihan soal dan pembahasan." },
-            { id:2, judul:"Laskar Pelangi", penulis:"Andrea Hirata", kategori:"Fiksi", tahun:2005, penerbit:"Bentang Pustaka", status:"tersedia", ikon:"🌈", warna:"#fff8e1", deskripsi:"Novel karya Andrea Hirata tentang perjuangan anak-anak Belitung menggapai mimpi lewat pendidikan." },
-            { id:3, judul:"IPA Terpadu Kelas VIII", penulis:"Tim Penyusun", kategori:"Sains", tahun:2023, penerbit:"Kemendikbud", status:"dipinjam", ikon:"🔬", warna:"#e3f2fd", deskripsi:"Buku pelajaran Ilmu Pengetahuan Alam terpadu untuk SMP kelas VIII kurikulum Merdeka." },
-            { id:4, judul:"Sejarah Kebudayaan Islam", penulis:"Ahmad Syalaby", kategori:"Agama", tahun:2020, penerbit:"Pustaka Al-Kautsar", status:"tersedia", ikon:"🕌", warna:"#f3e5f5", deskripsi:"Mengulas perjalanan panjang kebudayaan Islam dari masa Rasulullah hingga era modern." },
-            { id:5, judul:"Bahasa Indonesia Kelas IX", penulis:"Agus Trianto", kategori:"Bahasa", tahun:2021, penerbit:"Kemendikbud", status:"tersedia", ikon:"✏️", warna:"#fce4ec", deskripsi:"Buku teks Bahasa Indonesia untuk siswa SMP kelas IX. Mencakup keterampilan membaca, menulis, berbicara, dan menyimak." },
-            { id:6, judul:"Bumi Manusia", penulis:"Pramoedya Ananta Toer", kategori:"Fiksi", tahun:1980, penerbit:"Hasta Mitra", status:"tersedia", ikon:"🌍", warna:"#e8f5e9", deskripsi:"Novel sejarah karya Pramoedya Ananta Toer, mengisahkan kehidupan di Hindia Belanda awal abad ke-20." },
-            { id:7, judul:"Sejarah Indonesia Modern", penulis:"M.C. Ricklefs", kategori:"Sejarah", tahun:2008, penerbit:"Serambi", status:"dipinjam", ikon:"🏛️", warna:"#fff3e0", deskripsi:"Buku sejarah Indonesia dari abad ke-16 hingga abad ke-21 yang ditulis secara komprehensif." },
-            { id:8, judul:"Fisika Dasar", penulis:"Halliday & Resnick", kategori:"Sains", tahun:2019, penerbit:"Erlangga", status:"tersedia", ikon:"⚡", warna:"#e3f2fd", deskripsi:"Buku referensi Fisika Dasar yang membahas mekanika, termodinamika, optika, dan listrik magnet." },
-            { id:9, judul:"Al-Quran Hadis Kelas VII", penulis:"Tim Kemenag", kategori:"Agama", tahun:2022, penerbit:"Kemenag RI", status:"tersedia", ikon:"📖", warna:"#f3e5f5", deskripsi:"Buku pelajaran Al-Quran Hadis untuk siswa MTs / SMP Islam kelas VII." },
-            { id:10, judul:"Grammar in Use", penulis:"Raymond Murphy", kategori:"Bahasa", tahun:2019, penerbit:"Cambridge", status:"tersedia", ikon:"🔤", warna:"#fce4ec", deskripsi:"Buku referensi tata bahasa Inggris yang sangat populer untuk tingkat menengah. Dilengkapi latihan soal." },
+            { id: 1, judul: 'Matematika untuk SMP Kelas VII', penulis: 'Abdur Rahman Asari', kategori: 'Pelajaran', tahun: 2022, penerbit: 'Kemendikbud', status: 'tersedia', kode: 'MT', warna: 'linear-gradient(135deg, #14532d, #14b8a6)', deskripsi: 'Buku teks Matematika kurikulum Merdeka untuk siswa SMP kelas VII. Dilengkapi latihan soal dan pembahasan.' },
+            { id: 2, judul: 'Laskar Pelangi', penulis: 'Andrea Hirata', kategori: 'Fiksi', tahun: 2005, penerbit: 'Bentang Pustaka', status: 'tersedia', kode: 'LP', warna: 'linear-gradient(135deg, #92400e, #f59e0b)', deskripsi: 'Novel tentang perjuangan anak-anak Belitung menggapai mimpi lewat pendidikan, persahabatan, dan keberanian.' },
+            { id: 3, judul: 'IPA Terpadu Kelas VIII', penulis: 'Tim Penyusun', kategori: 'Sains', tahun: 2023, penerbit: 'Kemendikbud', status: 'dipinjam', kode: 'IP', warna: 'linear-gradient(135deg, #155e75, #38bdf8)', deskripsi: 'Buku pelajaran Ilmu Pengetahuan Alam terpadu untuk SMP kelas VIII kurikulum Merdeka.' },
+            { id: 4, judul: 'Sejarah Kebudayaan Islam', penulis: 'Ahmad Syalaby', kategori: 'Agama', tahun: 2020, penerbit: 'Pustaka Al-Kautsar', status: 'tersedia', kode: 'SK', warna: 'linear-gradient(135deg, #166534, #84cc16)', deskripsi: 'Mengulas perjalanan kebudayaan Islam dari masa Rasulullah hingga era modern dengan bahasa yang mudah diikuti.' },
+            { id: 5, judul: 'Bahasa Indonesia Kelas IX', penulis: 'Agus Trianto', kategori: 'Bahasa', tahun: 2021, penerbit: 'Kemendikbud', status: 'tersedia', kode: 'BI', warna: 'linear-gradient(135deg, #be123c, #fb7185)', deskripsi: 'Buku teks Bahasa Indonesia untuk kelas IX yang mencakup membaca, menulis, berbicara, dan menyimak.' },
+            { id: 6, judul: 'Bumi Manusia', penulis: 'Pramoedya Ananta Toer', kategori: 'Fiksi', tahun: 1980, penerbit: 'Hasta Mitra', status: 'tersedia', kode: 'BM', warna: 'linear-gradient(135deg, #1e3a8a, #60a5fa)', deskripsi: 'Novel sejarah yang mengisahkan kehidupan di Hindia Belanda awal abad ke-20.' },
+            { id: 7, judul: 'Sejarah Indonesia Modern', penulis: 'M.C. Ricklefs', kategori: 'Sejarah', tahun: 2008, penerbit: 'Serambi', status: 'dipinjam', kode: 'SI', warna: 'linear-gradient(135deg, #7c2d12, #fdba74)', deskripsi: 'Buku sejarah Indonesia dari abad ke-16 hingga abad ke-21 yang ditulis secara komprehensif.' },
+            { id: 8, judul: 'Fisika Dasar', penulis: 'Halliday & Resnick', kategori: 'Sains', tahun: 2019, penerbit: 'Erlangga', status: 'tersedia', kode: 'FD', warna: 'linear-gradient(135deg, #0f172a, #22d3ee)', deskripsi: 'Referensi Fisika Dasar yang membahas mekanika, termodinamika, optika, listrik, dan magnet.' },
+            { id: 9, judul: 'Al-Quran Hadis Kelas VII', penulis: 'Tim Kemenag', kategori: 'Agama', tahun: 2022, penerbit: 'Kemenag RI', status: 'tersedia', kode: 'AH', warna: 'linear-gradient(135deg, #365314, #a3e635)', deskripsi: 'Buku pelajaran Al-Quran Hadis untuk siswa kelas VII dengan materi dan latihan terstruktur.' },
+            { id: 10, judul: 'Grammar in Use', penulis: 'Raymond Murphy', kategori: 'Bahasa', tahun: 2019, penerbit: 'Cambridge', status: 'tersedia', kode: 'GU', warna: 'linear-gradient(135deg, #312e81, #818cf8)', deskripsi: 'Buku referensi tata bahasa Inggris tingkat menengah yang dilengkapi contoh dan latihan.' },
         ];
 
-        let kategoriFiltir = 'semua';
+        let kategoriFilter = 'semua';
         let pencarianTeks = '';
+
+        const activeChipClasses = ['bg-emerald-950', 'text-white', 'border-emerald-950'];
+        const inactiveChipClasses = ['bg-white', 'text-stone-600', 'border-stone-200', 'hover:border-emerald-300'];
 
         function renderBuku() {
             const grid = document.getElementById('bukuGrid');
-            const filtered = dataBuku.filter(b => {
-                const cocokkategori = kategoriFiltir === 'semua' || b.kategori === kategoriFiltir;
-                const cocokCari = b.judul.toLowerCase().includes(pencarianTeks) ||
-                                  b.penulis.toLowerCase().includes(pencarianTeks) ||
-                                  b.kategori.toLowerCase().includes(pencarianTeks);
-                return cocokkategori && cocokCari;
+            const filtered = dataBuku.filter((buku) => {
+                const cocokKategori = kategoriFilter === 'semua' || buku.kategori === kategoriFilter;
+                const kataKunci = `${buku.judul} ${buku.penulis} ${buku.kategori}`.toLowerCase();
+
+                return cocokKategori && kataKunci.includes(pencarianTeks);
             });
 
             if (filtered.length === 0) {
-                grid.innerHTML = `<div class="no-result tampil"><div class="no-result-ikon">🔍</div><p>Buku tidak ditemukan.<br>Coba kata kunci lain.</p></div>`;
+                grid.innerHTML = `
+                    <div class="col-span-full rounded-lg border border-dashed border-stone-300 bg-white p-10 text-center">
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-stone-100 text-stone-500">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path stroke-linecap="round" d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </div>
+                        <p class="mt-4 font-semibold text-stone-950">Buku tidak ditemukan</p>
+                        <p class="mt-1 text-sm text-stone-500">Coba kata kunci atau kategori lain.</p>
+                    </div>
+                `;
+
                 return;
             }
 
-            grid.innerHTML = filtered.map(b => `
-                <div class="buku-card" onclick="bukaNModal(${b.id})">
-                    <div class="buku-cover" style="background:${b.warna}">
-                        <span>${b.ikon}</span>
-                        <span class="buku-badge ${b.status}">${b.status === 'tersedia' ? 'Tersedia' : 'Dipinjam'}</span>
-                    </div>
-                    <div class="buku-info">
-                        <div class="buku-judul">${b.judul}</div>
-                        <div class="buku-penulis">${b.penulis}</div>
-                        <span class="buku-kategori-tag">${b.kategori}</span>
-                    </div>
-                </div>
-            `).join('');
+            grid.innerHTML = filtered.map((buku) => {
+                const statusClass = buku.status === 'tersedia'
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                    : 'border-rose-200 bg-rose-50 text-rose-700';
+                const statusLabel = buku.status === 'tersedia' ? 'Tersedia' : 'Dipinjam';
+
+                return `
+                    <article class="group overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-xl">
+                        <button type="button" class="block h-full w-full text-left" onclick="bukaModal(${buku.id})">
+                            <div class="relative flex h-56 items-center justify-center p-5 text-white" style="background: ${buku.warna}">
+                                <span class="absolute left-3 top-3 rounded-full border ${statusClass} px-3 py-1 text-xs font-semibold">${statusLabel}</span>
+                                <div class="flex h-24 w-20 items-center justify-center rounded-lg border border-white/30 bg-white/20 text-3xl font-semibold shadow-lg backdrop-blur">
+                                    ${buku.kode}
+                                </div>
+                                <div class="absolute bottom-0 left-5 right-5 h-2 rounded-t-lg bg-white/25"></div>
+                            </div>
+                            <div class="p-4">
+                                <p class="book-title min-h-11 text-sm font-semibold leading-6 text-stone-950">${buku.judul}</p>
+                                <p class="mt-2 truncate text-sm text-stone-500">${buku.penulis}</p>
+                                <div class="mt-4 flex items-center justify-between gap-3">
+                                    <span class="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-600">${buku.kategori}</span>
+                                    <span class="text-xs font-semibold text-emerald-700">Detail</span>
+                                </div>
+                            </div>
+                        </button>
+                    </article>
+                `;
+            }).join('');
         }
 
-        function filterKategori(kat, el) {
-            kategoriFiltir = kat;
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('aktif'));
-            el.classList.add('aktif');
+        function filterKategori(kategori, element) {
+            kategoriFilter = kategori;
+
+            document.querySelectorAll('.category-chip').forEach((chip) => {
+                chip.classList.remove(...activeChipClasses);
+                chip.classList.add(...inactiveChipClasses);
+            });
+
+            element.classList.remove(...inactiveChipClasses);
+            element.classList.add(...activeChipClasses);
             renderBuku();
         }
 
-        function cariБuku() {
-            pencarianTeks = document.getElementById('searchInput').value.toLowerCase();
+        function cariBuku() {
+            pencarianTeks = document.getElementById('searchInput').value.toLowerCase().trim();
             renderBuku();
         }
 
-        function bukaNModal(id) {
-            const b = dataBuku.find(x => x.id === id);
-            if (!b) return;
-            document.getElementById('modalCover').textContent = b.ikon;
-            document.getElementById('modalCover').style.background = b.warna;
-            document.getElementById('modalJudul').textContent = b.judul;
-            document.getElementById('modalPenulis').textContent = 'oleh ' + b.penulis;
-            document.getElementById('modalKategori').textContent = b.kategori;
-            document.getElementById('modalTahun').textContent = b.tahun;
-            document.getElementById('modalPenerbit').textContent = b.penerbit;
-            document.getElementById('modalStatus').textContent = b.status === 'tersedia' ? '✅ Tersedia' : '❌ Dipinjam';
-            document.getElementById('modalDeskripsi').textContent = b.deskripsi;
-            document.getElementById('modalOverlay').classList.add('aktif');
+        function scrollToCollection() {
+            cariBuku();
+            document.getElementById('koleksi').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function bukaModal(id) {
+            const buku = dataBuku.find((item) => item.id === id);
+
+            if (! buku) {
+                return;
+            }
+
+            document.getElementById('modalCover').style.background = buku.warna;
+            document.getElementById('modalInitial').textContent = buku.kode;
+            document.getElementById('modalJudul').textContent = buku.judul;
+            document.getElementById('modalPenulis').textContent = `oleh ${buku.penulis}`;
+            document.getElementById('modalKategori').textContent = buku.kategori;
+            document.getElementById('modalTahun').textContent = buku.tahun;
+            document.getElementById('modalPenerbit').textContent = buku.penerbit;
+            document.getElementById('modalStatus').textContent = buku.status === 'tersedia' ? 'Tersedia' : 'Dipinjam';
+            document.getElementById('modalDeskripsi').textContent = buku.deskripsi;
+
+            const overlay = document.getElementById('modalOverlay');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            overlay.setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
         }
 
-        function tutupModal(e) {
-            if (e.target === document.getElementById('modalOverlay')) tutupModalBtn();
+        function tutupModal(event) {
+            if (event.target === document.getElementById('modalOverlay')) {
+                tutupModalBtn();
+            }
         }
 
         function tutupModalBtn() {
-            document.getElementById('modalOverlay').classList.remove('aktif');
+            const overlay = document.getElementById('modalOverlay');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+            overlay.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
         }
 
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') tutupModalBtn(); });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                tutupModalBtn();
+            }
+        });
 
         renderBuku();
     </script>

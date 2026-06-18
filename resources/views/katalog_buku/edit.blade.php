@@ -44,11 +44,21 @@
                     required
                 />
                 <flux:input
-                    label="ISBN / Kode Buku"
+                    label="ISBN"
                     name="isbn"
                     value="{{ old('isbn', $buku->isbn) }}"
                     required
                 />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <flux:input
+                    label="Kode Buku"
+                    name="kode_buku"
+                    value="{{ old('kode_buku', $buku->kode_buku) }}"
+                    placeholder="Contoh: BK-2026-0001"
+                />
+                <div></div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

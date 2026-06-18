@@ -1,4 +1,10 @@
 <x-layouts::app :title="__('Katalog Buku')">
+<style>
+    :root {
+        --lib-teal:    #0f766e;
+        --lib-emerald: #10b981;
+    }
+</style>
 <div class="flex flex-col gap-6">
 
     {{-- Header --}}
@@ -7,7 +13,7 @@
             <flux:heading size="xl" level="1">Katalog Buku</flux:heading>
             <flux:subheading>Kelola koleksi buku perpustakaan SMPN 4 Jember</flux:subheading>
         </div>
-        <flux:button variant="primary" icon="plus" href="{{ route('katalog.create') }}">
+        <flux:button variant="primary" icon="plus" href="{{ route('katalog.create') }}" style="background: var(--lib-teal); border:none; color: #fff;">
             Tambah Buku
         </flux:button>
     </div>
@@ -69,7 +75,7 @@
             </flux:select>
         </div>
 
-        <flux:button type="submit" variant="primary" icon="magnifying-glass">Cari</flux:button>
+        <flux:button type="submit" variant="primary" icon="magnifying-glass" style="background: var(--lib-teal); border:none; color: #fff;">Cari</flux:button>
 
         @if(request()->hasAny(['search', 'kategori', 'status']))
             <flux:button href="{{ route('katalog') }}" variant="ghost" icon="x-mark">Reset</flux:button>
@@ -116,7 +122,7 @@
                 <flux:table.cell>
                     <div class="font-semibold text-sm text-zinc-800 dark:text-zinc-100">{{ $buku->judul }}</div>
                     <div class="text-xs text-zinc-400 mt-0.5">
-                        ISBN: {{ $buku->isbn ?? '—' }}
+                        Kode: {{ $buku->kode_buku ?? '—' }} &bull; ISBN: {{ $buku->isbn ?? '—' }}
                         @if($buku->tahun_terbit) &bull; {{ $buku->tahun_terbit }} @endif
                     </div>
                 </flux:table.cell>

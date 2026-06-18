@@ -79,7 +79,7 @@ class LaporanPeminjamanExport implements
             $row->tgl_harus_kembali?->format('d/m/Y') ?? '-',
             $row->tgl_realisasi_kembali?->format('d/m/Y') ?? '-',
             ucfirst($row->status),
-            $dendaAktual > 0 ? number_format($dendaAktual, 0, ',', '.') : '-',
+            $dendaAktual > 0 ? $dendaAktual : '-',
         ];
     }
 
@@ -149,6 +149,9 @@ class LaporanPeminjamanExport implements
                             ],
                         ],
                     ]);
+                    
+                    // Format kolom denda sebagai angka dengan separator
+                    $sheet->getStyle("K5:{$lastCol}{$lastRow}")->getNumberFormat()->setFormatCode('#,##0');
                 }
 
                 // Warna baris data: alternating
@@ -171,9 +174,14 @@ class LaporanPeminjamanExport implements
 
                 // Baris total denda di akhir
                 $totalRow = $lastRow + 2;
-                $total    = $this->data->sum('denda');
+                $total = 0;
+                foreach ($this->data as $item) {
+                    $dendaItem = $item->status === 'dipinjam' ? $item->hitungDenda() : $item->denda;
+                    $total += $dendaItem;
+                }
                 $sheet->setCellValue("J{$totalRow}", 'Total Denda:');
-                $sheet->setCellValue("K{$totalRow}", number_format($total, 0, ',', '.'));
+                $sheet->setCellValue("K{$totalRow}", $total);
+                $sheet->getStyle("K{$totalRow}")->getNumberFormat()->setFormatCode('#,##0');
                 $sheet->getStyle("J{$totalRow}:K{$totalRow}")->applyFromArray([
                     'font'      => ['bold' => true],
                     'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FEF9C3']],

@@ -76,18 +76,27 @@
 
             <input type="hidden" name="buku_id" id="buku_id" value="{{ old('buku_id') }}">
 
-            <div class="relative">
-                <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
-                <input
-                    type="text"
-                    id="buku-search"
-                    placeholder="Ketik judul buku atau ISBN..."
-                    autocomplete="off"
-                    class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 outline-none focus:border-amber-400 transition-colors"
-                >
-                <div id="buku-dropdown"
-                     class="hidden absolute z-40 left-0 right-0 mt-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-xl overflow-hidden max-h-56 overflow-y-auto">
+            <div class="flex gap-2">
+                <div class="relative flex-1">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
+                    <input
+                        type="text"
+                        id="buku-search"
+                        placeholder="Ketik judul buku atau ISBN..."
+                        autocomplete="off"
+                        class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-800 dark:text-zinc-100 placeholder-zinc-400 outline-none focus:border-amber-400 transition-colors"
+                    >
+                    <div id="buku-dropdown"
+                         class="hidden absolute z-40 left-0 right-0 mt-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-xl overflow-hidden max-h-56 overflow-y-auto">
+                    </div>
                 </div>
+
+                {{-- Tombol Scan QR Buku --}}
+                <button type="button" id="btn-scan-buku"
+                        title="Scan QR Buku"
+                        class="shrink-0 inline-flex items-center gap-2 px-3 py-2.5 rounded-xl bg-indigo-600 text-white text-sm hover:bg-indigo-700 transition-colors shadow-sm"
+                     <span class="hidden sm:inline">Scan QR</span>
+                </button>
             </div>
 
             {{-- Card buku terpilih --}}
@@ -430,5 +439,122 @@ elBukuSearch.addEventListener('focus', () => {
     elBukuSearch.placeholder       = 'Ketik judul buku atau ISBN...';
 });
 
+</script>
+
+<!-- HTML5 QR Code library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<!-- Modal Scan QR Buku -->
+<div id="modal-scan-buku" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40" id="modal-scan-buku-backdrop"></div>
+    <div class="relative max-w-lg w-full bg-white dark:bg-zinc-900 rounded-xl p-4 z-10">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold">📷 Scan QR Buku</h3>
+            <button type="button" id="modal-scan-buku-close" class="text-zinc-500 hover:text-red-500">×</button>
+        </div>
+        <div id="reader" class="w-full h-64 bg-black/5 dark:bg-zinc-800 rounded-md flex items-center justify-center overflow-hidden"></div>
+        <p id="scan-status" class="mt-2 text-sm text-zinc-500">Arahkan kamera ke QR code buku.</p>
+    </div>
+</div>
+
+<script>
+// Scanner: kontrol lifecycle
+let html5QrScanner = null;
+const btnScan = document.getElementById('btn-scan-buku');
+const modalScan = document.getElementById('modal-scan-buku');
+const modalBackdrop = document.getElementById('modal-scan-buku-backdrop');
+const modalClose = document.getElementById('modal-scan-buku-close');
+const scanStatus = document.getElementById('scan-status');
+
+const URL_CARI_KODE = "{{ route('api.cari.buku-kode') }}";
+
+function openScanModal() {
+    modalScan.classList.remove('hidden');
+    startScanner();
+}
+
+function closeScanModal() {
+    stopScanner();
+    modalScan.classList.add('hidden');
+}
+
+btnScan.addEventListener('click', openScanModal);
+modalClose.addEventListener('click', closeScanModal);
+modalBackdrop.addEventListener('click', closeScanModal);
+
+function startScanner() {
+    if (html5QrScanner) return;
+    const readerId = 'reader';
+    html5QrScanner = new Html5Qrcode(readerId);
+
+    Html5Qrcode.getCameras().then(cameras => {
+        const cameraId = cameras && cameras.length ? cameras[0].id : null;
+        if (!cameraId) {
+            scanStatus.textContent = 'Tidak ada kamera terdeteksi.';
+            return;
+        }
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        html5QrScanner.start(
+            { deviceId: { exact: cameraId } },
+            config,
+            qrCodeMessage => {
+                // Ketemu QR
+                handleScannedCode(qrCodeMessage);
+            },
+            errorMessage => {
+                // ignore minor errors
+            }
+        ).catch(err => {
+            scanStatus.textContent = 'Gagal mengakses kamera: ' + err;
+        });
+    }).catch(err => {
+        scanStatus.textContent = 'Error mendapatkan kamera: ' + err;
+    });
+}
+
+function stopScanner() {
+    if (!html5QrScanner) return Promise.resolve();
+    return html5QrScanner.stop().then(() => {
+        html5QrScanner.clear();
+        html5QrScanner = null;
+    }).catch(() => { html5QrScanner = null; });
+}
+
+function handleScannedCode(kode) {
+    // segera hentikan scanner dan tutup modal
+    stopScanner();
+    modalScan.classList.add('hidden');
+
+    // kirim AJAX ke server untuk cari kode_buku
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    fetch(URL_CARI_KODE, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrf || ''
+        },
+        body: JSON.stringify({ kode })
+    }).then(r => {
+        if (!r.ok) throw r;
+        return r.json();
+    }).then(buku => {
+        // Jika ditemukan, pilih buku otomatis
+        if (buku && buku.id) {
+            pilihBuku(buku.id, buku.judul, buku.pengarang ?? '-', buku.stok ?? 0);
+        } else {
+            alert('Buku tidak ditemukan');
+        }
+    }).catch(async (err) => {
+        try {
+            const body = await err.json();
+            if (body && body.message) alert(body.message);
+            else alert('Buku tidak ditemukan');
+        } catch (_) {
+            alert('Buku tidak ditemukan');
+        }
+    });
+}
+
+// Pastikan scanner berhenti saat navigasi/tutup window
+window.addEventListener('beforeunload', () => { if (html5QrScanner) html5QrScanner.stop(); });
 </script>
 </x-layouts::app>

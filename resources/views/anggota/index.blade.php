@@ -7,9 +7,9 @@
             <flux:heading size="xl" level="1">Data Anggota</flux:heading>
             <flux:subheading>Kelola data siswa dan guru perpustakaan SMPN 4 Jember</flux:subheading>
         </div>
-        <flux:button variant="primary" icon="plus" href="{{ route('anggota.create') }}">
-            Tambah Anggota
-        </flux:button>
+        <flux:button variant="primary" icon="plus" href="{{ route('anggota.create') }}" style="background: #0f766e; border: none; color: #fff;">
+    Tambah Anggota
+</flux:button>
     </div>
 
     <flux:separator />
@@ -61,8 +61,7 @@
             </flux:select>
         </div>
 
-        <flux:button type="submit" variant="primary" icon="magnifying-glass">Cari</flux:button>
-
+       <flux:button type="submit" variant="primary" icon="magnifying-glass" style="background: #0f766e; border: none; color: #fff;">Cari</flux:button>
         @if(request()->hasAny(['search', 'tipe', 'jenis_kelamin']))
             <flux:button href="{{ route('anggota.index') }}" variant="ghost" icon="x-mark">Reset</flux:button>
         @endif

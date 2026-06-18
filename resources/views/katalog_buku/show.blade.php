@@ -9,7 +9,7 @@
             </div>
             <div>
                 <flux:heading size="xl" level="1">{{ $buku->judul }}</flux:heading>
-                <flux:subheading>ISBN: {{ $buku->isbn ?? '—' }} &bull; Katalog Perpustakaan</flux:subheading>
+                <flux:subheading>Kode: {{ $buku->kode_buku ?? '—' }} &bull; ISBN: {{ $buku->isbn ?? '—' }} &bull; Katalog Perpustakaan</flux:subheading>
             </div>
         </div>
         <div class="flex gap-2 flex-wrap">
@@ -98,6 +98,10 @@
                             <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 mt-1">{{ $buku->tahun_terbit ?: '—' }}</p>
                         </div>
                         <div>
+                            <flux:label class="text-zinc-400 text-xs uppercase tracking-wider">Kode Buku</flux:label>
+                            <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 mt-1">{{ $buku->kode_buku ?? '—' }}</p>
+                        </div>
+                        <div>
                             <flux:label class="text-zinc-400 text-xs uppercase tracking-wider">ISBN</flux:label>
                             <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 mt-1">{{ $buku->isbn ?? '—' }}</p>
                         </div>
@@ -176,6 +180,38 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </flux:card>
+
+            {{-- QR Code Card --}}
+            <flux:card class="text-center">
+                <flux:heading size="sm">QR CODE BUKU</flux:heading>
+                <div class="py-4">
+                    @if($buku->qr && $buku->qr->qr_path)
+                        <img src="{{ asset('storage/' . $buku->qr->qr_path) }}" alt="QR {{ $buku->kode_buku }}" class="mx-auto w-40 h-40 object-contain bg-white p-2 rounded-md border" />
+                    @elseif($buku->kode_buku)
+                        <div class="mx-auto w-40 h-40 flex items-center justify-center bg-zinc-50 rounded-md border">—</div>
+                    @else
+                        <div class="mx-auto w-40 h-40 flex items-center justify-center bg-zinc-50 rounded-md border">Belum ada kode</div>
+                    @endif
+                </div>
+                <div class="text-sm text-zinc-700 dark:text-zinc-300">
+                    <div class="font-semibold">Kode Buku : {{ $buku->kode_buku ?? '—' }}</div>
+                    <div class="mt-1">Judul : {{ $buku->judul }}</div>
+                </div>
+                <div class="mt-4 flex justify-center gap-2">
+                    @if($buku->qr && $buku->qr->qr_path)
+                        <a href="{{ route('katalog.printqr', $buku->id) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-white hover:bg-zinc-50">🖨️ Cetak QR</a>
+                        <a href="{{ route('katalog.downloadqr', $buku->id) }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-white hover:bg-zinc-50">⬇️ Download JPEG</a>
+                    @else
+                        @if($buku->kode_buku)
+                            {{-- Jika ada kode_buku tetapi QR belum terbentuk, print route akan mencoba generate dan menampilkan halaman print --}}
+                            <a href="{{ route('katalog.printqr', $buku->id) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-white hover:bg-zinc-50">🖨️ Cetak QR</a>
+                            <a href="{{ route('katalog.downloadqr', $buku->id) }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-white hover:bg-zinc-50">⬇️ Download JPEG</a>
+                        @else
+                            <span class="text-xs text-zinc-400">Belum ada kode buku — QR tidak tersedia</span>
+                        @endif
+                    @endif
                 </div>
             </flux:card>
 

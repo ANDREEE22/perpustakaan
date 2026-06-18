@@ -26,6 +26,17 @@
         </div>
     @endif
 
+    {{-- Import Excel button/form (separate form, not nested) --}}
+    <div class="flex justify-end mb-2">
+        <form id="import-form" action="{{ route('katalog.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center gap-2">
+            @csrf
+            <input type="file" name="file" id="import-file-input" accept=".xlsx,.xls,.csv" class="hidden" />
+            <flux:button type="button" variant="ghost" icon="document-arrow-up" onclick="document.getElementById('import-file-input').click()">
+                Impor Excel
+            </flux:button>
+        </form>
+    </div>
+
     {{-- Form --}}
     <form action="{{ route('katalog.store') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-6">
         @csrf
@@ -44,12 +55,23 @@
                     required
                 />
                 <flux:input
-                    label="ISBN / Kode Buku"
+                    label="ISBN"
                     name="isbn"
                     value="{{ old('isbn') }}"
                     placeholder="Contoh: 978-602-123-456-7"
                     required
                 />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <flux:input
+                    label="Kode Buku"
+                    name="kode_buku"
+                    value="{{ old('kode_buku') }}"
+                    placeholder="Contoh: BK-2026-0001"
+                />
+                {{-- kosongkan kolom kedua untuk align pada layout --}}
+                <div></div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -172,6 +194,14 @@ document.getElementById('sampul-input').addEventListener('change', function(e) {
         icon.classList.add('hidden');
     };
     reader.readAsDataURL(file);
+});
+
+// Import file chooser handler
+document.getElementById('import-file-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!confirm('Mulai mengimpor file Excel? Proses akan menambahkan buku ke database.')) return;
+    document.getElementById('import-form').submit();
 });
 </script>
 </x-layouts::app>
