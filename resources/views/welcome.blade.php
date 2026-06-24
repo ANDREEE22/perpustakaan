@@ -409,24 +409,33 @@
                     <button class="category-chip inline-flex items-center gap-2 rounded-full border border-stone-200 bg-amber-500 px-5 py-2.5 text-sm font-semibold text-stone-950 transition shadow-sm active" onclick="filterKategori('semua', this)">
                         <i class="fas fa-layer-group"></i> Semua
                     </button>
-                    <button class="category-chip inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-stone-600 transition hover:border-amber-400 hover:text-amber-600 shadow-sm" onclick="filterKategori('Pelajaran', this)">
-                        <i class="fas fa-book"></i> Pelajaran
+                    @foreach($kategoris as $kategori)
+                    <button class="category-chip inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-stone-600 transition hover:border-amber-400 hover:text-amber-600 shadow-sm" onclick="filterKategori('{{ $kategori->nama }}', this)">
+                        @switch($kategori->nama)
+                            @case('Pelajaran')
+                                <i class="fas fa-book"></i>
+                                @break
+                            @case('Fiksi')
+                                <i class="fas fa-book-open"></i>
+                                @break
+                            @case('Sains')
+                                <i class="fas fa-flask"></i>
+                                @break
+                            @case('Sejarah')
+                                <i class="fas fa-landmark"></i>
+                                @break
+                            @case('Agama')
+                                <i class="fas fa-moon"></i>
+                                @break
+                            @case('Bahasa')
+                                <i class="fas fa-language"></i>
+                                @break
+                            @default
+                                <i class="fas fa-book"></i>
+                        @endswitch
+                        {{ $kategori->nama }}
                     </button>
-                    <button class="category-chip inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-stone-600 transition hover:border-amber-400 hover:text-amber-600 shadow-sm" onclick="filterKategori('Fiksi', this)">
-                        <i class="fas fa-book-open"></i> Fiksi
-                    </button>
-                    <button class="category-chip inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-stone-600 transition hover:border-amber-400 hover:text-amber-600 shadow-sm" onclick="filterKategori('Sains', this)">
-                        <i class="fas fa-flask"></i> Sains
-                    </button>
-                    <button class="category-chip inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-stone-600 transition hover:border-amber-400 hover:text-amber-600 shadow-sm" onclick="filterKategori('Sejarah', this)">
-                        <i class="fas fa-landmark"></i> Sejarah
-                    </button>
-                    <button class="category-chip inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-stone-600 transition hover:border-amber-400 hover:text-amber-600 shadow-sm" onclick="filterKategori('Agama', this)">
-                        <i class="fas fa-moon"></i> Agama
-                    </button>
-                    <button class="category-chip inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-stone-600 transition hover:border-amber-400 hover:text-amber-600 shadow-sm" onclick="filterKategori('Bahasa', this)">
-                        <i class="fas fa-language"></i> Bahasa
-                    </button>
+                    @endforeach
                 </div>
 
                 <!-- Books Grid -->
@@ -623,19 +632,19 @@
                             <div class="grid grid-cols-2 gap-6 mt-8 pt-6 border-t border-stone-100">
                                 <div>
                                     <span class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Total Buku</span>
-                                    <p class="text-2xl font-bold text-stone-900 mt-1">2,450</p>
+                                    <p class="text-2xl font-bold text-stone-900 mt-1">{{ number_format($statistics['totalBuku']) }}</p>
                                 </div>
                                 <div>
                                     <span class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Anggota Aktif</span>
-                                    <p class="text-2xl font-bold text-stone-900 mt-1">1,280</p>
+                                    <p class="text-2xl font-bold text-stone-900 mt-1">{{ number_format($statistics['anggotaAktif']) }}</p>
                                 </div>
                                 <div>
                                     <span class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Pengunjung</span>
-                                    <p class="text-2xl font-bold text-stone-900 mt-1">892 <span class="text-sm font-normal text-amber-500">/Bulan</span></p>
+                                    <p class="text-2xl font-bold text-stone-900 mt-1">{{ number_format($statistics['pengunjungBulanIni']) }} <span class="text-sm font-normal text-amber-500">/Bulan</span></p>
                                 </div>
                                 <div>
                                     <span class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Kepuasan</span>
-                                    <p class="text-2xl font-bold text-stone-900 mt-1">98%</p>
+                                    <p class="text-2xl font-bold text-stone-900 mt-1">{{ $statistics['kepuasan'] }}%</p>
                                 </div>
                             </div>
                         </div>
@@ -811,19 +820,18 @@
             observer.observe(el);
         });
 
-        // ===== DATA BUKU =====
-        const dataBuku = [
-            { id: 1, judul: 'Matematika SMP Kelas 7', penulis: 'Drs. Sukirman', kategori: 'Pelajaran', tahun: 2022, penerbit: 'Kencana', status: 'tersedia', kode: 'MAT7', warna: 'linear-gradient(135deg, #f59e0b, #ec4899)', deskripsi: 'Buku pelajaran matematika untuk siswa SMP kelas 7 yang mencakup aljabar, geometri, dan statistik dasar.' },
-            { id: 2, judul: 'Bahasa Indonesia Kelas 8', penulis: 'Dra. Siti Nurhaliza', kategori: 'Pelajaran', tahun: 2023, penerbit: 'Erlangga', status: 'tersedia', kode: 'BI8', warna: 'linear-gradient(135deg, #06b6d4, #0ea5e9)', deskripsi: 'Panduan lengkap pelajaran Bahasa Indonesia dengan latihan soal dan analisis teks.' },
-            { id: 3, judul: 'Apa itu Sains?', penulis: 'Dr. Bambang Tri', kategori: 'Sains', tahun: 2021, penerbit: 'Gramedia', status: 'dipinjam', kode: 'SAI', warna: 'linear-gradient(135deg, #ef4444, #f97316)', deskripsi: 'Pengenalan sains modern untuk remaja dengan penjelasan praktis dan eksperimen sederhana.' },
-            { id: 4, judul: 'Sejarah Indonesia Lengkap', penulis: 'Prof. Taufik Abdullah', kategori: 'Sejarah', tahun: 2020, penerbit: 'Balai Pustaka', status: 'tersedia', kode: 'SEJ', warna: 'linear-gradient(135deg, #8b5cf6, #a78bfa)', deskripsi: 'Kronik lengkap perjalanan sejarah Indonesia dari pra-kemerdekaan hingga era modern.' },
-            { id: 5, judul: 'Cara Menulis Fiksi', penulis: 'Dee Lestari', kategori: 'Fiksi', tahun: 2023, penerbit: 'Mizan', status: 'tersedia', kode: 'FIK', warna: 'linear-gradient(135deg, #10b981, #34d399)', deskripsi: 'Panduan menulis cerita fiksi yang menarik dengan teknik storytelling profesional.' },
-            { id: 6, judul: 'Pengantar Agama Islam', penulis: 'KH. Abdurrahman Wahid', kategori: 'Agama', tahun: 2022, penerbit: 'Mizan', status: 'tersedia', kode: 'AGM', warna: 'linear-gradient(135deg, #06b6d4, #0891b2)', deskripsi: 'Penjelasan mengenai ajaran-ajaran Islam dengan pendekatan modern dan relevan.' },
-            { id: 7, judul: 'English Grammar Today', penulis: 'Swan & Walters', kategori: 'Bahasa', tahun: 2023, penerbit: 'Cambridge', status: 'tersedia', kode: 'ENG', warna: 'linear-gradient(135deg, #fbbf24, #f59e0b)', deskripsi: 'Buku referensi tata bahasa Inggah dengan contoh penggunaan yang praktis dan mudah dipahami.' },
-            { id: 8, judul: 'Laskar Pelangi', penulis: 'Andrea Hirata', kategori: 'Fiksi', tahun: 2005, penerbit: 'Bentang Pustaka', status: 'dipinjam', kode: 'LP', warna: 'linear-gradient(135deg, #ec4899, #f472b6)', deskripsi: 'Novel fenomenal tentang perjuangan sejumlah siswa di sebuah sekolah kecil.' },
-            { id: 9, judul: 'IPA untuk Semua', penulis: 'Prof. Yohanes Surya', kategori: 'Sains', tahun: 2022, penerbit: 'Kompas', status: 'tersedia', kode: 'IPA', warna: 'linear-gradient(135deg, #14b8a6, #2dd4bf)', deskripsi: 'Ilmu Pengetahuan Alam yang mudah dipahami dengan eksperimen praktis dan menyenangkan.' },
-            { id: 10, judul: 'Grammar in Use', penulis: 'Raymond Murphy', kategori: 'Bahasa', tahun: 2019, penerbit: 'Cambridge', status: 'tersedia', kode: 'GU', warna: 'linear-gradient(135deg, #312e81, #818cf8)', deskripsi: 'Buku referensi tata bahasa Inggris tingkat menengah yang dilengkapi contoh dan latihan.' },
-        ];
+        // ===== WARNA GRADIEN UNTUK SETIAP KATEGORI =====
+        const warnaKategori = {
+            'Pelajaran': 'linear-gradient(135deg, #f59e0b, #ec4899)',
+            'Fiksi': 'linear-gradient(135deg, #ec4899, #f472b6)',
+            'Sains': 'linear-gradient(135deg, #ef4444, #f97316)',
+            'Sejarah': 'linear-gradient(135deg, #8b5cf6, #a78bfa)',
+            'Agama': 'linear-gradient(135deg, #06b6d4, #0891b2)',
+            'Bahasa': 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+        };
+
+        // ===== DATA BUKU DARI DATABASE =====
+        const dataBuku = @json($bukuData);
 
         let kategoriFilter = 'semua';
         let pencarianTeks = '';
@@ -858,11 +866,12 @@
                     ? 'border-teal-200 bg-teal-50 text-teal-700'
                     : 'border-rose-200 bg-rose-50 text-rose-700';
                 const statusLabel = buku.status === 'tersedia' ? 'Tersedia' : 'Dipinjam';
+                const warna = warnaKategori[buku.kategori] || 'linear-gradient(135deg, #f59e0b, #ec4899)';
 
                 return `
                     <article class="group overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-amber-200 scroll-scale-up" style="transition-delay: ${index * 0.05}s;">
                         <button type="button" class="block h-full w-full text-left" onclick="bukaModal(${buku.id})">
-                            <div class="relative flex h-56 items-center justify-center p-5 text-white" style="background: ${buku.warna}">
+                            <div class="relative flex h-56 items-center justify-center p-5 text-white" style="background: ${warna}">
                                 <span class="absolute left-4 top-4 rounded-full border ${statusClass} px-3 py-1 text-xs font-bold shadow-sm backdrop-blur-sm bg-white/90">${statusLabel}</span>
                                 <div class="flex h-28 w-20 items-center justify-center rounded-r-xl rounded-l-sm border border-white/20 bg-white/20 text-2xl font-bold shadow-2xl backdrop-blur-md transform transition group-hover:scale-105 group-hover:-rotate-3">
                                     ${buku.kode}
@@ -915,7 +924,9 @@
 
             if (!buku) return;
 
-            document.getElementById('modalCover').style.background = buku.warna;
+            const warna = warnaKategori[buku.kategori] || 'linear-gradient(135deg, #f59e0b, #ec4899)';
+
+            document.getElementById('modalCover').style.background = warna;
             document.getElementById('modalInitial').textContent = buku.kode;
             document.getElementById('modalJudul').textContent = buku.judul;
             document.getElementById('modalPenulis').textContent = `Karya: ${buku.penulis}`;
