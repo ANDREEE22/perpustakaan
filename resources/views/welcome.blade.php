@@ -769,11 +769,13 @@
                 <i class="fas fa-times text-lg w-6 h-6 flex items-center justify-center"></i>
             </button>
 
-            <div id="modalCover" class="h-40 w-full bg-gradient-to-br from-amber-400 to-amber-600"></div>
+            <div id="modalCover" class="h-56 w-full"></div>
 
             <div class="p-8">
                 <div class="flex gap-6">
-                    <div class="flex h-32 w-24 shrink-0 items-center justify-center rounded-xl border-4 border-white bg-stone-100 text-3xl font-bold text-stone-400 shadow-lg -mt-16" id="modalInitial"></div>
+                    <div class="h-32 w-24 shrink-0 rounded-xl border-4 border-white bg-stone-100 shadow-lg -mt-16 overflow-hidden flex items-center justify-center">
+                        <img id="modalInitial" src="" alt="Sampul" class="h-full w-full object-cover">
+                    </div>
 
                     <div class="flex-1 -mt-2">
                         <h2 id="modalJudul" class="text-2xl font-bold text-stone-900"></h2>
@@ -806,11 +808,8 @@
                 </div>
 
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-                    <button type="button" onclick="tutupModalBtn()" class="flex-1 rounded-xl border-2 border-stone-200 bg-white px-4 py-3.5 font-bold text-stone-600 transition hover:bg-stone-50 hover:border-stone-300">
+                    <button type="button" onclick="tutupModalBtn()" class="w-full rounded-xl bg-amber-500 px-6 py-3.5 font-bold text-stone-900 shadow-lg shadow-amber-500/30 transition hover:bg-amber-400 hover:-translate-y-1">
                         Kembali
-                    </button>
-                    <button type="button" class="flex-1 rounded-xl bg-amber-500 px-4 py-3.5 font-bold text-stone-900 shadow-lg shadow-amber-500/30 transition hover:bg-amber-400 hover:-translate-y-1">
-                        Pinjam Buku Sekarang
                     </button>
                 </div>
             </div>
@@ -898,7 +897,7 @@
                     <article class="group overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-amber-200 scroll-scale-up" style="transition-delay: ${index * 0.05}s;">
                         <button type="button" class="block h-full w-full text-left" onclick="bukaModal(${buku.id})">
                             <div class="relative flex h-56 items-center justify-center p-3 text-white bg-stone-100 overflow-hidden">
-                                <img src="${buku.sampul}" alt="${buku.judul}" class="h-full w-full object-cover hover:scale-110 transition-transform duration-300" onerror="this.src='${buku.sampul}'">
+                                <img src="${buku.sampul}" alt="${buku.judul}" class="h-full w-full object-cover hover:scale-110 transition-transform duration-300" onerror="this.src='{{ asset('images/placeholder-book.svg') }}'">
                                 <span class="absolute left-4 top-4 rounded-full border ${statusClass} px-3 py-1 text-xs font-bold shadow-sm backdrop-blur-sm bg-white/90">${statusLabel}</span>
                                 <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/30 to-transparent"></div>
                             </div>
@@ -948,10 +947,16 @@
 
             if (!buku) return;
 
+            // Set warna background
             const warna = warnaKategori[buku.kategori] || 'linear-gradient(135deg, #f59e0b, #ec4899)';
-
             document.getElementById('modalCover').style.background = warna;
-            document.getElementById('modalInitial').textContent = buku.kode;
+
+            // Set gambar sampul di badge
+            const modalImg = document.getElementById('modalInitial');
+            modalImg.src = buku.sampul;
+            modalImg.onerror = function() {
+                this.src = '{{ asset('images/placeholder-book.svg') }}';
+            };
             document.getElementById('modalJudul').textContent = buku.judul;
             document.getElementById('modalPenulis').textContent = `Karya: ${buku.penulis}`;
             document.getElementById('modalKategori').innerHTML = `<i class="fas fa-tag text-amber-500 mr-1"></i> ${buku.kategori}`;

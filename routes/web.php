@@ -30,7 +30,7 @@ Route::get('/', function () {
             'status' => $buku->stok > 0 ? 'tersedia' : 'dipinjam',
             'kode' => $buku->kode_buku,
             'deskripsi' => $buku->description ?? 'Deskripsi tidak tersedia',
-            'sampul' => $buku->sampul ? asset('storage/'.$buku->sampul) : asset('images/placeholder-book.png'),
+            'sampul' => $buku->sampul ? asset('storage/'.$buku->sampul) : asset('images/placeholder-book.svg'),
         ];
     })->toArray();
 
