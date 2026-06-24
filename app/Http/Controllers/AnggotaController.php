@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Anggota;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\AnggotaImport;
 
 class AnggotaController extends Controller
 {
@@ -43,6 +45,32 @@ class AnggotaController extends Controller
         $anggotas = $query->latest()->paginate(10)->withQueryString();
 
         return view('anggota.index', compact('anggotas'));
+    }
+
+    /**
+     * Form impor anggota via Excel
+     */
+    public function importForm()
+    {
+        return view('anggota.import');
+    }
+
+    /**
+     * Proses impor Excel anggota
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $file = $request->file('file');
+
+        $import = new AnggotaImport();
+        Excel::import($import, $file);
+
+        return redirect()->route('anggota.index')
+            ->with('success', "Impor selesai. Dimasukkan: {$import->inserted}, dilewati: {$import->skipped}.");
     }
 
     /**

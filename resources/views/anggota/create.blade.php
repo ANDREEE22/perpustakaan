@@ -26,6 +26,17 @@
         </div>
     @endif
 
+    {{-- Tombol Impor Excel --}}
+    <div class="flex justify-end mb-2">
+        <form id="import-form-anggota" action="{{ route('anggota.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center gap-2">
+            @csrf
+            <input type="file" name="file" id="import-file-input-anggota" accept=".xlsx,.xls,.csv" class="hidden" />
+            <flux:button type="button" variant="ghost" icon="document-arrow-up" onclick="document.getElementById('import-file-input-anggota').click()">
+                Impor Excel
+            </flux:button>
+        </form>
+    </div>
+
     {{-- Form --}}
     <form action="{{ route('anggota.store') }}" method="POST"
           enctype="multipart/form-data" class="flex flex-col gap-5">
@@ -153,6 +164,13 @@ document.getElementById('foto-input').addEventListener('change', function(e) {
         icon.classList.add('hidden');
     };
     reader.readAsDataURL(file);
+});
+// Import file chooser handler for anggota
+document.getElementById('import-file-input-anggota').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!confirm('Mulai mengimpor file Excel? Proses akan menambahkan anggota ke database.')) return;
+    document.getElementById('import-form-anggota').submit();
 });
 </script>
 </x-layouts::app>

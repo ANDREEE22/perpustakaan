@@ -211,14 +211,35 @@ document.getElementById('btn-kembali').addEventListener('click', async function 
     this.disabled = true; this.textContent = 'Memproses...';
     const res  = await fetch(`/pinjam/${pinjamId}/kembalikan`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({})
     });
-    const data = await res.json();
+
+    let data;
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('application/json')) {
+        data = await res.json();
+    } else {
+        const text = await res.text();
+        data = { message: text };
+    }
+
+    if (!res.ok) {
+        alert(data.error || data.message || 'Terjadi kesalahan saat memproses.');
+        this.disabled = false; this.textContent = 'Ya, Kembalikan';
+        return;
+    }
+
     document.getElementById('modal-kembali').classList.add('hidden');
-    document.getElementById('mh-desc').innerHTML = `<em>"${data.judul_buku}"</em> dikembalikan pada ${data.tgl_kembali}`;
+    document.getElementById('mh-desc').innerHTML = data.nama_anggota
+        ? `<strong>${data.nama_anggota}</strong> telah mengembalikan<br><em>"${data.judul_buku}"</em><br>pada ${data.tgl_kembali}`
+        : (data.message || 'Proses selesai.');
     if (data.denda > 0) {
         document.getElementById('mh-icon').textContent    = '⚠️';
-        document.getElementById('mh-nominal').textContent = data.denda_format;
+        document.getElementById('mh-nominal').textContent = data.denda_format || ('Rp ' + (data.denda || 0));
         document.getElementById('mh-denda').classList.remove('hidden');
     }
     document.getElementById('modal-hasil').classList.remove('hidden');

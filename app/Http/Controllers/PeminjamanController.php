@@ -116,7 +116,25 @@ class PeminjamanController extends Controller
         // Kembalikan stok buku
         $p->buku->increment('stok');
 
-        // Buat flash message yang informatif
+        // If the request expects JSON (AJAX/fetch), return JSON payload for frontend modal
+        $contentType = strtolower((string) $request->header('content-type', ''));
+        if ($request->wantsJson() || $request->ajax() || str_contains($request->header('accept', ''), 'application/json') || str_contains($contentType, 'application/json')) {
+            $response = [
+                'judul_buku' => $p->buku->judul,
+                'nama_anggota' => $p->anggota->nama_lengkap,
+                'tgl_kembali' => $tglKembali->format('d M Y'),
+                'denda' => $denda,
+                'denda_format' => 'Rp ' . number_format($denda, 0, ',', '.'),
+            ];
+
+            if ($denda > 0) {
+                $response['hari_terlambat'] = $p->hariTerlambat();
+            }
+
+            return response()->json($response);
+        }
+
+        // Buat flash message yang informatif untuk request biasa
         if ($denda > 0) {
             $hariTelat   = $p->hariTerlambat();
             $dendaFormat = 'Rp ' . number_format($denda, 0, ',', '.');

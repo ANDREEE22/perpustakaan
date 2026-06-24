@@ -39,6 +39,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/kategori/{id}',          [KategoriController::class, 'destroy'])->name('kategori.destroy');
 
     // ─── Anggota ─────────────────────────────────────────────────
+    // Anggota - import Excel (form + process) — HARUS sebelum resource routes
+    Route::get('/anggota/import', [AnggotaController::class, 'importForm'])->name('anggota.import.form');
+    Route::post('/anggota/import', [AnggotaController::class, 'import'])->name('anggota.import');
+
     Route::resource('anggota', AnggotaController::class)->names([
         'index'   => 'anggota.index',
         'create'  => 'anggota.create',
