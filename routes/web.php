@@ -12,6 +12,7 @@ use App\Models\Anggota;
 use App\Models\Buku;
 use App\Models\Kategori;
 use App\Models\Kunjungan;
+use App\Models\Peminjaman;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -29,6 +30,7 @@ Route::get('/', function () {
             'status' => $buku->stok > 0 ? 'tersedia' : 'dipinjam',
             'kode' => $buku->kode_buku,
             'deskripsi' => $buku->description ?? 'Deskripsi tidak tersedia',
+            'sampul' => $buku->sampul ? asset('storage/'.$buku->sampul) : asset('images/placeholder-book.png'),
         ];
     })->toArray();
 
@@ -42,7 +44,30 @@ Route::get('/', function () {
 
     $statistics = compact('totalBuku', 'anggotaAktif', 'pengunjungBulanIni', 'kepuasan');
 
-    return view('welcome', compact('bukus', 'kategoris', 'bukuData', 'statistics'));
+    // Monthly Chart Data (Last 5 months)
+    $monthlyData = [];
+    $chartLabels = [];
+    $chartValues = [];
+
+    for ($i = 4; $i >= 0; $i--) {
+        $date = now()->subMonths($i);
+        $month = $date->month;
+        $year = $date->year;
+
+        $count = Kunjungan::whereMonth('tanggal', $month)
+            ->whereYear('tanggal', $year)
+            ->count();
+
+        $chartLabels[] = $date->format('M');
+        $chartValues[] = $count;
+        $monthlyData[] = [
+            'bulan' => $date->format('F'),
+            'label' => $date->format('M'),
+            'nilai' => $count,
+        ];
+    }
+
+    return view('welcome', compact('bukus', 'kategoris', 'bukuData', 'statistics', 'monthlyData', 'chartValues', 'chartLabels'));
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {

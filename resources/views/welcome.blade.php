@@ -592,6 +592,35 @@
                             
                             <!-- Area Line Chart Modern -->
                             <div class="relative w-full h-56 mt-8">
+                                @php
+                                    // Normalize chart values for SVG (0-200 range)
+                                    $maxValue = max($chartValues) > 0 ? max($chartValues) : 100;
+                                    $normalizedValues = array_map(function($val) use ($maxValue) {
+                                        return 200 - ($val / $maxValue * 180);
+                                    }, $chartValues);
+                                    
+                                    // Generate path coordinates
+                                    $xStep = 500 / (count($chartValues) - 1);
+                                    $pathPoints = [];
+                                    foreach ($normalizedValues as $i => $y) {
+                                        $x = $i * $xStep;
+                                        $pathPoints[] = "{$x},{$y}";
+                                    }
+                                    $pathData = implode(' ', $pathPoints);
+                                    
+                                    // Create area path
+                                    $areaPath = "M0,200 L" . $pathData . " L500,200 Z";
+                                    
+                                    // Create line path
+                                    $linePath = "M" . $pathData;
+                                    
+                                    // Generate circle points
+                                    $circlePoints = [];
+                                    foreach ($normalizedValues as $i => $y) {
+                                        $x = $i * $xStep;
+                                        $circlePoints[] = ['x' => $x, 'y' => $y];
+                                    }
+                                @endphp
                                 <svg viewBox="0 0 500 200" class="w-full h-full drop-shadow-sm" preserveAspectRatio="none">
                                     <defs>
                                         <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
@@ -606,25 +635,22 @@
                                     <line x1="0" y1="150" x2="500" y2="150" stroke="#f5f5f4" stroke-width="2" />
                                     
                                     <!-- Area Fill -->
-                                    <path d="M0,200 L0,140 C100,120 150,150 250,90 C350,30 400,80 500,20 L500,200 Z" fill="url(#lineGrad)" />
+                                    <path d="{{ $areaPath }}" fill="url(#lineGrad)" />
                                     
                                     <!-- Stroke Line -->
-                                    <path d="M0,140 C100,120 150,150 250,90 C350,30 400,80 500,20" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" />
+                                    <path d="{{ $linePath }}" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" />
                                     
                                     <!-- Points -->
-                                    <circle cx="100" cy="132" r="5" fill="#fff" stroke="#f59e0b" stroke-width="3" />
-                                    <circle cx="250" cy="90" r="5" fill="#fff" stroke="#f59e0b" stroke-width="3" />
-                                    <circle cx="400" cy="58" r="5" fill="#fff" stroke="#f59e0b" stroke-width="3" />
-                                    <circle cx="500" cy="20" r="5" fill="#fff" stroke="#f59e0b" stroke-width="3" />
+                                    @foreach($circlePoints as $point)
+                                    <circle cx="{{ $point['x'] }}" cy="{{ $point['y'] }}" r="5" fill="#fff" stroke="#f59e0b" stroke-width="3" />
+                                    @endforeach
                                 </svg>
                                 
                                 <!-- X-Axis Labels -->
                                 <div class="flex justify-between text-xs font-semibold text-stone-400 mt-3 px-2">
-                                    <span>Jan</span>
-                                    <span>Feb</span>
-                                    <span>Mar</span>
-                                    <span>Apr</span>
-                                    <span>Mei</span>
+                                    @foreach($chartLabels as $label)
+                                    <span>{{ $label }}</span>
+                                    @endforeach
                                 </div>
                             </div>
 
@@ -871,11 +897,9 @@
                 return `
                     <article class="group overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-amber-200 scroll-scale-up" style="transition-delay: ${index * 0.05}s;">
                         <button type="button" class="block h-full w-full text-left" onclick="bukaModal(${buku.id})">
-                            <div class="relative flex h-56 items-center justify-center p-5 text-white" style="background: ${warna}">
+                            <div class="relative flex h-56 items-center justify-center p-3 text-white bg-stone-100 overflow-hidden">
+                                <img src="${buku.sampul}" alt="${buku.judul}" class="h-full w-full object-cover hover:scale-110 transition-transform duration-300" onerror="this.src='${buku.sampul}'">
                                 <span class="absolute left-4 top-4 rounded-full border ${statusClass} px-3 py-1 text-xs font-bold shadow-sm backdrop-blur-sm bg-white/90">${statusLabel}</span>
-                                <div class="flex h-28 w-20 items-center justify-center rounded-r-xl rounded-l-sm border border-white/20 bg-white/20 text-2xl font-bold shadow-2xl backdrop-blur-md transform transition group-hover:scale-105 group-hover:-rotate-3">
-                                    ${buku.kode}
-                                </div>
                                 <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/30 to-transparent"></div>
                             </div>
                             <div class="p-5">
