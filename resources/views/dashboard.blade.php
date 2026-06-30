@@ -170,7 +170,7 @@
                 </svg>
             </div>
             <div class="stat-number">{{ number_format($totalBuku) }}</div>
-            <div class="stat-label">Total Eksemplar</div>
+            <div class="stat-label">Total Buku</div>
             <div class="stat-sub" style="background:#ccfbf1;color:#0f766e">{{ $totalJudul }} judul</div>
         </div>
         {{-- Sedang Dipinjam --}}

@@ -8,11 +8,15 @@ use App\Http\Controllers\KunjunganController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LaporanKunjunganController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\StrukturController;
+use App\Http\Controllers\InfoController;
 use App\Models\Anggota;
 use App\Models\Buku;
 use App\Models\Kategori;
 use App\Models\Kunjungan;
 use App\Models\Peminjaman;
+use App\Models\Struktur;
+use App\Models\Info;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -108,6 +112,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'update' => 'anggota.update',
         'destroy' => 'anggota.destroy',
     ]);
+
+    // Route CRUD Admin Struktur Organisasi
+Route::resource('admin/struktur', StrukturController::class)->names([
+    'index' => 'struktur.index',
+    'create' => 'struktur.create',
+    'store' => 'struktur.store',
+    'edit' => 'struktur.edit',
+    'update' => 'struktur.update',
+    'destroy' => 'struktur.destroy',
+]);
+
+// Route CRUD Admin Info / Pengumuman
+Route::resource('admin/info', InfoController::class)->names([
+    'index' => 'info.index',
+    'create' => 'info.create',
+    'store' => 'info.store',
+    'edit' => 'info.edit',
+    'update' => 'info.update',
+    'destroy' => 'info.destroy',
+]);
 
     // ─── Peminjaman ──────────────────────────────────────────────
     Route::get('/pinjam', [PeminjamanController::class, 'index'])->name('pinjam.index');

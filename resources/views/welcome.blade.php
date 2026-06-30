@@ -40,7 +40,6 @@
                 to { opacity: 1; transform: translateY(0); }
             }
 
-            /* Efek transisi scroll yang diperhalus */
             .scroll-fade-in {
                 opacity: 0;
                 transform: translateY(30px);
@@ -305,16 +304,16 @@
 
     <!-- Social Media Sidebar -->
     <aside class="social-sidebar" aria-label="Social Media Links">
-        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="Facebook">
+        <a href="https://www.facebook.com/profile.php?id=100069959832475" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="Facebook">
             <i class="fab fa-facebook-f"></i>
         </a>
-        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="Instagram">
+        <a href="https://www.instagram.com/smpn4jember/" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="Instagram">
             <i class="fab fa-instagram"></i>
         </a>
-        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="Twitter">
-            <i class="fab fa-twitter"></i>
+        <a href="https://www.tiktok.com/@snipersmpn4jember" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="Twitter">
+            <i class="fab fa-tiktok"></i>
         </a>
-        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="YouTube">
+        <a href="https://www.youtube.com/@SMPN4JEMBER" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="YouTube">
             <i class="fab fa-youtube"></i>
         </a>
         <a href="mailto:perpustakaan@smpn4jember.sch.id" class="social-link" data-tooltip="Email">
@@ -347,7 +346,7 @@
     </header>
 
     <main>
-        <!-- HERO SECTION (Tampilan Welcome yang diperbarui) -->
+        <!-- HERO SECTION -->
         <section class="hero-backdrop relative isolate min-h-[720px] overflow-hidden pt-24 text-white flex items-center">
             <div class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,transparent,rgba(250,250,249,0.02)_60%,#fafaf9_100%)] backdrop-blur-[2px]"></div>
 
@@ -440,10 +439,13 @@
 
                 <!-- Books Grid -->
                 <div id="bukuGrid" class="grid gap-6 scroll-stagger sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+                
+                <!-- Pagination Container -->
+                <div id="paginationContainer" class="mt-12 flex flex-wrap justify-center items-center gap-2 scroll-fade-in"></div>
             </div>
         </section>
 
-        <!-- LAYANAN SECTION (BARU DITAMBAHKAN) -->
+        <!-- LAYANAN SECTION -->
         <section id="layanan" class="scroll-fade-in relative px-4 py-24 sm:px-6 lg:px-8 bg-stone-100 border-t border-stone-200">
             <div class="mx-auto max-w-7xl">
                 <div class="text-center mb-16 scroll-fade-in">
@@ -454,7 +456,6 @@
                 </div>
 
                 <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4 scroll-stagger">
-                    <!-- Layanan 1 -->
                     <div class="group relative overflow-hidden rounded-2xl bg-white p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
                         <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-amber-100 text-amber-600 text-2xl transition-transform group-hover:scale-110 group-hover:rotate-3">
                             <i class="fas fa-book-reader"></i>
@@ -463,7 +464,6 @@
                         <p class="text-sm text-stone-500 leading-relaxed">Akses e-book dan modul pembelajaran secara langsung melalui perangkat Anda tanpa batas waktu.</p>
                     </div>
 
-                    <!-- Layanan 2 -->
                     <div class="group relative overflow-hidden rounded-2xl bg-white p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
                         <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-sky-100 text-sky-600 text-2xl transition-transform group-hover:scale-110 group-hover:rotate-3">
                             <i class="fas fa-hand-holding-heart"></i>
@@ -472,7 +472,6 @@
                         <p class="text-sm text-stone-500 leading-relaxed">Layanan peminjaman buku fisik secara mandiri untuk mempermudah reservasi sebelum ke perpustakaan.</p>
                     </div>
 
-                    <!-- Layanan 3 -->
                     <div class="group relative overflow-hidden rounded-2xl bg-white p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
                         <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 text-2xl transition-transform group-hover:scale-110 group-hover:rotate-3">
                             <i class="fas fa-laptop-code"></i>
@@ -481,7 +480,6 @@
                         <p class="text-sm text-stone-500 leading-relaxed">Tersedia unit komputer dengan akses internet cepat untuk keperluan riset dan tugas sekolah siswa.</p>
                     </div>
 
-                    <!-- Layanan 4 -->
                     <div class="group relative overflow-hidden rounded-2xl bg-white p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
                         <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-rose-100 text-rose-600 text-2xl transition-transform group-hover:scale-110 group-hover:rotate-3">
                             <i class="fas fa-chalkboard-teacher"></i>
@@ -684,7 +682,6 @@
     <footer class="mt-0">
         <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
             <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
-                <!-- About -->
                 <div class="footer-section scroll-fade-in">
                     <div class="flex items-center gap-3 mb-6">
                         <img src="{{ asset('images/smp.png') }}" alt="Logo" class="h-12 w-12 rounded-xl bg-white object-contain p-1.5 shadow-md">
@@ -698,7 +695,6 @@
                     </p>
                 </div>
 
-                <!-- Katalog (Dengan Icon 1 Warna) -->
                 <div class="footer-section scroll-fade-in" style="transition-delay: 0.1s;">
                     <h3>Katalog</h3>
                     <ul class="space-y-3 mt-4">
@@ -710,7 +706,6 @@
                     </ul>
                 </div>
 
-                <!-- Layanan -->
                 <div class="footer-section scroll-fade-in" style="transition-delay: 0.2s;">
                     <h3>Layanan</h3>
                     <ul class="space-y-3 mt-4">
@@ -721,20 +716,19 @@
                     </ul>
                 </div>
 
-                <!-- Kontak & Social -->
                 <div class="footer-section scroll-fade-in" style="transition-delay: 0.3s;">
                     <h3>Ikuti Kami</h3>
                     <div class="footer-social-links mt-4">
-                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="footer-social-icon" title="Facebook">
+                        <a href="https://www.facebook.com/profile.php?id=100069959832475" target="_blank" rel="noopener noreferrer" class="footer-social-icon" title="Facebook">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="footer-social-icon" title="Instagram">
+                        <a href="https://www.instagram.com/smpn4jember/" target="_blank" rel="noopener noreferrer" class="footer-social-icon" title="Instagram">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="footer-social-icon" title="Twitter">
-                            <i class="fab fa-twitter"></i>
+                        <a href="https://www.tiktok.com/@snipersmpn4jember" target="_blank" rel="noopener noreferrer" class="footer-social-icon" title="Twitter">
+                            <i class="fab fa-tiktok"></i>
                         </a>
-                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="footer-social-icon" title="YouTube">
+                        <a href="https://www.youtube.com/@SMPN4JEMBER" target="_blank" rel="noopener noreferrer" class="footer-social-icon" title="YouTube">
                             <i class="fab fa-youtube"></i>
                         </a>
                     </div>
@@ -747,7 +741,6 @@
 
             <div class="footer-divider"></div>
 
-            <!-- Footer Bottom -->
             <div class="footer-bottom rounded-2xl px-6">
                 <div class="grid gap-4 md:grid-cols-2 items-center">
                     <div class="footer-bottom-text">
@@ -835,7 +828,6 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    // Stop observing once visible to prevent re-animating when scrolling back up
                     observerInstance.unobserve(entry.target);
                 }
             });
@@ -860,16 +852,21 @@
 
         let kategoriFilter = 'semua';
         let pencarianTeks = '';
+        
+        // ===== VARIABEL PAGINATION =====
+        let currentPage = 1;
+        const itemsPerPage = 8; // Batasan 8 card per halaman
 
         const activeChipClasses = ['bg-amber-500', 'text-stone-950', 'border-amber-500'];
         const inactiveChipClasses = ['bg-white', 'text-stone-600', 'border-stone-200'];
 
         function renderBuku() {
             const grid = document.getElementById('bukuGrid');
+            const paginationContainer = document.getElementById('paginationContainer');
+            
             const filtered = dataBuku.filter((buku) => {
                 const cocokKategori = kategoriFilter === 'semua' || buku.kategori === kategoriFilter;
                 const kataKunci = `${buku.judul} ${buku.penulis} ${buku.kategori}`.toLowerCase();
-
                 return cocokKategori && kataKunci.includes(pencarianTeks);
             });
 
@@ -883,18 +880,30 @@
                         <p class="mt-1 text-sm text-stone-500">Coba gunakan kata kunci atau kategori pencarian lain.</p>
                     </div>
                 `;
+                paginationContainer.innerHTML = ''; // Sembunyikan pagination jika kosong
                 return;
             }
 
-            grid.innerHTML = filtered.map((buku, index) => {
+            // ===== LOGIKA PAGINATION =====
+            const totalPages = Math.ceil(filtered.length / itemsPerPage);
+            
+            // Pastikan halaman tidak keluar batas jika hasil pencarian berubah
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = filtered.slice(startIndex, endIndex);
+
+            // Render Card Buku berdasarkan halaman saat ini
+            grid.innerHTML = paginatedData.map((buku, index) => {
                 const statusClass = buku.status === 'tersedia'
                     ? 'border-teal-200 bg-teal-50 text-teal-700'
                     : 'border-rose-200 bg-rose-50 text-rose-700';
                 const statusLabel = buku.status === 'tersedia' ? 'Tersedia' : 'Dipinjam';
-                const warna = warnaKategori[buku.kategori] || 'linear-gradient(135deg, #f59e0b, #ec4899)';
-
+                
                 return `
-                    <article class="group overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-amber-200 scroll-scale-up" style="transition-delay: ${index * 0.05}s;">
+                    <article class="group overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-amber-200 scroll-scale-up" style="transition-delay: ${(index % 8) * 0.05}s;">
                         <button type="button" class="block h-full w-full text-left" onclick="bukaModal(${buku.id})">
                             <div class="relative flex h-56 items-center justify-center p-3 text-white bg-stone-100 overflow-hidden">
                                 <img src="${buku.sampul}" alt="${buku.judul}" class="h-full w-full object-cover hover:scale-110 transition-transform duration-300" onerror="this.src='{{ asset('images/placeholder-book.svg') }}'">
@@ -917,10 +926,55 @@
                     </article>
                 `;
             }).join('');
+
+            renderPaginationControls(totalPages);
+        }
+
+        // ===== FUNGSI RENDER TOMBOL PAGINATION =====
+        function renderPaginationControls(totalPages) {
+            const container = document.getElementById('paginationContainer');
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+
+            // Tombol Prev
+            const prevDisabled = currentPage === 1 ? 'opacity-50 cursor-not-allowed bg-stone-100' : 'hover:bg-amber-400 hover:text-stone-900 transition bg-white';
+            html += `<button onclick="${currentPage === 1 ? '' : `changePage(${currentPage - 1})`}" class="px-4 py-2 rounded-xl border border-stone-200 text-sm font-bold text-stone-600 shadow-sm flex items-center gap-2 ${prevDisabled}">
+                        <i class="fas fa-chevron-left"></i> Prev
+                     </button>`;
+
+            // Angka Halaman
+            for (let i = 1; i <= totalPages; i++) {
+                const activeClass = i === currentPage 
+                    ? 'bg-amber-500 text-stone-950 border-amber-500 shadow-md scale-105' 
+                    : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50 transition';
+                html += `<button onclick="changePage(${i})" class="w-10 h-10 rounded-xl border text-sm font-bold shadow-sm flex items-center justify-center transition-all ${activeClass}">${i}</button>`;
+            }
+
+            // Tombol Next
+            const nextDisabled = currentPage === totalPages ? 'opacity-50 cursor-not-allowed bg-stone-100' : 'hover:bg-amber-400 hover:text-stone-900 transition bg-white';
+            html += `<button onclick="${currentPage === totalPages ? '' : `changePage(${currentPage + 1})`}" class="px-4 py-2 rounded-xl border border-stone-200 text-sm font-bold text-stone-600 shadow-sm flex items-center gap-2 ${nextDisabled}">
+                        Next <i class="fas fa-chevron-right"></i>
+                     </button>`;
+
+            container.innerHTML = html;
+        }
+
+        // ===== FUNGSI GANTI HALAMAN =====
+        function changePage(page) {
+            currentPage = page;
+            renderBuku();
+            // Gulir kembali ke awal section koleksi secara mulus
+            document.getElementById('koleksi').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function filterKategori(kategori, element) {
             kategoriFilter = kategori;
+            currentPage = 1; // Reset ke halaman 1 saat filter diubah
 
             document.querySelectorAll('.category-chip').forEach((chip) => {
                 chip.classList.remove(...activeChipClasses);
@@ -934,6 +988,7 @@
 
         function cariBuku() {
             pencarianTeks = document.getElementById('searchInput').value.toLowerCase().trim();
+            currentPage = 1; // Reset ke halaman 1 saat pencarian
             renderBuku();
         }
 
@@ -947,11 +1002,9 @@
 
             if (!buku) return;
 
-            // Set warna background
             const warna = warnaKategori[buku.kategori] || 'linear-gradient(135deg, #f59e0b, #ec4899)';
             document.getElementById('modalCover').style.background = warna;
 
-            // Set gambar sampul di badge
             const modalImg = document.getElementById('modalInitial');
             modalImg.src = buku.sampul;
             modalImg.onerror = function() {
@@ -962,7 +1015,7 @@
             document.getElementById('modalKategori').innerHTML = `<i class="fas fa-tag text-amber-500 mr-1"></i> ${buku.kategori}`;
             document.getElementById('modalTahun').innerHTML = `<i class="far fa-calendar-alt text-amber-500 mr-1"></i> ${buku.tahun}`;
             document.getElementById('modalPenerbit').innerHTML = `<i class="far fa-building text-amber-500 mr-1"></i> ${buku.penerbit}`;
-            document.getElementById('modalPenerbit').title = buku.penerbit; // tooltip jika kepanjangan
+            document.getElementById('modalPenerbit').title = buku.penerbit;
             
             const statusBadge = buku.status === 'tersedia' 
                 ? '<i class="fas fa-check-circle mr-1"></i> Tersedia' 
@@ -975,7 +1028,7 @@
             overlay.classList.remove('hidden');
             overlay.classList.add('flex');
             overlay.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden'; // prevent scroll
+            document.body.style.overflow = 'hidden'; 
         }
 
         function tutupModal(event) {
@@ -989,7 +1042,7 @@
             overlay.classList.add('hidden');
             overlay.classList.remove('flex');
             overlay.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = ''; // restore scroll
+            document.body.style.overflow = ''; 
         }
 
         document.addEventListener('keydown', (event) => {

@@ -43,7 +43,7 @@
 
         {{-- ── Identitas Buku ── --}}
         <div class="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex flex-col gap-4">
-            <flux:heading size="sm">📋 Identitas Buku</flux:heading>
+            <flux:heading size="sm">Identitas Buku</flux:heading>
             <flux:separator variant="subtle" />
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -113,7 +113,7 @@
 
         {{-- ── Inventaris ── --}}
         <div class="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex flex-col gap-4">
-            <flux:heading size="sm">📦 Data Inventaris</flux:heading>
+            <flux:heading size="sm">Data Inventaris</flux:heading>
             <flux:separator variant="subtle" />
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -143,7 +143,7 @@
 
         {{-- ── Upload Sampul ── --}}
         <div class="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex flex-col gap-4">
-            <flux:heading size="sm">🖼️ Sampul Buku</flux:heading>
+            <flux:heading size="sm">Sampul Buku</flux:heading>
             <flux:separator variant="subtle" />
 
             <div class="flex flex-col md:flex-row gap-4 items-start">

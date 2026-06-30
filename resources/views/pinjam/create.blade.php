@@ -31,7 +31,7 @@
 
         {{-- ══ PILIH ANGGOTA ══ --}}
         <div class="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex flex-col gap-4">
-            <flux:heading size="sm">👤 Pilih Anggota</flux:heading>
+            <flux:heading size="sm">Pilih Anggota</flux:heading>
             <flux:separator variant="subtle" />
 
             {{-- Hidden input yang dikirim ke server --}}
@@ -71,7 +71,7 @@
 
         {{-- ══ PILIH BUKU ══ --}}
         <div class="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex flex-col gap-4">
-            <flux:heading size="sm">📖 Pilih Buku</flux:heading>
+            <flux:heading size="sm">Pilih Buku</flux:heading>
             <flux:separator variant="subtle" />
 
             <input type="hidden" name="buku_id" id="buku_id" value="{{ old('buku_id') }}">
@@ -118,7 +118,7 @@
 
         {{-- ══ TANGGAL ══ --}}
         <div class="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex flex-col gap-4">
-            <flux:heading size="sm">📅 Tanggal Peminjaman</flux:heading>
+            <flux:heading size="sm">Tanggal Peminjaman</flux:heading>
             <flux:separator variant="subtle" />
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -389,7 +389,7 @@ function updateDurasi() {
     const el   = document.getElementById('info-durasi');
     el.innerHTML = hari > 0
         ? `Durasi peminjaman: <strong>${hari} hari</strong>`
-        : `<span class="text-red-500">⚠️ Tanggal kembali harus setelah tanggal pinjam!</span>`;
+        : `<span class="text-red-500">Tanggal kembali harus setelah tanggal pinjam!</span>`;
 }
 
 document.getElementById('tgl_pinjam').addEventListener('change', function () {
@@ -411,7 +411,7 @@ document.getElementById('form-pinjam').addEventListener('submit', function (e) {
         ok = false;
         elAnggotaSearch.style.borderColor = '#ef4444';
         elAnggotaSearch.style.boxShadow   = '0 0 0 2px #fee2e2';
-        elAnggotaSearch.placeholder       = '⚠️ Pilih anggota terlebih dahulu!';
+        elAnggotaSearch.placeholder       = 'Pilih anggota terlebih dahulu!';
         elAnggotaSearch.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
@@ -419,7 +419,7 @@ document.getElementById('form-pinjam').addEventListener('submit', function (e) {
         ok = false;
         elBukuSearch.style.borderColor = '#ef4444';
         elBukuSearch.style.boxShadow   = '0 0 0 2px #fee2e2';
-        elBukuSearch.placeholder       = '⚠️ Pilih buku terlebih dahulu!';
+        elBukuSearch.placeholder       = 'Pilih buku terlebih dahulu!';
         if (elAnggotaId.value) {
             elBukuSearch.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -448,7 +448,7 @@ elBukuSearch.addEventListener('focus', () => {
     <div class="absolute inset-0 bg-black/40" id="modal-scan-buku-backdrop"></div>
     <div class="relative max-w-lg w-full bg-white dark:bg-zinc-900 rounded-xl p-4 z-10">
         <div class="flex items-center justify-between mb-3">
-            <h3 class="font-semibold">📷 Scan QR Buku</h3>
+            <h3 class="font-semibold">Scan QR Buku</h3>
             <button type="button" id="modal-scan-buku-close" class="text-zinc-500 hover:text-red-500">×</button>
         </div>
         <div id="reader" class="w-full h-64 bg-black/5 dark:bg-zinc-800 rounded-md flex items-center justify-center overflow-hidden"></div>

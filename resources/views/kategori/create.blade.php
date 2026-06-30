@@ -31,7 +31,7 @@
         @csrf
 
         <div class="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex flex-col gap-4">
-            <flux:heading size="sm">🏷️ Informasi Kategori</flux:heading>
+            <flux:heading size="sm">Informasi Kategori</flux:heading>
             <flux:separator variant="subtle" />
 
             <flux:input
@@ -45,7 +45,7 @@
 
             <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800">
                 <div class="flex gap-3">
-                    <span class="text-blue-400 text-lg shrink-0">💡</span>
+                    <span class="text-blue-400 text-lg shrink-0"></span>
                     <p class="text-xs text-blue-600 dark:text-blue-400 leading-relaxed">
                         Gunakan nama kategori yang jelas dan mudah dipahami. Contoh: <strong>Pelajaran</strong>, <strong>Fiksi</strong>, <strong>Sains</strong>, <strong>Agama</strong>, <strong>Bahasa</strong>, <strong>Sejarah</strong>.
                     </p>
@@ -63,7 +63,7 @@
 
     {{-- Contoh kategori populer --}}
     <div class="p-5 rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50">
-        <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">💡 Saran Kategori Populer</p>
+        <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">Saran Kategori Populer</p>
         <div class="flex flex-wrap gap-2">
             @foreach(['Pelajaran', 'Fiksi', 'Non-Fiksi', 'Sains', 'Sejarah', 'Agama', 'Bahasa', 'Matematika', 'Ensiklopedia', 'Biografi', 'Referensi', 'Majalah'] as $saran)
                 <button type="button"

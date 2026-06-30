@@ -430,7 +430,7 @@
      onclick="if(event.target===this)this.classList.add('hidden')">
     <div class="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 w-full max-w-xs text-center shadow-2xl"
          style="animation: libFadeUp 0.2s ease">
-        <div class="text-4xl mb-2">✨</div>
+        <div class="text-4xl mb-2"></div>
         <h3 class="text-base font-bold mb-1" style="font-family:'Lora',serif;">Berhasil Check-In!</h3>
         <p class="text-xs mb-4 leading-relaxed" id="ms-desc" style="color: var(--lib-muted);"></p>
         <button onclick="document.getElementById('modal-sukses').classList.add('hidden')"

@@ -67,6 +67,24 @@
                         {{ __('Peminjaman') }}
                     </flux:sidebar.item>
 
+                    <flux:sidebar.item
+                        icon="users"
+                        :href="route('struktur.index')"
+                        :current="request()->routeIs('struktur*')"
+                        wire:navigate
+                    >
+                        {{ __('Struktur Organisasi') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item
+                        icon="megaphone"
+                        :href="route('info.index')"
+                        :current="request()->routeIs('info*')"
+                        wire:navigate
+                    >
+    {{ __('Info & Berita') }}
+</flux:sidebar.item>
+
                     <flux:navlist.group 
     heading="{{ __('Laporan') }}" 
     icon="chart-bar" 

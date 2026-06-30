@@ -44,7 +44,7 @@
 
         {{-- ── Data Identitas ── --}}
         <div class="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex flex-col gap-4">
-            <flux:heading size="sm">🪪 Data Identitas</flux:heading>
+            <flux:heading size="sm">Data Identitas</flux:heading>
             <flux:separator variant="subtle" />
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -95,7 +95,7 @@
 
         {{-- ── Kontak & Alamat ── --}}
         <div class="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex flex-col gap-4">
-            <flux:heading size="sm">📞 Kontak & Alamat</flux:heading>
+            <flux:heading size="sm">Kontak & Alamat</flux:heading>
             <flux:separator variant="subtle" />
 
             <flux:input
@@ -114,7 +114,7 @@
 
         {{-- ── Foto Anggota ── --}}
         <div class="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex flex-col gap-4">
-            <flux:heading size="sm">🖼️ Foto Anggota</flux:heading>
+            <flux:heading size="sm">Foto Anggota</flux:heading>
             <flux:separator variant="subtle" />
 
             <div class="flex flex-col md:flex-row gap-4 items-start">
