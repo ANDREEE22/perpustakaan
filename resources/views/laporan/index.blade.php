@@ -33,12 +33,7 @@
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Unduh Excel
             </a>
-            <button type="button" id="btn-cetak"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-colors"
-                    style="background: var(--lib-teal);">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                Cetak
-            </button>
+            
         </div>
     </div>
 
@@ -179,66 +174,89 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
-                    @forelse($peminjaman as $i => $p)
+                    @forelse($peminjaman as $i => $group)
                     @php
-                        $dendaAktual = $p->status === 'dipinjam' ? $p->hitungDenda() : $p->denda;
+                        $first = $group->first();
+                        $titleGroups = $group->groupBy(fn($x) => $x->buku_id);
+                        $booksCount = $titleGroups->count();
+                        $copiesCount = $group->count();
+                        $dendaAktual = $group->sum(fn($x) => $x->status === 'dipinjam' ? $x->hitungDenda() : $x->denda);
+                        $kategoriList = $titleGroups
+                            ->map(fn($bookGroup) => optional($bookGroup->first()->buku->kategori)->nama)
+                            ->unique()
+                            ->filter()
+                            ->values()
+                            ->all();
+                        $kategoriLabel = count($kategoriList) > 0 ? implode(', ', $kategoriList) : '—';
                     @endphp
-                    <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors
-                               {{ $p->isTerlambat() ? 'bg-red-50 dark:bg-red-900/10' : '' }}">
+                    <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors {{ $first->isTerlambat() ? 'bg-red-50 dark:bg-red-900/10' : '' }}">
 
                         <td class="px-4 py-3 text-zinc-400 text-xs">{{ $i + 1 }}</td>
 
                         <td class="px-4 py-3">
                             <div class="font-semibold text-zinc-800 dark:text-zinc-100 text-sm">
-                                {{ $p->anggota?->nama_lengkap ?? '—' }}
+                                {{ $first->anggota?->nama_lengkap ?? '—' }}
                             </div>
                             <div class="text-xs text-zinc-400 font-mono">
-                                {{ $p->anggota?->nomor_induk ?? '' }}
-                                @if($p->anggota?->kelas)
-                                    · {{ $p->anggota->kelas }}
+                                {{ $first->anggota?->nomor_induk ?? '' }}
+                                @if($first->anggota?->kelas)
+                                    · {{ $first->anggota->kelas }}
                                 @endif
                             </div>
                         </td>
 
                         <td class="px-4 py-3">
-                            <div class="font-medium text-zinc-800 dark:text-zinc-100 max-w-[200px] truncate" title="{{ $p->buku?->judul }}">
-                                {{ $p->buku?->judul ?? '—' }}
-                            </div>
-                            <div class="text-xs text-zinc-400">{{ $p->buku?->pengarang ?? '' }}</div>
+                            @if($booksCount === 1)
+                                @php $single = $titleGroups->first()->first(); @endphp
+                                <div class="font-medium text-zinc-800 dark:text-zinc-100 max-w-[200px] truncate" title="{{ $single->buku?->judul }}">
+                                    {{ $single->buku?->judul ?? '—' }}
+                                </div>
+                                <div class="text-xs text-zinc-400">
+                                    {{ $single->buku?->pengarang ?? '' }} · {{ $copiesCount }} buku
+                                </div>
+                            @else
+                                <div class="font-medium text-zinc-800 dark:text-zinc-100">{{ $booksCount }} judul buku</div>
+                                <div class="space-y-1 mt-1 text-xs text-zinc-500">
+                                    @foreach($titleGroups as $bookGroup)
+                                        @php $item = $bookGroup->first(); @endphp
+                                        <div>{{ Str::limit($item->buku?->judul, 30) }} <span class="text-zinc-400">({{ $bookGroup->count() }} buku)</span></div>
+                                    @endforeach
+                                </div>
+                            @endif
                         </td>
 
                         <td class="px-4 py-3">
                             <span class="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 text-xs">
-                                {{ $p->buku?->kategori?->nama ?? '—' }}
+                                {{ $kategoriLabel }}
                             </span>
                         </td>
 
                         <td class="px-4 py-3 text-center text-sm text-zinc-600 dark:text-zinc-400">
-                            {{ $p->tgl_pinjam?->format('d/m/Y') ?? '—' }}
+                            {{ $first->tgl_pinjam?->format('d/m/Y') ?? '—' }}
                         </td>
 
                         <td class="px-4 py-3 text-center">
-                            <span class="text-sm {{ $p->isTerlambat() ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-zinc-600 dark:text-zinc-400' }}">
-                                {{ $p->tgl_harus_kembali?->format('d/m/Y') ?? '—' }}
+                            <span class="text-sm {{ $first->isTerlambat() ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-zinc-600 dark:text-zinc-400' }}">
+                                {{ $first->tgl_harus_kembali?->format('d/m/Y') ?? '—' }}
                             </span>
-                            @if($p->isTerlambat())
+                            @if($first->isTerlambat())
                                 <div class="text-xs text-red-500">
-                                    +{{ $p->hariTerlambat() }} hari
+                                    +{{ $first->hariTerlambat() }} hari
                                 </div>
                             @endif
                         </td>
 
                         <td class="px-4 py-3 text-center text-sm text-zinc-600 dark:text-zinc-400">
-                            {{ $p->tgl_realisasi_kembali?->format('d/m/Y') ?? '—' }}
+                            {{ $first->tgl_realisasi_kembali?->format('d/m/Y') ?? '—' }}
                         </td>
 
                         {{-- Status Badges (Emoji warna-warni dibersihkan) --}}
                         <td class="px-4 py-3 text-center">
-                            @if($p->status === 'kembali')
+                            @if($first->status === 'kembali')
                                 <span class="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold">
                                     Kembali
                                 </span>
-                            @elseif($p->isTerlambat())
+                            @elseif($first->isTerlambat())
                                 <span class="px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-semibold">
                                     Terlambat
                                 </span>
@@ -392,24 +410,39 @@ function cetakHalaman() {
                 </tr>
             </thead>
             <tbody>
-                @forelse($peminjaman as $i => $p)
+                @forelse($peminjaman as $i => $group)
                 @php
-                    $dendaPrint = $p->status === 'dipinjam' ? $p->hitungDenda() : $p->denda;
+                    $firstPrint = $group->first();
+                    $titleGroupsPrint = $group->groupBy(fn($item) => $item->buku_id);
+                    $dendaPrint = $group->sum(fn($item) => $item->status === 'dipinjam' ? $item->hitungDenda() : $item->denda);
+                    $judulPrint = $titleGroupsPrint->map(fn($bookGroup) => (
+                        $bookGroup->count() > 1
+                            ? ($bookGroup->first()->buku?->judul ?? '—')." (".$bookGroup->count()." buku)"
+                            : ($bookGroup->first()->buku?->judul ?? '—')
+                    ))->implode("\n");
+                    $kategoriPrint = $titleGroupsPrint
+                        ->map(fn($bookGroup) => optional($bookGroup->first()->buku->kategori)->nama)
+                        ->unique()
+                        ->filter()
+                        ->values()
+                        ->implode(', ');
                 @endphp
-                <tr class="{{ $p->isTerlambat() ? 'terlambat' : '' }}">
+                <tr class="{{ $firstPrint->isTerlambat() ? 'terlambat' : '' }}">
                     <td>{{ $i + 1 }}</td>
-                    <td><strong>{{ $p->anggota?->nama_lengkap ?? '—' }}</strong></td>
-                    <td style="font-size:9px">{{ $p->anggota?->nomor_induk ?? '' }}{{ $p->anggota?->kelas ? ' / '.$p->anggota->kelas : '' }}</td>
-                    <td>{{ $p->buku?->judul ?? '—' }}</td>
-                    <td>{{ $p->buku?->kategori?->nama ?? '—' }}</td>
-                    <td>{{ $p->tgl_pinjam?->format('d/m/Y') ?? '—' }}</td>
-                    <td>{{ $p->tgl_harus_kembali?->format('d/m/Y') ?? '—' }}</td>
-                    <td>{{ $p->tgl_realisasi_kembali?->format('d/m/Y') ?? '—' }}</td>
+                    <td><strong>{{ $firstPrint->anggota?->nama_lengkap ?? '—' }}</strong></td>
+                    <td style="font-size:9px">{{ $firstPrint->anggota?->nomor_induk ?? '' }}{{ $firstPrint->anggota?->kelas ? ' / '.$firstPrint->anggota->kelas : '' }}</td>
                     <td>
-                        @if($p->status === 'kembali')
+                        {!! nl2br(e($judulPrint)) !!}
+                    </td>
+                    <td>{{ $kategoriPrint ?: '—' }}</td>
+                    <td>{{ $firstPrint->tgl_pinjam?->format('d/m/Y') ?? '—' }}</td>
+                    <td>{{ $firstPrint->tgl_harus_kembali?->format('d/m/Y') ?? '—' }}</td>
+                    <td>{{ $firstPrint->tgl_realisasi_kembali?->format('d/m/Y') ?? '—' }}</td>
+                    <td>
+                        @if($firstPrint->status === 'kembali')
                             <span class="badge badge-green">Kembali</span>
-                        @elseif($p->isTerlambat())
-                            <span class="badge badge-red">Terlambat +{{ $p->hariTerlambat() }}h</span>
+                        @elseif($firstPrint->isTerlambat())
+                            <span class="badge badge-red">Terlambat</span>
                         @else
                             <span class="badge badge-amber">Dipinjam</span>
                         @endif

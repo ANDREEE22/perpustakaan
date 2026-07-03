@@ -134,7 +134,7 @@
                     <div class="flex items-center justify-between">
                         <flux:label>Status</flux:label>
                         @if($p->status === 'kembali')
-                            <flux:badge color="green">✅ Sudah Kembali</flux:badge>
+                            <flux:badge color="green">Sudah Kembali</flux:badge>
                         @elseif($groupLate)
                             <flux:badge color="red">⚠️ Terlambat</flux:badge>
                         @else
@@ -197,7 +197,7 @@
      class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
      onclick="if(event.target===this)document.getElementById('modal-kembali').classList.add('hidden')">
     <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 w-full max-w-md" style="animation:modalIn 0.25s ease">
-        <div class="text-4xl text-center mb-3" id="mk-icon">📬</div>
+        <div class="text-4xl text-center mb-3" id="mk-icon"></div>
         <flux:heading size="lg" class="text-center mb-2">Kembalikan Buku?</flux:heading>
         <p class="text-sm text-zinc-500 text-center mb-5" id="mk-desc"></p>
         <div class="flex gap-3">
@@ -214,7 +214,7 @@
 
 <div id="modal-hasil" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 w-full max-w-md text-center" style="animation:modalIn 0.25s ease">
-        <div class="text-5xl mb-3" id="mh-icon">✅</div>
+        <div class="text-5xl mb-3" id="mh-icon"></div>
         <flux:heading size="lg" class="mb-2">Buku Berhasil Dikembalikan!</flux:heading>
         <p class="text-sm text-zinc-500 mb-4" id="mh-desc"></p>
         <div id="mh-denda" class="hidden mb-4 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200">

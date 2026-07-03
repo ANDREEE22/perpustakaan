@@ -207,12 +207,16 @@
 
     {{-- Pagination --}}
     @if($data_buku->hasPages())
-        <div>{{ $data_buku->links() }}</div>
+        <div>{{ $data_buku->links('vendor.pagination.custom') }}</div>
     @endif
 
     {{-- Info total --}}
+    @php
+        $first = ($data_buku->currentPage() - 1) * $data_buku->perPage() + 1;
+        $last = min($data_buku->currentPage() * $data_buku->perPage(), $data_buku->total());
+    @endphp
     <p class="text-xs text-zinc-400 text-right">
-        Menampilkan {{ $data_buku->firstItem() ?? 0 }}–{{ $data_buku->lastItem() ?? 0 }}
+        Menampilkan {{ $first }}–{{ $last }}
         dari {{ $data_buku->total() }} buku
     </p>
 

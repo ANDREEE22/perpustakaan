@@ -72,30 +72,48 @@ class PeminjamanController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'anggota_id' => 'required|exists:anggotas,id',
-            'buku_id' => 'required|array|min:1',
-            'buku_id.*' => 'required|distinct|exists:bukus,id',
-            'tgl_pinjam' => 'required|date',
-            'tgl_harus_kembali' => 'required|date|after_or_equal:tgl_pinjam',
-            'catatan' => 'nullable|string|max:255',
-        ]);
+        if ($request->filled('items')) {
+            $validated = $request->validate([
+                'anggota_id' => 'required|exists:anggotas,id',
+                'items' => 'required|array|min:1',
+                'items.*.buku_id' => 'required|distinct|exists:bukus,id',
+                'items.*.qty' => 'required|integer|min:1',
+                'tgl_pinjam' => 'required|date',
+                'tgl_harus_kembali' => 'required|date|after_or_equal:tgl_pinjam',
+                'catatan' => 'nullable|string|max:255',
+            ]);
 
-        $bukus = Buku::whereIn('id', $validated['buku_id'])
+            $items = collect($validated['items'])
+                ->mapWithKeys(fn ($item) => [$item['buku_id'] => $item['qty']]);
+        } else {
+            $validated = $request->validate([
+                'anggota_id' => 'required|exists:anggotas,id',
+                'buku_id' => 'required|array|min:1',
+                'buku_id.*' => 'required|distinct|exists:bukus,id',
+                'tgl_pinjam' => 'required|date',
+                'tgl_harus_kembali' => 'required|date|after_or_equal:tgl_pinjam',
+                'catatan' => 'nullable|string|max:255',
+            ]);
+
+            $items = collect($validated['buku_id'])
+                ->mapWithKeys(fn ($bukuId) => [$bukuId => 1]);
+        }
+
+        $bukus = Buku::whereIn('id', $items->keys())
             ->get()
             ->keyBy('id');
 
         try {
-            DB::transaction(function () use ($validated, $bukus) {
-                foreach ($validated['buku_id'] as $bukuId) {
+            DB::transaction(function () use ($validated, $bukus, $items) {
+                foreach ($items as $bukuId => $qty) {
                     $buku = $bukus->get($bukuId);
 
                     if (! $buku) {
                         throw new \RuntimeException('Buku tidak ditemukan.');
                     }
 
-                    if ($buku->stok <= 0) {
-                        throw new \RuntimeException('Stok buku "'.$buku->judul.'" sudah habis.');
+                    if ($buku->stok < $qty) {
+                        throw new \RuntimeException('Stok buku "'.$buku->judul.'" tidak mencukupi. Tersedia: '.$buku->stok.'.');
                     }
 
                     $sudahPinjam = Peminjaman::where('anggota_id', $validated['anggota_id'])
@@ -107,25 +125,27 @@ class PeminjamanController extends Controller
                         throw new \RuntimeException('Anggota ini masih meminjam buku "'.$buku->judul.'".');
                     }
 
-                    Peminjaman::create([
-                        'anggota_id' => $validated['anggota_id'],
-                        'buku_id' => $bukuId,
-                        'tgl_pinjam' => $validated['tgl_pinjam'],
-                        'tgl_harus_kembali' => $validated['tgl_harus_kembali'],
-                        'catatan' => $validated['catatan'] ?? null,
-                        'status' => 'dipinjam',
-                        'denda' => 0,
-                    ]);
+                    for ($i = 0; $i < $qty; $i++) {
+                        Peminjaman::create([
+                            'anggota_id' => $validated['anggota_id'],
+                            'buku_id' => $bukuId,
+                            'tgl_pinjam' => $validated['tgl_pinjam'],
+                            'tgl_harus_kembali' => $validated['tgl_harus_kembali'],
+                            'catatan' => $validated['catatan'] ?? null,
+                            'status' => 'dipinjam',
+                            'denda' => 0,
+                        ]);
+                    }
 
-                    $buku->decrement('stok');
+                    $buku->decrement('stok', $qty);
                 }
             });
         } catch (\RuntimeException $e) {
             return back()->withErrors(['buku_id' => $e->getMessage()])->withInput();
         }
 
-        $totalBuku = count($validated['buku_id']);
-        $judulPertama = $bukus->get($validated['buku_id'][0])->judul;
+        $totalBuku = $items->sum();
+        $judulPertama = $bukus->get($items->keys()->first())->judul;
         $message = $totalBuku === 1
             ? 'Peminjaman buku "'.$judulPertama.'" berhasil dicatat!'
             : 'Peminjaman '.$totalBuku.' buku berhasil dicatat!';

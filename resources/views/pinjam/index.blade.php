@@ -154,7 +154,9 @@
                 $terlambat    = $group->contains(fn($x) => $x->isTerlambat());
                 $hariTelat    = $group->map(fn($x) => $x->hariTerlambat())->max() ?? 0;
                 $dendaPreview = $group->sum(fn($x) => $x->status === 'dipinjam' ? $x->hitungDenda() : $x->denda);
-                $booksCount = $group->count();
+                $copiesCount = $group->count();
+                $titleGroups = $group->groupBy(fn($x) => $x->buku_id);
+                $booksCount = $titleGroups->count();
                 $start = ($peminjaman->currentPage() - 1) * $peminjaman->perPage();
             @endphp
             <flux:table.row key="{{ $first->id }}">
@@ -186,11 +188,17 @@
                 {{-- Buku (gabungan) --}}
                 <flux:table.cell>
                     @if($booksCount === 1)
-                        <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ Str::limit($first->buku->judul, 35) }}</div>
-                        <div class="text-xs text-zinc-500">{{ $first->buku->pengarang }}</div>
+                        @php $singleBook = $titleGroups->first()->first(); @endphp
+                        <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ Str::limit($singleBook->buku->judul, 35) }}</div>
+                        <div class="text-xs text-zinc-500">{{ $singleBook->buku->pengarang }} · {{ $copiesCount }} buku</div>
                     @else
                         <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ $booksCount }} judul buku</div>
-                        <div class="text-xs text-zinc-500">@foreach($group as $g){{ $loop->first ? '' : ', ' }}{{ Str::limit($g->buku->judul, 30) }}@endforeach</div>
+                        <div class="space-y-1 mt-2 text-xs text-zinc-500">
+                            @foreach($titleGroups as $bookGroup)
+                                @php $bookItem = $bookGroup->first(); @endphp
+                                <div>{{ Str::limit($bookItem->buku->judul, 30) }} <span class="text-zinc-400">({{ $bookGroup->count() }} buku)</span></div>
+                            @endforeach
+                        </div>
                     @endif
                 </flux:table.cell>
 
@@ -246,7 +254,7 @@
                         @if($first->status === 'dipinjam')
                             <button
                                 type="button"
-                                onclick="konfirmasiKembali({{ $first->id }}, '{{ addslashes(optional($first->anggota)->nama_lengkap ?? '-') }}', '{{ addslashes($booksCount === 1 ? $first->buku->judul : $booksCount . ' buku') }}', {{ $dendaPreview }}, {{ $hariTelat }})"
+                                onclick="konfirmasiKembali({{ $first->id }}, '{{ addslashes(optional($first->anggota)->nama_lengkap ?? '-') }}', '{{ addslashes($booksCount === 1 ? $first->buku->judul.' ('.$copiesCount.' buku)' : $booksCount . ' judul buku ('.$copiesCount.' buku)') }}', {{ $dendaPreview }}, {{ $hariTelat }})"
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer
                                        {{ $terlambat
                                            ? 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-700 dark:text-red-400'
@@ -303,7 +311,7 @@
      onclick="if(event.target===this)tutupModal()">
     <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 w-full max-w-md shadow-2xl"
          style="animation: modalIn 0.25s ease">
-        <div id="modal-icon" class="text-center text-4xl mb-3">📬</div>
+        <div id="modal-icon" class="text-center text-4xl mb-3"></div>
         <flux:heading size="lg" class="text-center mb-2" id="modal-judul">Kembalikan Buku?</flux:heading>
         <p class="text-sm text-zinc-500 dark:text-zinc-400 text-center mb-5 leading-relaxed" id="modal-desc"></p>
 
@@ -322,7 +330,7 @@
         {{-- Info tepat waktu --}}
         <div id="modal-ok-box" class="hidden mb-5 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
             <div class="flex items-center gap-2">
-                <span class="text-emerald-600 text-sm font-semibold">✅ Tepat Waktu — Tidak Ada Denda</span>
+                <span class="text-emerald-600 text-sm font-semibold">Tepat Waktu — Tidak Ada Denda</span>
             </div>
         </div>
 
@@ -344,7 +352,7 @@
      class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 w-full max-w-md shadow-2xl text-center"
          style="animation: modalIn 0.25s ease">
-        <div class="text-5xl mb-3" id="hasil-icon">✅</div>
+        <div class="text-5xl mb-3" id="hasil-icon"></div>
         <flux:heading size="lg" class="mb-2">Buku Berhasil Dikembalikan!</flux:heading>
         <p class="text-sm text-zinc-500 dark:text-zinc-400 mb-4 leading-relaxed" id="hasil-desc"></p>
         <div id="hasil-denda-box" class="hidden mb-4 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
@@ -382,7 +390,7 @@ function konfirmasiKembali(id, namaAnggota, judulBuku, denda, hariTelat) {
     } else {
         dendaBox.classList.add('hidden');
         okBox.classList.remove('hidden');
-        document.getElementById('modal-icon').textContent  = '📬';
+        document.getElementById('modal-icon').textContent  = '';
         document.getElementById('modal-judul').textContent = 'Kembalikan Buku?';
         btnKonfirmasi.className = 'flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors';
     }
@@ -455,7 +463,7 @@ btnKonfirmasi.addEventListener('click', async function () {
             document.getElementById('hasil-denda-nominal').textContent = data.denda_format || ('Rp ' + (data.denda || 0).toLocaleString('id-ID'));
             hasilDendaBox.classList.remove('hidden');
         } else {
-            document.getElementById('hasil-icon').textContent = '✅';
+            document.getElementById('hasil-icon').textContent = '';
             hasilDendaBox.classList.add('hidden');
         }
 

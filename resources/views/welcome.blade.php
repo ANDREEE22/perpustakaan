@@ -705,7 +705,7 @@
                                 </div>
                                 <div>
                                     <h3 class="font-bold text-stone-900">Alamat</h3>
-                                    <p class="mt-1 text-sm text-stone-500">Jl. Diponegoro No. 1, Jember, East Java 68121</p>
+                                    <p class="mt-1 text-sm text-stone-500">Jl. Nusa Indah No.14, Krajan, Jemberlor, Kec. Patrang, Kabupaten Jember, Jawa Timur 68118</p>
                                 </div>
                             </div>
                         </div>
@@ -714,7 +714,7 @@
                     <div class="scroll-slide-right">
                         <div class="rounded-2xl bg-white p-8 border border-stone-200 shadow-lg">
                             <h3 class="text-2xl font-bold text-stone-900">Statistik Perpustakaan</h3>
-                            <p class="text-sm text-stone-500 mt-2">Data perkembangan buku & pengunjung tahun 2024</p>
+                            <p class="text-sm text-stone-500 mt-2">Data perkembangan buku & pengunjung tahun 2026</p>
                             
                             <div class="relative w-full h-56 mt-8">
                                 @php

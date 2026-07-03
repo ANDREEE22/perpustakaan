@@ -171,35 +171,60 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($peminjaman as $i => $p)
+            @forelse($peminjaman as $i => $group)
             @php
-                $dendaPdf = $p->status === 'dipinjam' ? $p->hitungDenda() : $p->denda;
+                $first = $group->first();
+                $titleGroups = $group->groupBy(fn($x) => $x->buku_id);
+                $booksCount = $titleGroups->count();
+                $copiesCount = $group->count();
+                $dendaPdf = $group->sum(fn($x) => $x->status === 'dipinjam' ? $x->hitungDenda() : $x->denda);
+                $kategoriList = $titleGroups
+                    ->map(fn($bookGroup) => optional($bookGroup->first()->buku->kategori)->nama)
+                    ->unique()
+                    ->filter()
+                    ->values()
+                    ->all();
+                $kategoriLabel = count($kategoriList) > 0 ? implode(', ', $kategoriList) : '—';
             @endphp
-            <tr class="{{ $p->isTerlambat() ? 'terlambat' : '' }}">
+            <tr class="{{ $first->isTerlambat() ? 'terlambat' : '' }}">
                 <td class="text-center" style="color:#aaa">{{ $i + 1 }}</td>
                 <td>
-                    <strong>{{ $p->anggota?->nama_lengkap ?? '—' }}</strong>
+                    <strong>{{ $first->anggota?->nama_lengkap ?? '—' }}</strong>
                 </td>
                 <td style="font-size:8px; color:#777">
-                    {{ $p->anggota?->nomor_induk ?? '—' }}
-                    @if($p->anggota?->kelas)
-                        / {{ $p->anggota->kelas }}
+                    {{ $first->anggota?->nomor_induk ?? '—' }}
+                    @if($first->anggota?->kelas)
+                        / {{ $first->anggota->kelas }}
                     @endif
                 </td>
-                <td style="font-size:8.5px">{{ $p->buku?->judul ?? '—' }}</td>
-                <td style="font-size:8px">{{ $p->buku?->kategori?->nama ?? '—' }}</td>
-                <td class="text-center">{{ $p->tgl_pinjam?->format('d/m/Y') ?? '—' }}</td>
-                <td class="text-center {{ $p->isTerlambat() ? 'font-bold' : '' }}" style="{{ $p->isTerlambat() ? 'color:#dc2626' : '' }}">
-                    {{ $p->tgl_harus_kembali?->format('d/m/Y') ?? '—' }}
-                    @if($p->isTerlambat())
-                        <br><span style="font-size:7.5px">+{{ $p->hariTerlambat() }}h</span>
+                <td style="font-size:8.5px">
+                    @if($booksCount === 1)
+                        @php $single = $titleGroups->first()->first(); @endphp
+                        {{ $single->buku?->judul ?? '—' }}
+                        <div style="font-size:7.5px; color:#555">{{ $single->buku?->pengarang ?? '' }} · {{ $copiesCount }} buku</div>
+                    @else
+                        <div>{{ $booksCount }} judul buku</div>
+                        <div style="font-size:7.5px; color:#555; line-height:1.2">
+                            @foreach($titleGroups as $bookGroup)
+                                @php $item = $bookGroup->first(); @endphp
+                                {{ $item->buku?->judul ?? '—' }} ({{ $bookGroup->count() }} buku)@if(! $loop->last)<br>@endif
+                            @endforeach
+                        </div>
                     @endif
                 </td>
-                <td class="text-center">{{ $p->tgl_realisasi_kembali?->format('d/m/Y') ?? '—' }}</td>
+                <td style="font-size:8px">{{ $kategoriLabel }}</td>
+                <td class="text-center">{{ $first->tgl_pinjam?->format('d/m/Y') ?? '—' }}</td>
+                <td class="text-center {{ $first->isTerlambat() ? 'font-bold' : '' }}" style="{{ $first->isTerlambat() ? 'color:#dc2626' : '' }}">
+                    {{ $first->tgl_harus_kembali?->format('d/m/Y') ?? '—' }}
+                    @if($first->isTerlambat())
+                        <br><span style="font-size:7.5px">+{{ $first->hariTerlambat() }}h</span>
+                    @endif
+                </td>
+                <td class="text-center">{{ $first->tgl_realisasi_kembali?->format('d/m/Y') ?? '—' }}</td>
                 <td class="text-center">
-                    @if($p->status === 'kembali')
+                    @if($first->status === 'kembali')
                         <span class="badge badge-green">Kembali</span>
-                    @elseif($p->isTerlambat())
+                    @elseif($first->isTerlambat())
                         <span class="badge badge-red">Terlambat</span>
                     @else
                         <span class="badge badge-amber">Dipinjam</span>

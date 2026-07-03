@@ -5,35 +5,30 @@ namespace App\Exports;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithColumnWidths;
-use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class LaporanPeminjamanExport implements
-    FromCollection,
-    WithHeadings,
-    WithMapping,
-    WithStyles,
-    WithTitle,
-    WithColumnWidths,
-    WithEvents
+class LaporanPeminjamanExport implements FromCollection, WithColumnWidths, WithEvents, WithHeadings, WithMapping, WithStyles, WithTitle
 {
     protected Collection $data;
+
     protected Carbon $dari;
+
     protected Carbon $sampai;
 
     public function __construct(Collection $data, Carbon $dari, Carbon $sampai)
     {
-        $this->data   = $data;
-        $this->dari   = $dari;
+        $this->data = $data;
+        $this->dari = $dari;
         $this->sampai = $sampai;
     }
 
@@ -53,7 +48,7 @@ class LaporanPeminjamanExport implements
             // Baris 1: judul laporan (di-merge via AfterSheet event)
             ['LAPORAN PEMINJAMAN BUKU', '', '', '', '', '', '', '', '', ''],
             // Baris 2: periode
-            ['SMP Negeri 4 Jember | Periode: ' . $this->dari->format('d/m/Y') . ' s.d. ' . $this->sampai->format('d/m/Y'), '', '', '', '', '', '', '', '', ''],
+            ['SMP Negeri 4 Jember | Periode: '.$this->dari->format('d/m/Y').' s.d. '.$this->sampai->format('d/m/Y'), '', '', '', '', '', '', '', '', ''],
             // Baris 3: kosong
             ['', '', '', '', '', '', '', '', '', ''],
             // Baris 4: header kolom
@@ -66,19 +61,33 @@ class LaporanPeminjamanExport implements
         static $no = 0;
         $no++;
 
-        $dendaAktual = $row->status === 'dipinjam' ? $row->hitungDenda() : $row->denda;
+        $titleGroups = $row->groupBy(fn ($item) => $item->buku_id);
+        $judul = $titleGroups->map(fn ($bookGroup) => (
+            $bookGroup->count() > 1
+                ? ($bookGroup->first()->buku?->judul ?? '-').' ('.$bookGroup->count().' buku)'
+                : ($bookGroup->first()->buku?->judul ?? '-')
+        ))->implode("\n");
+
+        $kategori = $titleGroups
+            ->map(fn ($bookGroup) => optional($bookGroup->first()->buku->kategori)->nama)
+            ->unique()
+            ->filter()
+            ->values()
+            ->implode(', ');
+
+        $dendaAktual = $row->sum(fn ($item) => $item->status === 'dipinjam' ? $item->hitungDenda() : $item->denda);
 
         return [
             $no,
-            $row->tgl_pinjam?->format('d/m/Y') ?? '-',
-            $row->anggota?->nama_lengkap ?? '-',
-            $row->anggota?->nomor_induk ?? '-',
-            $row->anggota?->kelas ?? 'Guru/Staf',
-            $row->buku?->judul ?? '-',
-            $row->buku?->kategori?->nama ?? '-',
-            $row->tgl_harus_kembali?->format('d/m/Y') ?? '-',
-            $row->tgl_realisasi_kembali?->format('d/m/Y') ?? '-',
-            ucfirst($row->status),
+            $row->first()->tgl_pinjam?->format('d/m/Y') ?? '-',
+            $row->first()->anggota?->nama_lengkap ?? '-',
+            $row->first()->anggota?->nomor_induk ?? '-',
+            $row->first()->anggota?->kelas ?? 'Guru/Staf',
+            $judul,
+            $kategori ?: '-',
+            $row->first()->tgl_harus_kembali?->format('d/m/Y') ?? '-',
+            $row->first()->tgl_realisasi_kembali?->format('d/m/Y') ?? '-',
+            ucfirst($row->first()->status),
             $dendaAktual > 0 ? $dendaAktual : '-',
         ];
     }
@@ -127,11 +136,11 @@ class LaporanPeminjamanExport implements
 
                 // Style judul
                 $sheet->getStyle('A1')->applyFromArray([
-                    'font'      => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '1a5c3a']],
+                    'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '1a5c3a']],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                 ]);
                 $sheet->getStyle('A2')->applyFromArray([
-                    'font'      => ['size' => 10, 'italic' => true],
+                    'font' => ['size' => 10, 'italic' => true],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                 ]);
 
@@ -145,13 +154,16 @@ class LaporanPeminjamanExport implements
                         'borders' => [
                             'allBorders' => [
                                 'borderStyle' => Border::BORDER_THIN,
-                                'color'       => ['rgb' => 'D1D5DB'],
+                                'color' => ['rgb' => 'D1D5DB'],
                             ],
                         ],
                     ]);
-                    
+
                     // Format kolom denda sebagai angka dengan separator
                     $sheet->getStyle("K5:{$lastCol}{$lastRow}")->getNumberFormat()->setFormatCode('#,##0');
+                    // Wrap text untuk daftar judul buku yang mungkin multi-baris
+                    $sheet->getStyle("F5:F{$lastRow}")->getAlignment()->setWrapText(true);
+                    $sheet->getStyle("G5:G{$lastRow}")->getAlignment()->setWrapText(true);
                 }
 
                 // Warna baris data: alternating
@@ -162,9 +174,9 @@ class LaporanPeminjamanExport implements
                         ]);
                     }
                     // Warna merah untuk terlambat
-                    $idx   = $i - 5;
-                    $item  = $this->data->values()->get($idx);
-                    if ($item && $item->isTerlambat()) {
+                    $idx = $i - 5;
+                    $item = $this->data->values()->get($idx);
+                    if ($item && $item->first()->isTerlambat()) {
                         $sheet->getStyle("A{$i}:{$lastCol}{$i}")->applyFromArray([
                             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FEF2F2']],
                             'font' => ['color' => ['rgb' => '991B1B']],
@@ -176,15 +188,15 @@ class LaporanPeminjamanExport implements
                 $totalRow = $lastRow + 2;
                 $total = 0;
                 foreach ($this->data as $item) {
-                    $dendaItem = $item->status === 'dipinjam' ? $item->hitungDenda() : $item->denda;
+                    $dendaItem = $item->sum(fn ($sub) => $sub->status === 'dipinjam' ? $sub->hitungDenda() : $sub->denda);
                     $total += $dendaItem;
                 }
                 $sheet->setCellValue("J{$totalRow}", 'Total Denda:');
                 $sheet->setCellValue("K{$totalRow}", $total);
                 $sheet->getStyle("K{$totalRow}")->getNumberFormat()->setFormatCode('#,##0');
                 $sheet->getStyle("J{$totalRow}:K{$totalRow}")->applyFromArray([
-                    'font'      => ['bold' => true],
-                    'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FEF9C3']],
+                    'font' => ['bold' => true],
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FEF9C3']],
                 ]);
 
                 // Freeze baris header

@@ -199,7 +199,7 @@ const elBukuSelected    = document.getElementById('buku-selected');
 const elBukuSelectedList = document.getElementById('buku-selected-list');
 const elHiddenBukuInputs = document.getElementById('hidden-buku-inputs');
 const selectedBooks = [];
-const OLD_BUKU_IDS = {!! json_encode(old('buku_id', [])) !!};
+const OLD_ITEMS = {!! json_encode(old('items', [])) !!};
 
 // ── Escape HTML untuk innerHTML ───────────────────────────────
 function esc(s) {
@@ -355,17 +355,42 @@ elBukuSearch.addEventListener('input', function () {
 });
 
 function pilihBuku(id, judul, pengarang, stok) {
-    if (selectedBooks.some(book => String(book.id) === String(id))) {
-        alert('Buku ini sudah terpilih.');
-        return;
+    const existing = selectedBooks.find(book => String(book.id) === String(id));
+
+    if (existing) {
+        if (existing.qty >= Number(stok)) {
+            alert('Jumlah buku tidak bisa lebih dari stok tersedia.');
+            return;
+        }
+
+        existing.qty += 1;
+    } else {
+        selectedBooks.push({ id, judul, pengarang, stok, qty: 1 });
     }
 
-    selectedBooks.push({ id, judul, pengarang, stok });
     renderSelectedBooks();
 
     elBukuSearch.value = '';
     elBukuDrop.classList.add('hidden');
     elBukuSearch.style.borderColor = '';
+}
+
+function updateBookQty(id, qty) {
+    const book = selectedBooks.find(item => String(item.id) === String(id));
+    if (!book) {
+        return;
+    }
+
+    const parsedQty = Number(qty);
+    if (Number.isNaN(parsedQty) || parsedQty < 1) {
+        book.qty = 1;
+    } else if (parsedQty > Number(book.stok)) {
+        book.qty = Number(book.stok);
+    } else {
+        book.qty = parsedQty;
+    }
+
+    renderSelectedBooks();
 }
 
 function removeSelectedBook(id) {
@@ -391,35 +416,57 @@ function renderSelectedBooks() {
     }
 
     elBukuSelected.classList.remove('hidden');
-    elHiddenBukuInputs.innerHTML = selectedBooks.map(book => `
-        <input type="hidden" name="buku_id[]" value="${esc(book.id)}">
+    elHiddenBukuInputs.innerHTML = selectedBooks.map((book, index) => `
+        <input type="hidden" name="items[${index}][buku_id]" value="${esc(book.id)}">
+        <input type="hidden" name="items[${index}][qty]" value="${esc(book.qty)}">
     `).join('');
 
     elBukuSelectedList.innerHTML = selectedBooks.map(book => `
-        <div class="rounded-2xl border border-amber-200 dark:border-amber-700 bg-white dark:bg-zinc-950 p-3 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center text-xl">📖</div>
-            <div class="min-w-0 flex-1">
+        <div class="rounded-2xl border border-amber-200 dark:border-amber-700 bg-white dark:bg-zinc-950 p-3 grid gap-3 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+            <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 text-xl">📖</div>
+            <div class="min-w-0">
                 <p class="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">${esc(book.judul)}</p>
                 <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate">${esc(book.pengarang)} · Stok: ${esc(book.stok)}</p>
             </div>
-            <button type="button" class="text-red-500 hover:text-red-600 text-sm font-medium" onclick="removeSelectedBook('${esc(book.id)}')">Hapus</button>
+            <div class="flex items-center gap-2">
+                <label class="text-xs text-zinc-500">Jumlah</label>
+                <input
+                    type="number"
+                    min="1"
+                    max="${esc(book.stok)}"
+                    value="${esc(book.qty)}"
+                    class="w-20 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 px-2 py-1"
+                    onchange="updateBookQty('${esc(book.id)}', this.value)"
+                >
+                <button type="button" class="text-red-500 hover:text-red-600 text-sm font-medium" onclick="removeSelectedBook('${esc(book.id)}')">Hapus</button>
+            </div>
         </div>
     `).join('');
 }
 
 function loadOldSelectedBooks() {
-    const oldIds = Array.isArray(OLD_BUKU_IDS) ? OLD_BUKU_IDS : [OLD_BUKU_IDS].filter(Boolean);
-    oldIds.forEach(id => {
-        if (selectedBooks.some(book => String(book.id) === String(id))) {
+    const oldItems = Array.isArray(OLD_ITEMS) ? OLD_ITEMS : [];
+
+    oldItems.forEach(item => {
+        if (! item || ! item.buku_id) {
             return;
         }
 
-        const buku = DATA_BUKU.find(item => String(item.id) === String(id));
+        const existing = selectedBooks.find(book => String(book.id) === String(item.buku_id));
+        const buku = DATA_BUKU.find(entry => String(entry.id) === String(item.buku_id));
+        const qty = Number(item.qty) || 1;
+
+        if (existing) {
+            existing.qty = Math.min(existing.qty + qty, Number(buku?.stok ?? qty));
+            return;
+        }
+
         selectedBooks.push({
-            id,
+            id: item.buku_id,
             judul: buku?.judul ?? 'Judul tidak tersedia',
             pengarang: buku?.pengarang ?? '-',
             stok: buku?.stok ?? '-',
+            qty: qty,
         });
     });
     renderSelectedBooks();

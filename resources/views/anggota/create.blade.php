@@ -121,7 +121,7 @@
                 {{-- Preview placeholder --}}
                 <div class="w-20 h-20 rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-600 shrink-0 overflow-hidden flex items-center justify-center bg-zinc-50 dark:bg-zinc-800">
                     <img id="preview-img" src="" alt="" class="hidden w-full h-full object-cover">
-                    <span id="preview-icon" class="text-2xl">👤</span>
+                    <span id="preview-icon" class="text-2xl"></span>
                 </div>
 
                 <div class="flex-1">

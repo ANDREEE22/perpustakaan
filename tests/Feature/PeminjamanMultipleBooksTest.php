@@ -3,6 +3,7 @@
 use App\Models\Anggota;
 use App\Models\Buku;
 use App\Models\Kategori;
+use App\Models\Peminjaman;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -68,4 +69,50 @@ test('user can borrow multiple books in one transaction', function () {
     ]);
     $this->assertSame(1, Buku::find($buku1->id)->stok);
     $this->assertSame(0, Buku::find($buku2->id)->stok);
+});
+
+test('user can borrow multiple copies of the same book title in one transaction', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+
+    $kategori = Kategori::create(['nama' => 'Umum']);
+
+    $anggota = Anggota::create([
+        'nomor_induk' => 'A002',
+        'nama_lengkap' => 'Test Anggota Dua',
+        'jenis_kelamin' => 'P',
+        'kelas' => 'XIIPA',
+        'tempat_lahir' => 'Surabaya',
+        'tanggal_lahir' => now()->subYears(15)->format('Y-m-d'),
+        'no_telepon' => '081234567891',
+        'alamat' => 'Jl. Test No. 2',
+    ]);
+
+    $buku = Buku::create([
+        'kode_buku' => 'B003',
+        'judul' => 'Buku Sama',
+        'isbn' => '9781111111111',
+        'kategori_id' => $kategori->id,
+        'pengarang' => 'Pengarang Sama',
+        'penerbit' => 'Penerbit Sama',
+        'tahun_terbit' => 2022,
+        'stok' => 10,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->post(route('pinjam.store'), [
+            'anggota_id' => $anggota->id,
+            'items' => [
+                ['buku_id' => $buku->id, 'qty' => 3],
+            ],
+            'tgl_pinjam' => now()->format('Y-m-d'),
+            'tgl_harus_kembali' => now()->addDays(7)->format('Y-m-d'),
+            'catatan' => 'Test pinjam 3 copy buku sama',
+        ]);
+
+    $response->assertRedirect(route('pinjam.index'));
+    $this->assertSame(3, Peminjaman::where('anggota_id', $anggota->id)
+        ->where('buku_id', $buku->id)
+        ->where('status', 'dipinjam')
+        ->count());
+    $this->assertSame(7, Buku::find($buku->id)->stok);
 });

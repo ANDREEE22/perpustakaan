@@ -244,11 +244,15 @@
 
     {{-- Pagination --}}
     @if($anggotas->hasPages())
-        <div>{{ $anggotas->links() }}</div>
+        <div>{{ $anggotas->links('vendor.pagination.custom') }}</div>
     @endif
 
+    @php
+        $first = ($anggotas->currentPage() - 1) * $anggotas->perPage() + 1;
+        $last = min($anggotas->currentPage() * $anggotas->perPage(), $anggotas->total());
+    @endphp
     <p class="text-xs text-zinc-400 text-right">
-        Menampilkan {{ $anggotas->firstItem() ?? 0 }}–{{ $anggotas->lastItem() ?? 0 }}
+        Menampilkan {{ $first }}–{{ $last }}
         dari {{ $anggotas->total() }} anggota
     </p>
 

@@ -346,7 +346,8 @@
             {{-- Header List Meta --}}
             <div class="flex items-center justify-between border-b pb-2 mt-1" style="border-color: var(--lib-border);">
                 <div class="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5" style="color: var(--lib-muted);">
-                    <span>📋 Daftar Kunjungan —</span>
+                    <span>
+                        Daftar Kunjungan —</span>
                     <span style="color: var(--lib-emerald); font-family: 'Lora', serif;" class="normal-case text-sm font-bold">{{ $tanggal->isoFormat('dddd, D MMMM Y') }}</span>
                 </div>
                 <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600" id="jumlah-label">
