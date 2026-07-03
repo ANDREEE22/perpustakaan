@@ -2,22 +2,29 @@
 <div class="max-w-3xl mx-auto flex flex-col gap-6">
 
     {{-- Header --}}
+    @php
+        $groupCount = $group->count();
+        $groupLate = $group->contains(fn($item) => $item->isTerlambat());
+        $groupDenda = $group->sum(fn($item) => $item->status === 'dipinjam' ? $item->hitungDenda() : $item->denda);
+        $groupTitle = $groupCount > 1 ? $groupCount.' Buku' : $p->buku->judul;
+    @endphp
+
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <flux:heading size="xl" level="1">Detail Peminjaman</flux:heading>
-            <flux:subheading>#{{ str_pad($p->id, 5, '0', STR_PAD_LEFT) }} &bull; {{ $p->tgl_pinjam->format('d M Y') }}</flux:subheading>
+            <flux:subheading>#{{ str_pad($p->id, 5, '0', STR_PAD_LEFT) }} &bull; {{ $p->tgl_pinjam->format('d M Y') }} @if($groupCount > 1)&bull; {{ $groupCount }} buku @endif</flux:subheading>
         </div>
         <div class="flex gap-2 flex-wrap">
             @if($p->status === 'dipinjam')
                 <button type="button"
-                    onclick="konfirmasiKembali({{ $p->id }}, '{{ addslashes($p->anggota->nama_lengkap) }}', '{{ addslashes($p->buku->judul) }}')"
+                    onclick="konfirmasiKembali({{ $p->id }}, '{{ addslashes(optional($p->anggota)->nama_lengkap ?? '-') }}', '{{ addslashes($groupCount === 1 ? $p->buku->judul : $groupCount.' buku') }}')"
                     class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
-                           {{ $p->isTerlambat()
+                           {{ $groupLate
                                ? 'bg-red-600 hover:bg-red-700 text-white'
                                : 'bg-green-600 hover:bg-green-700 text-white' }}
                            transition-colors">
                     <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                    Kembalikan Buku
+                    Kembalikan
                 </button>
             @endif
             <flux:button variant="ghost" icon="chevron-left" href="{{ route('pinjam.index') }}">Kembali</flux:button>
@@ -37,20 +44,24 @@
                     <flux:label class="text-xs font-bold uppercase tracking-wider text-zinc-400">Anggota Peminjam</flux:label>
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-lg font-bold text-zinc-500">
-                            @if($p->anggota->foto)
+                            @if(optional($p->anggota)->foto)
                                 <img src="{{ Storage::url($p->anggota->foto) }}" class="w-full h-full object-cover" alt="">
-                            @else
+                            @elseif(optional($p->anggota)->nama_lengkap)
                                 {{ strtoupper(substr($p->anggota->nama_lengkap, 0, 1)) }}
+                            @else
+                                —
                             @endif
                         </div>
                         <div>
-                            <div class="font-bold text-zinc-800 dark:text-zinc-100">{{ $p->anggota->nama_lengkap }}</div>
-                            <div class="text-sm text-zinc-500">{{ $p->anggota->nomor_induk }}
-                                @if($p->anggota->kelas) · Kelas {{ $p->anggota->kelas }} @endif
+                            <div class="font-bold text-zinc-800 dark:text-zinc-100">{{ optional($p->anggota)->nama_lengkap ?? '—' }}</div>
+                            <div class="text-sm text-zinc-500">{{ optional($p->anggota)->nomor_induk ?? '—' }}
+                                @if(optional($p->anggota)->kelas) · Kelas {{ $p->anggota->kelas }} @endif
                             </div>
                         </div>
+                        @if(optional($p->anggota)->id)
                         <a href="{{ route('anggota.show', $p->anggota->id) }}"
                            class="ml-auto text-xs text-blue-500 hover:underline">Lihat Profil →</a>
+                        @endif
                     </div>
                 </div>
             </flux:card>
@@ -59,24 +70,47 @@
             <flux:card>
                 <div class="space-y-4">
                     <flux:label class="text-xs font-bold uppercase tracking-wider text-zinc-400">Buku Dipinjam</flux:label>
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-14 rounded-xl shrink-0 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 flex items-center justify-center text-2xl">
-                            @if($p->buku->sampul)
-                                <img src="{{ asset('storage/' . $p->buku->sampul) }}" class="w-full h-full object-cover rounded-xl" alt="">
-                            @else
-                                📖
-                            @endif
-                        </div>
-                        <div>
-                            <div class="font-bold text-zinc-800 dark:text-zinc-100">{{ $p->buku->judul }}</div>
-                            <div class="text-sm text-zinc-500">{{ $p->buku->pengarang }}
-                                @if($p->buku->penerbit) · {{ $p->buku->penerbit }} @endif
+                    @if($groupCount === 1)
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-14 rounded-xl shrink-0 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 flex items-center justify-center text-2xl">
+                                @if($p->buku->sampul)
+                                    <img src="{{ asset('storage/' . $p->buku->sampul) }}" class="w-full h-full object-cover rounded-xl" alt="">
+                                @else
+                                    📖
+                                @endif
                             </div>
-                            <div class="text-xs text-zinc-400 mt-0.5">ISBN: {{ $p->buku->isbn ?? '—' }}</div>
+                            <div>
+                                <div class="font-bold text-zinc-800 dark:text-zinc-100">{{ $p->buku->judul }}</div>
+                                <div class="text-sm text-zinc-500">{{ $p->buku->pengarang }}
+                                    @if($p->buku->penerbit) · {{ $p->buku->penerbit }} @endif
+                                </div>
+                                <div class="text-xs text-zinc-400 mt-0.5">ISBN: {{ $p->buku->isbn ?? '—' }}</div>
+                            </div>
+                            <a href="{{ route('katalog.show', $p->buku->id) }}"
+                               class="ml-auto text-xs text-blue-500 hover:underline">Lihat Buku →</a>
                         </div>
-                        <a href="{{ route('katalog.show', $p->buku->id) }}"
-                           class="ml-auto text-xs text-blue-500 hover:underline">Lihat Buku →</a>
-                    </div>
+                    @else
+                        <div class="space-y-3">
+                            @foreach($group as $item)
+                                <div class="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 p-4">
+                                    <div class="flex items-start gap-4">
+                                        <div class="w-12 h-14 rounded-xl shrink-0 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 flex items-center justify-center text-2xl">
+                                            @if($item->buku->sampul)
+                                                <img src="{{ asset('storage/' . $item->buku->sampul) }}" class="w-full h-full object-cover rounded-xl" alt="">
+                                            @else
+                                                📖
+                                            @endif
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="font-bold text-zinc-800 dark:text-zinc-100">{{ $item->buku->judul }}</div>
+                                            <div class="text-sm text-zinc-500">{{ $item->buku->pengarang }} · {{ $item->buku->penerbit ?? '—' }}</div>
+                                            <div class="text-xs text-zinc-400 mt-0.5">ISBN: {{ $item->buku->isbn ?? '—' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </flux:card>
 
@@ -101,7 +135,7 @@
                         <flux:label>Status</flux:label>
                         @if($p->status === 'kembali')
                             <flux:badge color="green">✅ Sudah Kembali</flux:badge>
-                        @elseif($p->isTerlambat())
+                        @elseif($groupLate)
                             <flux:badge color="red">⚠️ Terlambat</flux:badge>
                         @else
                             <flux:badge color="blue">📖 Dipinjam</flux:badge>
@@ -115,7 +149,7 @@
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-zinc-500">Harus Kembali</span>
-                            <span class="font-semibold {{ $p->isTerlambat() ? 'text-red-500' : 'text-zinc-700 dark:text-zinc-300' }}">
+                            <span class="font-semibold {{ $groupLate ? 'text-red-500' : 'text-zinc-700 dark:text-zinc-300' }}">
                                 {{ $p->tgl_harus_kembali->format('d M Y') }}
                             </span>
                         </div>
@@ -127,16 +161,16 @@
                         @endif
                     </div>
 
-                    @if($p->hariTerlambat() > 0)
+                    @if($groupDenda > 0)
                     <div class="border-t border-zinc-200 dark:border-zinc-700 pt-4">
                         <div class="flex justify-between text-sm mb-1">
                             <span class="text-zinc-500">Keterlambatan</span>
-                            <span class="font-bold text-red-500">{{ $p->hariTerlambat() }} hari</span>
+                            <span class="font-bold text-red-500">{{ $groupLate ? $p->hariTerlambat() : 0 }} hari</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-zinc-500 text-sm">Denda</span>
                             <span class="text-lg font-bold text-red-600 dark:text-red-400">
-                                Rp {{ number_format($p->denda ?: $p->hitungDenda(), 0, ',', '.') }}
+                                Rp {{ number_format($groupDenda, 0, ',', '.') }}
                             </span>
                         </div>
                         <p class="text-xs text-zinc-400 mt-1">@ Rp 500 / hari</p>

@@ -148,52 +148,62 @@
         </flux:table.columns>
 
         <flux:table.rows>
-            @forelse($peminjaman as $i => $p)
+            @forelse($peminjamanGrouped as $i => $group)
             @php
-                $terlambat    = $p->isTerlambat();
-                $hariTelat    = $p->hariTerlambat();
-                $dendaPreview = $p->status === 'dipinjam' ? $p->hitungDenda() : $p->denda;
+                $first = $group->first();
+                $terlambat    = $group->contains(fn($x) => $x->isTerlambat());
+                $hariTelat    = $group->map(fn($x) => $x->hariTerlambat())->max() ?? 0;
+                $dendaPreview = $group->sum(fn($x) => $x->status === 'dipinjam' ? $x->hitungDenda() : $x->denda);
+                $booksCount = $group->count();
+                $start = ($peminjaman->currentPage() - 1) * $peminjaman->perPage();
             @endphp
-            <flux:table.row :key="$p->id">
+            <flux:table.row key="{{ $first->id }}">
 
                 {{-- No --}}
                 <flux:table.cell class="text-zinc-400 text-sm">
-                    {{ $peminjaman->firstItem() + $i }}
+                    {{ $start + $loop->iteration }}
                 </flux:table.cell>
 
                 {{-- Anggota --}}
                 <flux:table.cell>
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 border flex items-center justify-center text-xs font-bold bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400" style="border-color: var(--lib-border);">
-                            @if($p->anggota->foto)
-                                <img src="{{ Storage::url($p->anggota->foto) }}" class="w-full h-full object-cover">
+                            @if(optional($first->anggota)->foto)
+                                <img src="{{ Storage::url($first->anggota->foto) }}" class="w-full h-full object-cover">
+                            @elseif(optional($first->anggota)->nama_lengkap)
+                                <span style="color: var(--lib-teal);">{{ strtoupper(substr($first->anggota->nama_lengkap, 0, 1)) }}</span>
                             @else
-                                <span style="color: var(--lib-teal);">{{ strtoupper(substr($p->anggota->nama_lengkap, 0, 1)) }}</span>
+                                <span class="text-zinc-400">—</span>
                             @endif
                         </div>
                         <div>
-                            <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ $p->anggota->nama_lengkap }}</div>
-                            <div class="text-xs text-zinc-400 font-mono">{{ $p->anggota->nomor_induk }}{{ $p->anggota->kelas ? ' · ' . $p->anggota->kelas : '' }}</div>
+                            <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ optional($first->anggota)->nama_lengkap ?? '—' }}</div>
+                            <div class="text-xs text-zinc-400 font-mono">{{ optional($first->anggota)->nomor_induk ?? '—' }}{{ optional($first->anggota)->kelas ? ' · ' . $first->anggota->kelas : '' }}</div>
                         </div>
                     </div>
                 </flux:table.cell>
 
-                {{-- Buku --}}
+                {{-- Buku (gabungan) --}}
                 <flux:table.cell>
-                    <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ Str::limit($p->buku->judul, 35) }}</div>
-                    <div class="text-xs text-zinc-500">{{ $p->buku->pengarang }}</div>
+                    @if($booksCount === 1)
+                        <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ Str::limit($first->buku->judul, 35) }}</div>
+                        <div class="text-xs text-zinc-500">{{ $first->buku->pengarang }}</div>
+                    @else
+                        <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ $booksCount }} judul buku</div>
+                        <div class="text-xs text-zinc-500">@foreach($group as $g){{ $loop->first ? '' : ', ' }}{{ Str::limit($g->buku->judul, 30) }}@endforeach</div>
+                    @endif
                 </flux:table.cell>
 
                 {{-- Tgl Pinjam --}}
                 <flux:table.cell>
-                    <span class="text-sm text-zinc-600 dark:text-zinc-400 font-mono">{{ $p->tgl_pinjam->format('d/m/Y') }}</span>
+                    <span class="text-sm text-zinc-600 dark:text-zinc-400 font-mono">{{ $first->tgl_pinjam->format('d/m/Y') }}</span>
                 </flux:table.cell>
 
                 {{-- Harus Kembali --}}
                 <flux:table.cell>
                     <span class="text-sm font-semibold font-mono {{ $terlambat ? 'text-red-600 dark:text-red-400' : 'text-zinc-600 dark:text-zinc-400' }}">
-                        {{ $p->tgl_harus_kembali->format('d/m/Y') }}
-                        @if($terlambat && $p->status === 'dipinjam')
+                        {{ $first->tgl_harus_kembali->format('d/m/Y') }}
+                        @if($terlambat && $first->status === 'dipinjam')
                             <span class="block text-[10px] font-bold text-red-500 uppercase tracking-wide">+{{ $hariTelat }} hari telat</span>
                         @endif
                     </span>
@@ -201,7 +211,7 @@
 
                 {{-- Status Badges --}}
                 <flux:table.cell>
-                    @if($p->status === 'kembali')
+                    @if($first->status === 'kembali')
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400">
                             Selesai
                         </span>
@@ -231,12 +241,12 @@
                 <flux:table.cell align="end">
                     <div class="flex justify-end items-center gap-2">
                         <flux:button variant="ghost" size="sm" icon="eye"
-                            href="{{ route('pinjam.show', $p->id) }}" title="Detail" />
+                            href="{{ route('pinjam.show', $first->id) }}" title="Detail" />
 
-                        @if($p->status === 'dipinjam')
+                        @if($first->status === 'dipinjam')
                             <button
                                 type="button"
-                                onclick="konfirmasiKembali({{ $p->id }}, '{{ addslashes($p->anggota->nama_lengkap) }}', '{{ addslashes($p->buku->judul) }}', {{ $dendaPreview }}, {{ $hariTelat }})"
+                                onclick="konfirmasiKembali({{ $first->id }}, '{{ addslashes(optional($first->anggota)->nama_lengkap ?? '-') }}', '{{ addslashes($booksCount === 1 ? $first->buku->judul : $booksCount . ' buku') }}', {{ $dendaPreview }}, {{ $hariTelat }})"
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer
                                        {{ $terlambat
                                            ? 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-700 dark:text-red-400'
@@ -246,7 +256,7 @@
                             </button>
                         @else
                             <span class="text-xs text-zinc-400 font-mono px-2">
-                                {{ $p->tgl_realisasi_kembali?->format('d/m/Y') }}
+                                {{ $first->tgl_realisasi_kembali?->format('d/m/Y') }}
                             </span>
                         @endif
                     </div>

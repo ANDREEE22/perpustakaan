@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InfoController;
 use App\Http\Controllers\KatalogBukuController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\KunjunganController;
@@ -9,14 +10,13 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LaporanKunjunganController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\StrukturController;
-use App\Http\Controllers\InfoController;
 use App\Models\Anggota;
 use App\Models\Buku;
+use App\Models\Info;
 use App\Models\Kategori;
 use App\Models\Kunjungan;
 use App\Models\Peminjaman;
 use App\Models\Struktur;
-use App\Models\Info;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -46,6 +46,11 @@ Route::get('/', function () {
         ->count();
     $kepuasan = 98; // Default satisfaction rate
 
+    $pengumumans = Info::orderBy('tanggal_publish', 'desc')
+        ->take(3)
+        ->get();
+
+    $strukturs = Struktur::orderBy('level', 'asc')->get();
     $statistics = compact('totalBuku', 'anggotaAktif', 'pengunjungBulanIni', 'kepuasan');
 
     // Monthly Chart Data (Last 5 months)
@@ -71,7 +76,7 @@ Route::get('/', function () {
         ];
     }
 
-    return view('welcome', compact('bukus', 'kategoris', 'bukuData', 'statistics', 'monthlyData', 'chartValues', 'chartLabels'));
+    return view('welcome', compact('bukus', 'kategoris', 'bukuData', 'statistics', 'monthlyData', 'chartValues', 'chartLabels', 'pengumumans', 'strukturs'));
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -102,6 +107,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Anggota - import Excel (form + process) — HARUS sebelum resource routes
     Route::get('/anggota/import', [AnggotaController::class, 'importForm'])->name('anggota.import.form');
     Route::post('/anggota/import', [AnggotaController::class, 'import'])->name('anggota.import');
+    Route::post('/anggota/hapus-kelas', [AnggotaController::class, 'hapusKelas'])->name('anggota.hapus-kelas');
 
     Route::resource('anggota', AnggotaController::class)->names([
         'index' => 'anggota.index',
@@ -114,24 +120,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ]);
 
     // Route CRUD Admin Struktur Organisasi
-Route::resource('admin/struktur', StrukturController::class)->names([
-    'index' => 'struktur.index',
-    'create' => 'struktur.create',
-    'store' => 'struktur.store',
-    'edit' => 'struktur.edit',
-    'update' => 'struktur.update',
-    'destroy' => 'struktur.destroy',
-]);
+    Route::resource('admin/struktur', StrukturController::class)->names([
+        'index' => 'struktur.index',
+        'create' => 'struktur.create',
+        'store' => 'struktur.store',
+        'edit' => 'struktur.edit',
+        'update' => 'struktur.update',
+        'destroy' => 'struktur.destroy',
+    ]);
 
-// Route CRUD Admin Info / Pengumuman
-Route::resource('admin/info', InfoController::class)->names([
-    'index' => 'info.index',
-    'create' => 'info.create',
-    'store' => 'info.store',
-    'edit' => 'info.edit',
-    'update' => 'info.update',
-    'destroy' => 'info.destroy',
-]);
+    // Route CRUD Admin Info / Pengumuman
+    Route::resource('admin/info', InfoController::class)->names([
+        'index' => 'info.index',
+        'create' => 'info.create',
+        'store' => 'info.store',
+        'edit' => 'info.edit',
+        'update' => 'info.update',
+        'destroy' => 'info.destroy',
+    ]);
 
     // ─── Peminjaman ──────────────────────────────────────────────
     Route::get('/pinjam', [PeminjamanController::class, 'index'])->name('pinjam.index');

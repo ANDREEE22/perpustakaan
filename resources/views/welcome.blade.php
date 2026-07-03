@@ -184,6 +184,69 @@
             transition: width 0.1s ease;
         }
 
+        /* ===== STRUKTUR ORGANISASI TREE CSS ===== */
+        .org-tree-wrapper {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        .org-tree-wrapper::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
+        }
+        .org-tree ul {
+            padding-top: 30px; 
+            position: relative;
+            display: flex;
+            justify-content: center;
+            padding-left: 0;
+        }
+        .org-tree li {
+            float: left; text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 30px 10px 0 10px;
+        }
+        .org-tree li::before, .org-tree li::after {
+            content: '';
+            position: absolute; top: 0; right: 50%;
+            border-top: 2px solid #d6d3d1; /* stone-300 */
+            width: 50%; height: 30px;
+        }
+        .org-tree li::after {
+            right: auto; left: 50%;
+            border-left: 2px solid #d6d3d1;
+        }
+        .org-tree li:only-child::after, .org-tree li:only-child::before {
+            display: none;
+        }
+        .org-tree li:only-child { 
+            padding-top: 0;
+        }
+        .org-tree li:first-child::before, .org-tree li:last-child::after {
+            border: 0 none;
+        }
+        .org-tree li:last-child::before {
+            border-right: 2px solid #d6d3d1;
+            border-radius: 0 8px 0 0;
+        }
+        .org-tree li:first-child::after {
+            border-radius: 8px 0 0 0;
+        }
+        .org-tree ul ul::before {
+            content: '';
+            position: absolute; top: 0; left: 50%;
+            border-left: 2px solid #d6d3d1;
+            width: 0; height: 30px;
+            margin-left: -1px;
+        }
+        
+        .org-node {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            cursor: default;
+        }
+
         /* ===== FOOTER ===== */
         footer {
             background: linear-gradient(135deg, #1c1917 0%, #0f0d0c 100%);
@@ -299,10 +362,8 @@
 </head>
 <body class="min-h-screen bg-stone-50 font-sans text-stone-950 antialiased">
     
-    <!-- Scroll Progress Bar -->
     <div class="scroll-progress"></div>
 
-    <!-- Social Media Sidebar -->
     <aside class="social-sidebar" aria-label="Social Media Links">
         <a href="https://www.facebook.com/profile.php?id=100069959832475" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="Facebook">
             <i class="fab fa-facebook-f"></i>
@@ -335,6 +396,7 @@
                 <a href="#koleksi" class="transition hover:text-amber-400">Koleksi</a>
                 <a href="#layanan" class="transition hover:text-amber-400">Layanan</a>
                 <a href="#pengumuman" class="transition hover:text-amber-400">Info</a>
+                <a href="#struktur" class="transition hover:text-amber-400">Struktur</a>
                 <a href="#kontak" class="transition hover:text-amber-400">Kontak</a>
             </nav>
 
@@ -346,7 +408,6 @@
     </header>
 
     <main>
-        <!-- HERO SECTION -->
         <section class="hero-backdrop relative isolate min-h-[720px] overflow-hidden pt-24 text-white flex items-center">
             <div class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,transparent,rgba(250,250,249,0.02)_60%,#fafaf9_100%)] backdrop-blur-[2px]"></div>
 
@@ -376,7 +437,6 @@
                     </div>
                 </div>
 
-                <!-- Search Bar Floating -->
                 <div class="mt-4 lg:w-2/3 scroll-scale-up" style="animation-delay: 0.4s">
                     <div class="rounded-2xl border border-white/10 bg-white/10 p-3 shadow-2xl backdrop-blur-lg">
                         <div class="flex flex-col gap-3 sm:flex-row">
@@ -393,7 +453,6 @@
             </div>
         </section>
 
-        <!-- KOLEKSI SECTION -->
         <section id="koleksi" class="scroll-fade-in relative px-4 py-24 sm:px-6 lg:px-8 bg-stone-50">
             <div class="mx-auto max-w-7xl">
                 <div class="mb-12 scroll-fade-in text-center">
@@ -403,7 +462,6 @@
                     </p>
                 </div>
 
-                <!-- Category Filter -->
                 <div class="mb-10 flex flex-wrap justify-center gap-3 scroll-stagger">
                     <button class="category-chip inline-flex items-center gap-2 rounded-full border border-stone-200 bg-amber-500 px-5 py-2.5 text-sm font-semibold text-stone-950 transition shadow-sm active" onclick="filterKategori('semua', this)">
                         <i class="fas fa-layer-group"></i> Semua
@@ -437,15 +495,12 @@
                     @endforeach
                 </div>
 
-                <!-- Books Grid -->
                 <div id="bukuGrid" class="grid gap-6 scroll-stagger sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
                 
-                <!-- Pagination Container -->
                 <div id="paginationContainer" class="mt-12 flex flex-wrap justify-center items-center gap-2 scroll-fade-in"></div>
             </div>
         </section>
 
-        <!-- LAYANAN SECTION -->
         <section id="layanan" class="scroll-fade-in relative px-4 py-24 sm:px-6 lg:px-8 bg-stone-100 border-t border-stone-200">
             <div class="mx-auto max-w-7xl">
                 <div class="text-center mb-16 scroll-fade-in">
@@ -491,7 +546,6 @@
             </div>
         </section>
 
-        <!-- INFO/PENGUMUMAN SECTION -->
         <section id="pengumuman" class="scroll-fade-in relative bg-white px-4 py-20 sm:px-6 lg:px-8 border-y border-stone-200">
             <div class="mx-auto max-w-7xl">
                 <h2 class="text-3xl font-bold text-stone-900 sm:text-4xl scroll-fade-in">Informasi & Pengumuman</h2>
@@ -500,46 +554,121 @@
                 </p>
 
                 <div class="mt-12 grid gap-6 scroll-stagger md:grid-cols-2 lg:grid-cols-3">
-                    <article class="overflow-hidden rounded-2xl border border-stone-100 bg-stone-50 shadow-sm transition hover:shadow-lg hover:-translate-y-1 scroll-scale-up">
-                        <div class="h-32 bg-gradient-to-r from-amber-400 to-amber-500"></div>
-                        <div class="p-6 -mt-8">
-                            <span class="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-white shadow-md text-amber-600 mb-4 text-xl">
-                                <i class="fas fa-bullhorn"></i>
-                            </span>
-                            <h3 class="text-lg font-bold text-stone-900">Koleksi Buku Baru Tersedia</h3>
-                            <p class="mt-2 text-sm text-stone-500 leading-relaxed">Kami telah menambahkan 50 judul buku baru ke dalam katalog digital perpustakaan untuk menunjang semester genap.</p>
-                            <p class="mt-4 text-xs font-semibold text-stone-400">15 Juni 2024</p>
+                    @forelse($pengumumans as $index => $info)
+                        @php
+                            $gradient = match($info->tipe_warna) {
+                                'emerald' => 'from-emerald-400 to-teal-500',
+                                'sky' => 'from-sky-400 to-blue-500',
+                                default => 'from-amber-400 to-amber-500',
+                            };
+                            $icon = match($info->tipe_warna) {
+                                'emerald' => 'fa-check-circle',
+                                'sky' => 'fa-clock',
+                                default => 'fa-bullhorn',
+                            };
+                            $delay = $index * 100;
+                        @endphp
+                        <article class="overflow-hidden rounded-2xl border border-stone-100 bg-stone-50 shadow-sm transition hover:shadow-lg hover:-translate-y-1 scroll-scale-up" style="transition-delay: {{ $delay }}ms;">
+                            <div class="h-32 bg-gradient-to-r {{ $gradient }}"></div>
+                            <div class="p-6 -mt-8">
+                                <span class="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-white shadow-md text-stone-600 mb-4 text-xl">
+                                    <i class="fas {{ $icon }}"></i>
+                                </span>
+                                <h3 class="text-lg font-bold text-stone-900">{{ $info->judul_pengumuman }}</h3>
+                                <p class="mt-2 text-sm text-stone-500 leading-relaxed">{{ Str::limit($info->isi_informasi, 120) }}</p>
+                                <p class="mt-4 text-xs font-semibold text-stone-400">{{ $info->tanggal_publish?->format('d M Y') }}</p>
+                            </div>
+                        </article>
+                    @empty
+                        <div class="lg:col-span-3 rounded-2xl border border-stone-100 bg-stone-50 p-8 text-center text-stone-500">
+                            Belum ada informasi atau pengumuman terbaru.
                         </div>
-                    </article>
-
-                    <article class="overflow-hidden rounded-2xl border border-stone-100 bg-stone-50 shadow-sm transition hover:shadow-lg hover:-translate-y-1 scroll-scale-up" style="transition-delay: 0.1s;">
-                        <div class="h-32 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
-                        <div class="p-6 -mt-8">
-                            <span class="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-white shadow-md text-teal-600 mb-4 text-xl">
-                                <i class="fas fa-check-circle"></i>
-                            </span>
-                            <h3 class="text-lg font-bold text-stone-900">Peminjaman Buku Dibuka</h3>
-                            <p class="mt-2 text-sm text-stone-500 leading-relaxed">Siswa dapat meminjam hingga 5 buku sekaligus dengan durasi maksimal 14 hari melalui akun portal siswa.</p>
-                            <p class="mt-4 text-xs font-semibold text-stone-400">10 Juni 2024</p>
-                        </div>
-                    </article>
-
-                    <article class="overflow-hidden rounded-2xl border border-stone-100 bg-stone-50 shadow-sm transition hover:shadow-lg hover:-translate-y-1 scroll-scale-up" style="transition-delay: 0.2s;">
-                        <div class="h-32 bg-gradient-to-r from-sky-400 to-blue-500"></div>
-                        <div class="p-6 -mt-8">
-                            <span class="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-white shadow-md text-blue-600 mb-4 text-xl">
-                                <i class="fas fa-clock"></i>
-                            </span>
-                            <h3 class="text-lg font-bold text-stone-900">Jam Operasional</h3>
-                            <p class="mt-2 text-sm text-stone-500 leading-relaxed">Senin - Jumat: 07:00 - 15:00.<br>Sabtu: 08:00 - 12:00.<br>Minggu: Tutup</p>
-                            <p class="mt-4 text-xs font-semibold text-stone-400">Berlaku hingga akhir tahun</p>
-                        </div>
-                    </article>
+                    @endforelse
                 </div>
             </div>
         </section>
 
-        <!-- CONTACT & STATS SECTION -->
+        <section id="struktur" class="scroll-fade-in relative px-4 py-24 sm:px-6 lg:px-8 bg-stone-100 border-b border-stone-200">
+            <div class="mx-auto max-w-7xl">
+                <div class="text-center mb-12 scroll-fade-in">
+                    <h2 class="text-3xl font-bold text-stone-900 sm:text-4xl">Struktur Organisasi</h2>
+                    <p class="mt-4 text-stone-500 max-w-2xl mx-auto">
+                        Tim pengelola Perpustakaan Digital SMP Negeri 4 Jember yang berdedikasi melayani kebutuhan literasi Anda.
+                    </p>
+                </div>
+
+                <div class="org-tree-wrapper overflow-x-auto pb-10 w-full scroll-scale-up">
+                    @if($strukturs->isEmpty())
+                        <div class="rounded-3xl border border-stone-200 bg-white p-12 text-center text-stone-500 shadow-sm">
+                            Belum ada data struktur organisasi. Silakan tambahkan melalui panel admin.
+                        </div>
+                    @else
+                        @php
+                            $levels = $strukturs->groupBy('level')->sortKeys();
+                            $topLevel = $levels->get(1, collect());
+                            $secondLevel = $levels->get(2, collect());
+                            $thirdLevel = $levels->get(3, collect());
+                            $fourthLevel = $levels->get(4, collect());
+                        @endphp
+
+                        <div class="org-tree min-w-[900px] w-full">
+                            <ul>
+                                @foreach($topLevel as $top)
+                                    <li>
+                                        <div class="org-node group">
+                                            <div class="relative w-24 h-24 rounded-full border-4 border-rose-500 p-1 bg-white shadow-xl mx-auto z-10 transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-2">
+                                                <img src="{{ $top->foto ? asset('storage/'.$top->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($top->nama) . '&background=ffe4e6&color=e11d48&font-size=0.33' }}" alt="{{ $top->nama }}" class="w-full h-full rounded-full object-cover">
+                                            </div>
+                                            <div class="bg-gradient-to-br from-rose-500 to-pink-600 text-white rounded-2xl px-6 py-4 shadow-lg min-w-[200px] text-center relative z-0 -mt-6 pt-8 border border-white/20 transition-all duration-300 group-hover:shadow-rose-500/30">
+                                                <h4 class="font-bold text-sm tracking-wide">{{ $top->nama }}</h4>
+                                                <p class="text-xs text-rose-100 mt-1 font-medium bg-black/10 inline-block px-3 py-1 rounded-full">({{ $top->jabatan }})</p>
+                                            </div>
+                                        </div>
+
+                                        @if($secondLevel->isNotEmpty())
+                                            <ul>
+                                                @foreach($secondLevel as $second)
+                                                    <li>
+                                                        <div class="org-node group">
+                                                            <div class="relative w-20 h-20 rounded-full border-4 border-amber-500 p-1 bg-white shadow-lg mx-auto z-10 transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-2">
+                                                                <img src="{{ $second->foto ? asset('storage/'.$second->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($second->nama) . '&background=fef3c7&color=d97706&font-size=0.33' }}" alt="{{ $second->nama }}" class="w-full h-full rounded-full object-cover">
+                                                            </div>
+                                                            <div class="bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-2xl px-5 py-3 shadow-md min-w-[180px] text-center relative z-0 -mt-5 pt-7 border border-white/20 transition-all duration-300 group-hover:shadow-amber-500/30">
+                                                                <h4 class="font-bold text-sm">{{ $second->nama }}</h4>
+                                                                <p class="text-[11px] text-amber-100 mt-1 font-medium bg-black/10 inline-block px-2.5 py-0.5 rounded-full">({{ $second->jabatan }})</p>
+                                                            </div>
+                                                        </div>
+
+                                                        @if($thirdLevel->isNotEmpty())
+                                                            <ul>
+                                                                @foreach($thirdLevel as $third)
+                                                                    <li>
+                                                                        <div class="org-node group">
+                                                                            <div class="relative w-16 h-16 rounded-full border-[3px] border-emerald-400 p-1 bg-white shadow mx-auto z-10 transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-2">
+                                                                                <img src="{{ $third->foto ? asset('storage/'.$third->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($third->nama) . '&background=d1fae5&color=059669&font-size=0.33' }}" alt="{{ $third->nama }}" class="w-full h-full rounded-full object-cover">
+                                                                            </div>
+                                                                            <div class="bg-gradient-to-br from-emerald-400 to-teal-500 text-white rounded-xl px-4 py-2 shadow min-w-[140px] text-center relative z-0 -mt-4 pt-5 border border-white/20 transition-all duration-300 group-hover:shadow-emerald-500/30">
+                                                                                <h4 class="font-bold text-xs">{{ $third->nama }}</h4>
+                                                                                <p class="text-[10px] text-emerald-50 mt-1">({{ $third->jabatan }})</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        @endif
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </section>
+
         <section id="kontak" class="scroll-fade-in relative px-4 py-24 sm:px-6 lg:px-8 bg-stone-50">
             <div class="mx-auto max-w-7xl">
                 <div class="grid gap-16 lg:grid-cols-2">
@@ -582,13 +711,11 @@
                         </div>
                     </div>
 
-                    <!-- MODERN CHART SECTION -->
                     <div class="scroll-slide-right">
                         <div class="rounded-2xl bg-white p-8 border border-stone-200 shadow-lg">
                             <h3 class="text-2xl font-bold text-stone-900">Statistik Perpustakaan</h3>
                             <p class="text-sm text-stone-500 mt-2">Data perkembangan buku & pengunjung tahun 2024</p>
                             
-                            <!-- Area Line Chart Modern -->
                             <div class="relative w-full h-56 mt-8">
                                 @php
                                     // Normalize chart values for SVG (0-200 range)
@@ -627,24 +754,19 @@
                                         </linearGradient>
                                     </defs>
                                     
-                                    <!-- Grid Lines (Background) -->
                                     <line x1="0" y1="50" x2="500" y2="50" stroke="#f5f5f4" stroke-width="2" />
                                     <line x1="0" y1="100" x2="500" y2="100" stroke="#f5f5f4" stroke-width="2" />
                                     <line x1="0" y1="150" x2="500" y2="150" stroke="#f5f5f4" stroke-width="2" />
                                     
-                                    <!-- Area Fill -->
                                     <path d="{{ $areaPath }}" fill="url(#lineGrad)" />
                                     
-                                    <!-- Stroke Line -->
                                     <path d="{{ $linePath }}" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" />
                                     
-                                    <!-- Points -->
                                     @foreach($circlePoints as $point)
                                     <circle cx="{{ $point['x'] }}" cy="{{ $point['y'] }}" r="5" fill="#fff" stroke="#f59e0b" stroke-width="3" />
                                     @endforeach
                                 </svg>
                                 
-                                <!-- X-Axis Labels -->
                                 <div class="flex justify-between text-xs font-semibold text-stone-400 mt-3 px-2">
                                     @foreach($chartLabels as $label)
                                     <span>{{ $label }}</span>
@@ -652,7 +774,6 @@
                                 </div>
                             </div>
 
-                            <!-- Summary Numbers -->
                             <div class="grid grid-cols-2 gap-6 mt-8 pt-6 border-t border-stone-100">
                                 <div>
                                     <span class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Total Buku</span>
@@ -678,7 +799,6 @@
         </section>
     </main>
 
-    <!-- FOOTER -->
     <footer class="mt-0">
         <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
             <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
@@ -755,7 +875,6 @@
         </div>
     </footer>
 
-    <!-- Modal Detail Buku -->
     <div id="modalOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm" onclick="tutupModal(event)" aria-hidden="true">
         <div class="relative max-h-[90vh] max-w-2xl w-full overflow-y-auto rounded-3xl bg-white shadow-2xl mx-4">
             <button type="button" onclick="tutupModalBtn()" class="absolute right-4 top-4 z-10 rounded-full bg-white/20 backdrop-blur-md p-2 text-white transition hover:bg-white/40 focus:outline-none">

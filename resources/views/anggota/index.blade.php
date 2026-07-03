@@ -7,9 +7,56 @@
             <flux:heading size="xl" level="1">Data Anggota</flux:heading>
             <flux:subheading>Kelola data siswa dan guru perpustakaan SMPN 4 Jember</flux:subheading>
         </div>
-        <flux:button variant="primary" icon="plus" href="{{ route('anggota.create') }}" style="background: #0f766e; border: none; color: #fff;">
-    Tambah Anggota
-</flux:button>
+        <div class="flex flex-wrap gap-2 items-center">
+            <flux:button variant="primary" icon="plus" href="{{ route('anggota.create') }}" style="background: #0f766e; border: none; color: #fff;">
+                Tambah Anggota
+            </flux:button>
+
+            <flux:dropdown position="bottom" align="end">
+                <flux:button variant="ghost" icon="trash" style="background: #dc2626; border: none; color: #fff;">
+                    Hapus Kelas
+                </flux:button>
+                <flux:menu>
+                    <div class="px-3 py-2 text-sm text-zinc-500">Hapus kelas lulus dan promosikan siswa</div>
+                    <form method="POST" action="{{ route('anggota.hapus-kelas') }}">
+                        @csrf
+                        <input type="hidden" name="kelas_tahun" value="9">
+                        <flux:menu.item
+                            as="button"
+                            type="submit"
+                            icon="trash"
+                            onclick="return confirm('Hapus semua anggota kelas 9 lalu promosikan kelas 7 dan 8 naik satu tingkat?')"
+                        >
+                            Kelas 9
+                        </flux:menu.item>
+                    </form>
+                    <form method="POST" action="{{ route('anggota.hapus-kelas') }}">
+                        @csrf
+                        <input type="hidden" name="kelas_tahun" value="8">
+                        <flux:menu.item
+                            as="button"
+                            type="submit"
+                            icon="trash"
+                            onclick="return confirm('Hapus semua anggota kelas 8 lalu promosikan kelas 7 naik kelas 8?')"
+                        >
+                            Kelas 8
+                        </flux:menu.item>
+                    </form>
+                    <form method="POST" action="{{ route('anggota.hapus-kelas') }}">
+                        @csrf
+                        <input type="hidden" name="kelas_tahun" value="7">
+                        <flux:menu.item
+                            as="button"
+                            type="submit"
+                            icon="trash"
+                            onclick="return confirm('Hapus semua anggota kelas 7?')"
+                        >
+                            Kelas 7
+                        </flux:menu.item>
+                    </form>
+                </flux:menu>
+            </flux:dropdown>
+        </div>
     </div>
 
     <flux:separator />

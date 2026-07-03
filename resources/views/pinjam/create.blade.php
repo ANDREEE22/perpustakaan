@@ -74,7 +74,7 @@
             <flux:heading size="sm">Pilih Buku</flux:heading>
             <flux:separator variant="subtle" />
 
-            <input type="hidden" name="buku_id" id="buku_id" value="{{ old('buku_id') }}">
+            <div id="hidden-buku-inputs"></div>
 
             <div class="flex gap-2">
                 <div class="relative flex-1">
@@ -94,21 +94,24 @@
                 {{-- Tombol Scan QR Buku --}}
                 <button type="button" id="btn-scan-buku"
                         title="Scan QR Buku"
-                        class="shrink-0 inline-flex items-center gap-2 px-3 py-2.5 rounded-xl bg-indigo-600 text-white text-sm hover:bg-indigo-700 transition-colors shadow-sm"
+                        class="shrink-0 inline-flex items-center gap-2 px-3 py-2.5 rounded-xl bg-indigo-600 text-white text-sm hover:bg-indigo-700 transition-colors shadow-sm">
                      <span class="hidden sm:inline">Scan QR</span>
                 </button>
             </div>
 
-            {{-- Card buku terpilih --}}
             <div id="buku-selected"
-                 class="hidden p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 flex items-center gap-3">
-                <div class="w-9 h-11 rounded-lg bg-amber-100 dark:bg-amber-800 flex items-center justify-center text-xl shrink-0">📖</div>
-                <div class="flex-1 min-w-0">
-                    <div class="font-semibold text-sm text-amber-800 dark:text-amber-200 truncate" id="buku-judul">—</div>
-                    <div class="text-xs text-amber-600 dark:text-amber-400" id="buku-info">—</div>
+                 class="hidden p-3 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                        <p class="font-semibold text-sm text-amber-800 dark:text-amber-200">Buku terpilih</p>
+                        <p class="text-xs text-amber-600 dark:text-amber-400">Tambahkan beberapa judul buku sebelum menyimpan.</p>
+                    </div>
+                    <button type="button" onclick="clearBuku()"
+                            class="text-amber-500 hover:text-red-500 text-sm font-medium transition-colors">
+                        Hapus semua
+                    </button>
                 </div>
-                <button type="button" onclick="clearBuku()"
-                        class="text-amber-400 hover:text-red-500 text-xl leading-none shrink-0 px-1 transition-colors">×</button>
+                <div id="buku-selected-list" class="grid gap-3"></div>
             </div>
 
             @error('buku_id')
@@ -190,10 +193,13 @@ const elAnggotaDrop     = document.getElementById('anggota-dropdown');
 const elAnggotaSelected = document.getElementById('anggota-selected');
 const elAnggotaId       = document.getElementById('anggota_id');
 
-const elBukuSearch   = document.getElementById('buku-search');
-const elBukuDrop     = document.getElementById('buku-dropdown');
-const elBukuSelected = document.getElementById('buku-selected');
-const elBukuId       = document.getElementById('buku_id');
+const elBukuSearch      = document.getElementById('buku-search');
+const elBukuDrop        = document.getElementById('buku-dropdown');
+const elBukuSelected    = document.getElementById('buku-selected');
+const elBukuSelectedList = document.getElementById('buku-selected-list');
+const elHiddenBukuInputs = document.getElementById('hidden-buku-inputs');
+const selectedBooks = [];
+const OLD_BUKU_IDS = {!! json_encode(old('buku_id', [])) !!};
 
 // ── Escape HTML untuk innerHTML ───────────────────────────────
 function esc(s) {
@@ -349,21 +355,74 @@ elBukuSearch.addEventListener('input', function () {
 });
 
 function pilihBuku(id, judul, pengarang, stok) {
-    elBukuId.value = id;
-    document.getElementById('buku-judul').textContent = judul;
-    document.getElementById('buku-info').textContent  =
-        pengarang + ' · Stok tersedia: ' + stok;
-    elBukuSelected.classList.remove('hidden');
+    if (selectedBooks.some(book => String(book.id) === String(id))) {
+        alert('Buku ini sudah terpilih.');
+        return;
+    }
+
+    selectedBooks.push({ id, judul, pengarang, stok });
+    renderSelectedBooks();
+
     elBukuSearch.value = '';
     elBukuDrop.classList.add('hidden');
     elBukuSearch.style.borderColor = '';
 }
 
+function removeSelectedBook(id) {
+    const index = selectedBooks.findIndex(book => String(book.id) === String(id));
+    if (index !== -1) {
+        selectedBooks.splice(index, 1);
+        renderSelectedBooks();
+    }
+}
+
 function clearBuku() {
-    elBukuId.value = '';
-    elBukuSelected.classList.add('hidden');
+    selectedBooks.length = 0;
+    renderSelectedBooks();
     elBukuSearch.value = '';
     elBukuSearch.focus();
+}
+
+function renderSelectedBooks() {
+    if (selectedBooks.length === 0) {
+        elBukuSelected.classList.add('hidden');
+        elHiddenBukuInputs.innerHTML = '';
+        return;
+    }
+
+    elBukuSelected.classList.remove('hidden');
+    elHiddenBukuInputs.innerHTML = selectedBooks.map(book => `
+        <input type="hidden" name="buku_id[]" value="${esc(book.id)}">
+    `).join('');
+
+    elBukuSelectedList.innerHTML = selectedBooks.map(book => `
+        <div class="rounded-2xl border border-amber-200 dark:border-amber-700 bg-white dark:bg-zinc-950 p-3 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center text-xl">📖</div>
+            <div class="min-w-0 flex-1">
+                <p class="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">${esc(book.judul)}</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate">${esc(book.pengarang)} · Stok: ${esc(book.stok)}</p>
+            </div>
+            <button type="button" class="text-red-500 hover:text-red-600 text-sm font-medium" onclick="removeSelectedBook('${esc(book.id)}')">Hapus</button>
+        </div>
+    `).join('');
+}
+
+function loadOldSelectedBooks() {
+    const oldIds = Array.isArray(OLD_BUKU_IDS) ? OLD_BUKU_IDS : [OLD_BUKU_IDS].filter(Boolean);
+    oldIds.forEach(id => {
+        if (selectedBooks.some(book => String(book.id) === String(id))) {
+            return;
+        }
+
+        const buku = DATA_BUKU.find(item => String(item.id) === String(id));
+        selectedBooks.push({
+            id,
+            judul: buku?.judul ?? 'Judul tidak tersedia',
+            pengarang: buku?.pengarang ?? '-',
+            stok: buku?.stok ?? '-',
+        });
+    });
+    renderSelectedBooks();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -377,6 +436,8 @@ document.addEventListener('click', function (e) {
         elBukuDrop.classList.add('hidden');
     }
 });
+
+loadOldSelectedBooks();
 
 // ══════════════════════════════════════════════════════════════
 // HITUNG DURASI OTOMATIS
@@ -415,11 +476,11 @@ document.getElementById('form-pinjam').addEventListener('submit', function (e) {
         elAnggotaSearch.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    if (!elBukuId.value) {
+    if (selectedBooks.length === 0) {
         ok = false;
         elBukuSearch.style.borderColor = '#ef4444';
         elBukuSearch.style.boxShadow   = '0 0 0 2px #fee2e2';
-        elBukuSearch.placeholder       = 'Pilih buku terlebih dahulu!';
+        elBukuSearch.placeholder       = 'Pilih setidaknya satu buku!';
         if (elAnggotaId.value) {
             elBukuSearch.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }

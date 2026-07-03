@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\AnggotaImport;
 use App\Models\Anggota;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\AnggotaImport;
 
 class AnggotaController extends Controller
 {
@@ -17,12 +17,13 @@ class AnggotaController extends Controller
     {
         $query = Anggota::query();
 
-        // Cari berdasarkan nama atau nomor induk
+        // Cari berdasarkan nama, nomor induk, atau kelas
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = trim($request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('nama_lengkap', 'like', "%{$search}%")
-                  ->orWhere('nomor_induk', 'like', "%{$search}%");
+                    ->orWhere('nomor_induk', 'like', "%{$search}%")
+                    ->orWhere('kelas', 'like', "%{$search}%");
             });
         }
 
@@ -48,6 +49,85 @@ class AnggotaController extends Controller
     }
 
     /**
+     * Hapus seluruh anggota pada satu kelas dan promosikan kelas di bawahnya.
+     */
+    public function hapusKelas(Request $request)
+    {
+        $validated = $request->validate([
+            'kelas_tahun' => 'required|in:7,8,9',
+        ]);
+
+        $selectedGrade = (int) $validated['kelas_tahun'];
+
+        $selectedPatterns = $this->kelasPatterns($selectedGrade);
+
+        Anggota::where(function ($query) use ($selectedPatterns) {
+            foreach ($selectedPatterns as $pattern) {
+                $query->orWhere('kelas', 'like', $pattern);
+            }
+        })->delete();
+
+        for ($grade = $selectedGrade - 1; $grade >= 7; $grade--) {
+            $nextGrade = $grade + 1;
+            $patterns = $this->kelasPatterns($grade);
+
+            $anggotas = Anggota::where(function ($query) use ($patterns) {
+                foreach ($patterns as $pattern) {
+                    $query->orWhere('kelas', 'like', $pattern);
+                }
+            })->get();
+
+            foreach ($anggotas as $anggota) {
+                $updated = $this->promoteKelas($anggota->kelas);
+
+                if ($updated !== null) {
+                    $anggota->kelas = $updated;
+                    $anggota->save();
+                }
+            }
+        }
+
+        $message = "Semua anggota kelas {$selectedGrade} berhasil dihapus.";
+
+        if ($selectedGrade > 7) {
+            $message .= ' Kelas di bawahnya telah dipromosikan satu tingkat.';
+        }
+
+        return redirect()->route('anggota.index')->with('success', $message);
+    }
+
+    private function kelasPatterns(int $grade): array
+    {
+        return match ($grade) {
+            7 => ['7%', 'VII%'],
+            8 => ['8%', 'VIII%'],
+            9 => ['9%', 'IX%'],
+            default => [],
+        };
+    }
+
+    private function promoteKelas(string $kelas): ?string
+    {
+        if (preg_match('/^VII(.*)$/i', $kelas, $matches)) {
+            return 'VIII'.$matches[1];
+        }
+
+        if (preg_match('/^7(.*)$/', $kelas, $matches)) {
+            return '8'.$matches[1];
+        }
+
+        if (preg_match('/^VIII(.*)$/i', $kelas, $matches)) {
+            return 'IX'.$matches[1];
+        }
+
+        if (preg_match('/^8(.*)$/', $kelas, $matches)) {
+            return '9'.$matches[1];
+        }
+
+        return null;
+    }
+
+    /**
      * Form impor anggota via Excel
      */
     public function importForm()
@@ -66,7 +146,7 @@ class AnggotaController extends Controller
 
         $file = $request->file('file');
 
-        $import = new AnggotaImport();
+        $import = new AnggotaImport;
         Excel::import($import, $file);
 
         return redirect()->route('anggota.index')
@@ -87,15 +167,15 @@ class AnggotaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nomor_induk'   => 'required|string|unique:anggotas,nomor_induk',
-            'nama_lengkap'  => 'required|string|max:255',
+            'nomor_induk' => 'required|string|unique:anggotas,nomor_induk',
+            'nama_lengkap' => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:L,P',
-            'kelas'         => 'nullable|string|max:50',
-            'tempat_lahir'  => 'nullable|string|max:100',
+            'kelas' => 'nullable|string|max:50',
+            'tempat_lahir' => 'nullable|string|max:100',
             'tanggal_lahir' => 'nullable|date',
-            'no_telepon'    => 'nullable|string|max:20',
-            'alamat'        => 'nullable|string',
-            'foto'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'no_telepon' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($request->hasFile('foto')) {
@@ -105,7 +185,7 @@ class AnggotaController extends Controller
         Anggota::create($validated);
 
         return redirect()->route('anggota.index')
-                         ->with('success', 'Anggota "' . $validated['nama_lengkap'] . '" berhasil ditambahkan!');
+            ->with('success', 'Anggota "'.$validated['nama_lengkap'].'" berhasil ditambahkan!');
     }
 
     /**
@@ -114,6 +194,7 @@ class AnggotaController extends Controller
     public function show($id)
     {
         $anggota = Anggota::findOrFail($id);
+
         return view('anggota.show', compact('anggota'));
     }
 
@@ -123,6 +204,7 @@ class AnggotaController extends Controller
     public function edit($id)
     {
         $anggota = Anggota::findOrFail($id);
+
         return view('anggota.edit', compact('anggota'));
     }
 
@@ -134,15 +216,15 @@ class AnggotaController extends Controller
         $anggota = Anggota::findOrFail($id);
 
         $validated = $request->validate([
-            'nomor_induk'   => 'required|string|unique:anggotas,nomor_induk,' . $id,
-            'nama_lengkap'  => 'required|string|max:255',
+            'nomor_induk' => 'required|string|unique:anggotas,nomor_induk,'.$id,
+            'nama_lengkap' => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:L,P',
-            'kelas'         => 'nullable|string|max:50',
-            'tempat_lahir'  => 'nullable|string|max:100',
+            'kelas' => 'nullable|string|max:50',
+            'tempat_lahir' => 'nullable|string|max:100',
             'tanggal_lahir' => 'nullable|date',
-            'no_telepon'    => 'nullable|string|max:20',
-            'alamat'        => 'nullable|string',
-            'foto'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'no_telepon' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($request->hasFile('foto')) {
@@ -156,7 +238,7 @@ class AnggotaController extends Controller
         $anggota->update($validated);
 
         return redirect()->route('anggota.index')
-                         ->with('success', 'Data "' . $anggota->nama_lengkap . '" berhasil diperbarui!');
+            ->with('success', 'Data "'.$anggota->nama_lengkap.'" berhasil diperbarui!');
     }
 
     /**
@@ -174,6 +256,6 @@ class AnggotaController extends Controller
         $anggota->delete();
 
         return redirect()->route('anggota.index')
-                         ->with('success', 'Anggota "' . $nama . '" berhasil dihapus.');
+            ->with('success', 'Anggota "'.$nama.'" berhasil dihapus.');
     }
 }
