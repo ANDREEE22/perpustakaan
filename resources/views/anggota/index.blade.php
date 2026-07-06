@@ -25,7 +25,9 @@
                             as="button"
                             type="submit"
                             icon="trash"
-                            onclick="return confirm('Hapus semua anggota kelas 9 lalu promosikan kelas 7 dan 8 naik satu tingkat?')"
+                            class="delete-kelas-action"
+                            data-title="Hapus semua anggota kelas 9?"
+                            data-text="Kelas 7 dan 8 akan naik satu tingkat."
                         >
                             Kelas 9
                         </flux:menu.item>
@@ -37,7 +39,9 @@
                             as="button"
                             type="submit"
                             icon="trash"
-                            onclick="return confirm('Hapus semua anggota kelas 8 lalu promosikan kelas 7 naik kelas 8?')"
+                            class="delete-kelas-action"
+                            data-title="Hapus semua anggota kelas 8?"
+                            data-text="Kelas 7 akan naik ke kelas 8."
                         >
                             Kelas 8
                         </flux:menu.item>
@@ -49,7 +53,9 @@
                             as="button"
                             type="submit"
                             icon="trash"
-                            onclick="return confirm('Hapus semua anggota kelas 7?')"
+                            class="delete-kelas-action"
+                            data-title="Hapus semua anggota kelas 7?"
+                            data-text="Tindakan ini tidak bisa dibatalkan."
                         >
                             Kelas 7
                         </flux:menu.item>
@@ -61,24 +67,6 @@
 
     <flux:separator />
 
-    {{-- Flash Messages --}}
-    @if(session('success'))
-        <div class="flex items-center gap-3 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span class="text-sm font-medium">{{ session('success') }}</span>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
-            <span class="text-sm font-medium">{{ session('error') }}</span>
-        </div>
-    @endif
 
     {{-- Filter & Search --}}
     <form method="GET" action="{{ route('anggota.index') }}" class="flex flex-wrap gap-3 items-end">
@@ -211,8 +199,7 @@
                             href="{{ route('anggota.edit', $anggota->id) }}"
                             title="Edit"
                         />
-                        <form action="{{ route('anggota.destroy', $anggota->id) }}" method="POST"
-                              onsubmit="return confirm('Hapus anggota \'{{ addslashes($anggota->nama_lengkap) }}\'? Tindakan ini tidak bisa dibatalkan.')">
+                        <form action="{{ route('anggota.destroy', $anggota->id) }}" method="POST" class="delete-anggota-form">
                             @csrf
                             @method('DELETE')
                             <flux:button type="submit" variant="ghost" size="sm" icon="trash" title="Hapus" />
@@ -257,4 +244,52 @@
     </p>
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.delete-kelas-action').forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const form = button.closest('form');
+
+                Swal.fire({
+                    title: button.dataset.title || 'Yakin ingin melanjutkan?',
+                    text: button.dataset.text || 'Tindakan ini tidak bisa dibatalkan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, lanjutkan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed && form) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll('.delete-anggota-form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const name = form.dataset.name || 'anggota ini';
+
+                Swal.fire({
+                    title: 'Hapus anggota?',
+                    text: 'Tindakan ini tidak bisa dibatalkan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
 </x-layouts::app>

@@ -25,6 +25,10 @@ test('users can authenticate using the login screen', function () {
         ->assertRedirect(route('dashboard', absolute: false));
 
     $this->assertAuthenticated();
+    expect(session('swal'))->toMatchArray([
+        'title' => 'Login berhasil',
+        'icon' => 'success',
+    ]);
 });
 
 test('users can not authenticate with invalid password', function () {

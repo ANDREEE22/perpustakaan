@@ -200,8 +200,20 @@ document.getElementById('sampul-input').addEventListener('change', function(e) {
 document.getElementById('import-file-input').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
-    if (!confirm('Mulai mengimpor file Excel? Proses akan menambahkan buku ke database.')) return;
-    document.getElementById('import-form').submit();
+    Swal.fire({
+        title: 'Impor file Excel?',
+        text: 'Proses ini akan menambahkan buku ke database.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, impor',
+        cancelButtonText: 'Batal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('import-form').submit();
+        }
+    });
 });
 </script>
 </x-layouts::app>

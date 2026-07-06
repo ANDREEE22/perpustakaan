@@ -237,8 +237,10 @@
                 @endphp
                 <div class="borrow-item">
                     <div class="borrow-cover">
-                        @if($p->buku->sampul)
-                            <img src="{{ asset('storage/' . $p->buku->sampul) }}" class="w-full h-full object-cover" alt="">
+                        @php($buku = optional($p->buku))
+                        @php($anggota = optional($p->anggota))
+                        @if($buku->sampul)
+                            <img src="{{ asset('storage/' . $buku->sampul) }}" class="w-full h-full object-cover" alt="">
                         @else
                             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -246,9 +248,9 @@
                         @endif
                     </div>
                     <div style="flex:1;min-width:0">
-                        <div class="borrow-title" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $p->buku->judul }}</div>
-                        <div class="borrow-meta">{{ $p->anggota->nama_lengkap }} &bull; {{ $p->anggota->kelas ?? 'Guru' }}</div>
-                        <div class="borrow-meta">Pinjam: {{ $p->tgl_pinjam->format('d/m/Y') }} &bull; Kembali: {{ $p->tgl_harus_kembali->format('d/m/Y') }}</div>
+                        <div class="borrow-title" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $buku->judul ?? 'Judul tidak tersedia' }}</div>
+                        <div class="borrow-meta">{{ $anggota->nama_lengkap ?? 'Nama tidak tersedia' }} &bull; {{ $anggota->kelas ?? 'Guru' }}</div>
+                        <div class="borrow-meta">Pinjam: {{ $p->tgl_pinjam?->format('d/m/Y') ?? '-' }} &bull; Kembali: {{ $p->tgl_harus_kembali?->format('d/m/Y') ?? '-' }}</div>
                     </div>
                     <span class="borrow-badge {{ $badgeClass }}">{{ $badgeLabel }}</span>
                 </div>

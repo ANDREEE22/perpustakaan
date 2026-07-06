@@ -42,8 +42,13 @@ class KategoriController extends Controller
 
         Kategori::create($validated);
 
-        return redirect()->route('kategori.index')
-            ->with('success', 'Kategori "' . $validated['nama'] . '" berhasil ditambahkan!');
+        return redirect()->route('kategori.index')->with('swal', [
+            'title' => 'Berhasil',
+            'text' => 'Kategori "' . $validated['nama'] . '" berhasil ditambahkan.',
+            'icon' => 'success',
+            'timer' => 2200,
+            'showConfirmButton' => false,
+        ]);
     }
 
     /**
@@ -72,8 +77,13 @@ class KategoriController extends Controller
 
         $kategori->update($validated);
 
-        return redirect()->route('kategori.index')
-            ->with('success', 'Kategori "' . $kategori->nama . '" berhasil diperbarui!');
+        return redirect()->route('kategori.index')->with('swal', [
+            'title' => 'Berhasil',
+            'text' => 'Kategori "' . $kategori->nama . '" berhasil diperbarui.',
+            'icon' => 'success',
+            'timer' => 2200,
+            'showConfirmButton' => false,
+        ]);
     }
 
     /**
@@ -84,14 +94,24 @@ class KategoriController extends Controller
         $kategori = Kategori::withCount('bukus')->findOrFail($id);
 
         if ($kategori->bukus_count > 0) {
-            return redirect()->route('kategori.index')
-                ->with('error', 'Kategori "' . $kategori->nama . '" tidak dapat dihapus karena masih memiliki ' . $kategori->bukus_count . ' buku terkait.');
+            return redirect()->route('kategori.index')->with('swal', [
+                'title' => 'Gagal',
+                'text' => 'Kategori "' . $kategori->nama . '" tidak dapat dihapus karena masih memiliki ' . $kategori->bukus_count . ' buku terkait.',
+                'icon' => 'error',
+                'timer' => 2800,
+                'showConfirmButton' => false,
+            ]);
         }
 
         $namaKategori = $kategori->nama;
         $kategori->delete();
 
-        return redirect()->route('kategori.index')
-            ->with('success', 'Kategori "' . $namaKategori . '" berhasil dihapus.');
+        return redirect()->route('kategori.index')->with('swal', [
+            'title' => 'Berhasil dihapus',
+            'text' => 'Kategori "' . $namaKategori . '" berhasil dihapus.',
+            'icon' => 'success',
+            'timer' => 2200,
+            'showConfirmButton' => false,
+        ]);
     }
 }

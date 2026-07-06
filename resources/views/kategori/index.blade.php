@@ -79,24 +79,6 @@
 
     <flux:separator />
 
-    {{-- Flash Message --}}
-    @if(session('success'))
-        <div class="flex items-center gap-3 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 a1">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span class="text-sm font-medium">{{ session('success') }}</span>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 a1">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
-            <span class="text-sm font-medium">{{ session('error') }}</span>
-        </div>
-    @endif
 
     {{-- ══ Stat Cards (Disamakan Desain & Icon Outline dengan Dashboard Baru) ══ --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 a2">
@@ -188,8 +170,7 @@
                                 href="{{ route('kategori.edit', $kategori->id) }}"
                                 title="Edit Kategori"
                             />
-                            <form action="{{ route('kategori.destroy', $kategori->id) }}" method="POST"
-                                  onsubmit="return confirm('Hapus kategori \'{{ addslashes($kategori->nama) }}\'? Pastikan tidak ada buku yang menggunakan kategori ini.')">
+                            <form action="{{ route('kategori.destroy', $kategori->id) }}" method="POST" class="delete-kategori-form">
                                 @csrf
                                 @method('DELETE')
                                 <flux:button
@@ -242,4 +223,36 @@
     </div>
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.delete-kategori-form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const button = form.querySelector('button[type="submit"]');
+                const isDisabled = button?.disabled;
+
+                if (isDisabled) {
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Hapus kategori?',
+                    text: 'Tindakan ini tidak bisa dibatalkan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
 </x-layouts::app>

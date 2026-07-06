@@ -359,7 +359,12 @@ function pilihBuku(id, judul, pengarang, stok) {
 
     if (existing) {
         if (existing.qty >= Number(stok)) {
-            alert('Jumlah buku tidak bisa lebih dari stok tersedia.');
+            Swal.fire({
+                title: 'Stok tidak mencukupi',
+                text: 'Jumlah buku tidak bisa lebih dari stok tersedia.',
+                icon: 'warning',
+                confirmButtonText: 'Tutup',
+            });
             return;
         }
 
@@ -654,8 +659,20 @@ function handleScannedCode(kode) {
     }).catch(async (err) => {
         try {
             const body = await err.json();
-            if (body && body.message) alert(body.message);
-            else alert('Buku tidak ditemukan');
+            if (body && body.message) {
+                Swal.fire({
+                    title: 'Gagal',
+                    text: body.message,
+                    icon: 'error',
+                    confirmButtonText: 'Tutup',
+                });
+            } else {
+                Swal.fire({
+                    title: 'Buku tidak ditemukan',
+                    icon: 'warning',
+                    confirmButtonText: 'Tutup',
+                });
+            }
         } catch (_) {
             alert('Buku tidak ditemukan');
         }

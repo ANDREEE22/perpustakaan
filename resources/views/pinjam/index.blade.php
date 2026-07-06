@@ -50,27 +50,6 @@
 
     <flux:separator />
 
-    {{-- Flash Notifications --}}
-    @if(session('success'))
-        <div class="flex items-center gap-3 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span class="text-sm font-medium">{{ session('success') }}</span>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            <span class="text-sm font-medium">{{ session('error') }}</span>
-        </div>
-    @endif
-
-    @if(session('info_denda'))
-        <div class="flex items-start gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 text-amber-800 dark:text-amber-300">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0 mt-0.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            <span class="text-sm font-medium">{!! session('info_denda') !!}</span>
-        </div>
-    @endif
 
     {{-- Statistik Uniform Premium Minimalis --}}
     <div class="stat-grid-pjm">
@@ -189,14 +168,16 @@
                 <flux:table.cell>
                     @if($booksCount === 1)
                         @php $singleBook = $titleGroups->first()->first(); @endphp
-                        <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ Str::limit($singleBook->buku->judul, 35) }}</div>
-                        <div class="text-xs text-zinc-500">{{ $singleBook->buku->pengarang }} · {{ $copiesCount }} buku</div>
+                        @php $bookData = optional($singleBook->buku); @endphp
+                        <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ Str::limit($bookData->judul ?? 'Judul tidak tersedia', 35) }}</div>
+                        <div class="text-xs text-zinc-500">{{ $bookData->pengarang ?? 'Pengarang tidak tersedia' }} · {{ $copiesCount }} buku</div>
                     @else
                         <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ $booksCount }} judul buku</div>
                         <div class="space-y-1 mt-2 text-xs text-zinc-500">
                             @foreach($titleGroups as $bookGroup)
                                 @php $bookItem = $bookGroup->first(); @endphp
-                                <div>{{ Str::limit($bookItem->buku->judul, 30) }} <span class="text-zinc-400">({{ $bookGroup->count() }} buku)</span></div>
+                                @php $bookData = optional($bookItem->buku); @endphp
+                                <div>{{ Str::limit($bookData->judul ?? 'Judul tidak tersedia', 30) }} <span class="text-zinc-400">({{ $bookGroup->count() }} buku)</span></div>
                             @endforeach
                         </div>
                     @endif
@@ -254,7 +235,7 @@
                         @if($first->status === 'dipinjam')
                             <button
                                 type="button"
-                                onclick="konfirmasiKembali({{ $first->id }}, '{{ addslashes(optional($first->anggota)->nama_lengkap ?? '-') }}', '{{ addslashes($booksCount === 1 ? $first->buku->judul.' ('.$copiesCount.' buku)' : $booksCount . ' judul buku ('.$copiesCount.' buku)') }}', {{ $dendaPreview }}, {{ $hariTelat }})"
+                                onclick="konfirmasiKembali({{ $first->id }}, '{{ addslashes(optional($first->anggota)->nama_lengkap ?? '-') }}', '{{ addslashes($booksCount === 1 ? optional($first->buku)->judul ?? 'Judul tidak tersedia'.' ('.$copiesCount.' buku)' : $booksCount . ' judul buku ('.$copiesCount.' buku)') }}', {{ $dendaPreview }}, {{ $hariTelat }})"
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer
                                        {{ $terlambat
                                            ? 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-700 dark:text-red-400'
@@ -441,7 +422,12 @@ btnKonfirmasi.addEventListener('click', async function () {
 
         if (!res.ok) {
             const msg = data.error || data.message || 'Terjadi kesalahan.';
-            alert(msg);
+            Swal.fire({
+                title: 'Gagal',
+                text: msg,
+                icon: 'error',
+                confirmButtonText: 'Tutup',
+            });
             btn.disabled = false;
             btn.textContent = originalText;
             return;
@@ -471,7 +457,12 @@ btnKonfirmasi.addEventListener('click', async function () {
 
     } catch (e) {
         console.error(e);
-        alert('Gagal terhubung ke server. Periksa koneksi atau coba lagi.');
+        Swal.fire({
+            title: 'Koneksi gagal',
+            text: 'Periksa koneksi atau coba lagi.',
+            icon: 'error',
+            confirmButtonText: 'Tutup',
+        });
         btn.disabled = false;
         btn.textContent = originalText;
     }

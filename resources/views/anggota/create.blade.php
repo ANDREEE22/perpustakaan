@@ -169,8 +169,21 @@ document.getElementById('foto-input').addEventListener('change', function(e) {
 document.getElementById('import-file-input-anggota').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
-    if (!confirm('Mulai mengimpor file Excel? Proses akan menambahkan anggota ke database.')) return;
-    document.getElementById('import-form-anggota').submit();
+
+    Swal.fire({
+        title: 'Impor file Excel?',
+        text: 'Proses ini akan menambahkan anggota ke database.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0f766e',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, impor',
+        cancelButtonText: 'Batal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('import-form-anggota').submit();
+        }
+    });
 });
 </script>
 </x-layouts::app>

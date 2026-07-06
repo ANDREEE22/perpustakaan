@@ -14,3 +14,57 @@
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@php($swal = session()->pull('swal'))
+@if ($swal)
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire(@json($swal));
+        });
+    </script>
+@endif
+
+@php($successMessage = session()->pull('success'))
+@if ($successMessage)
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                title: 'Berhasil',
+                text: @json($successMessage),
+                icon: 'success',
+                timer: 2200,
+                showConfirmButton: false,
+            });
+        });
+    </script>
+@endif
+
+@php($errorMessage = session()->pull('error'))
+@if ($errorMessage)
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                title: 'Gagal',
+                text: @json($errorMessage),
+                icon: 'error',
+                timer: 2600,
+                showConfirmButton: false,
+            });
+        });
+    </script>
+@endif
+
+@php($infoDenda = session()->pull('info_denda'))
+@if ($infoDenda)
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                title: 'Informasi',
+                html: {!! json_encode($infoDenda, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!},
+                icon: 'info',
+                confirmButtonText: 'Tutup',
+            });
+        });
+    </script>
+@endif

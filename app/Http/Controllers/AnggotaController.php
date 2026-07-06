@@ -93,7 +93,13 @@ class AnggotaController extends Controller
             $message .= ' Kelas di bawahnya telah dipromosikan satu tingkat.';
         }
 
-        return redirect()->route('anggota.index')->with('success', $message);
+        return redirect()->route('anggota.index')->with('swal', [
+            'title' => 'Berhasil',
+            'text' => $message,
+            'icon' => 'success',
+            'timer' => 2400,
+            'showConfirmButton' => false,
+        ]);
     }
 
     private function kelasPatterns(int $grade): array
@@ -149,8 +155,13 @@ class AnggotaController extends Controller
         $import = new AnggotaImport;
         Excel::import($import, $file);
 
-        return redirect()->route('anggota.index')
-            ->with('success', "Impor selesai. Dimasukkan: {$import->inserted}, dilewati: {$import->skipped}.");
+        return redirect()->route('anggota.index')->with('swal', [
+            'title' => 'Impor selesai',
+            'text' => "Dimasukkan: {$import->inserted}, dilewati: {$import->skipped}.",
+            'icon' => 'success',
+            'timer' => 2600,
+            'showConfirmButton' => false,
+        ]);
     }
 
     /**
@@ -184,8 +195,13 @@ class AnggotaController extends Controller
 
         Anggota::create($validated);
 
-        return redirect()->route('anggota.index')
-            ->with('success', 'Anggota "'.$validated['nama_lengkap'].'" berhasil ditambahkan!');
+        return redirect()->route('anggota.index')->with('swal', [
+            'title' => 'Berhasil',
+            'text' => 'Anggota "'.$validated['nama_lengkap'].'" berhasil ditambahkan.',
+            'icon' => 'success',
+            'timer' => 2200,
+            'showConfirmButton' => false,
+        ]);
     }
 
     /**
@@ -237,8 +253,13 @@ class AnggotaController extends Controller
 
         $anggota->update($validated);
 
-        return redirect()->route('anggota.index')
-            ->with('success', 'Data "'.$anggota->nama_lengkap.'" berhasil diperbarui!');
+        return redirect()->route('anggota.index')->with('swal', [
+            'title' => 'Berhasil',
+            'text' => 'Data "'.$anggota->nama_lengkap.'" berhasil diperbarui.',
+            'icon' => 'success',
+            'timer' => 2200,
+            'showConfirmButton' => false,
+        ]);
     }
 
     /**
@@ -255,7 +276,12 @@ class AnggotaController extends Controller
         $nama = $anggota->nama_lengkap;
         $anggota->delete();
 
-        return redirect()->route('anggota.index')
-            ->with('success', 'Anggota "'.$nama.'" berhasil dihapus.');
+        return redirect()->route('anggota.index')->with('swal', [
+            'title' => 'Berhasil dihapus',
+            'text' => 'Anggota "'.$nama.'" berhasil dihapus.',
+            'icon' => 'success',
+            'timer' => 2200,
+            'showConfirmButton' => false,
+        ]);
     }
 }

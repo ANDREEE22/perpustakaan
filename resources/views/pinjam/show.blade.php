@@ -262,7 +262,12 @@ document.getElementById('btn-kembali').addEventListener('click', async function 
     }
 
     if (!res.ok) {
-        alert(data.error || data.message || 'Terjadi kesalahan saat memproses.');
+        Swal.fire({
+            title: 'Gagal',
+            text: data.error || data.message || 'Terjadi kesalahan saat memproses.',
+            icon: 'error',
+            confirmButtonText: 'Tutup',
+        });
         this.disabled = false; this.textContent = 'Ya, Kembalikan';
         return;
     }

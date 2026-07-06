@@ -33,13 +33,6 @@
 
     <flux:separator />
 
-    {{-- Flash --}}
-    @if(session('success'))
-        <div class="flex items-center gap-3 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span class="text-sm font-medium">{{ session('success') }}</span>
-        </div>
-    @endif
 
     {{-- Konten --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -117,8 +110,7 @@
 
             {{-- Hapus --}}
             <div class="flex justify-start mt-4">
-                <form action="{{ route('anggota.destroy', $anggota->id) }}" method="POST"
-                      onsubmit="return confirm('Hapus anggota \'{{ addslashes($anggota->nama_lengkap) }}\'? Tindakan ini tidak bisa dibatalkan.')">
+                <form action="{{ route('anggota.destroy', $anggota->id) }}" method="POST" class="delete-anggota-form">
                     @csrf
                     @method('DELETE')
                     <button type="submit"
@@ -182,4 +174,29 @@
 
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.delete-anggota-form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                Swal.fire({
+                    title: 'Hapus anggota?',
+                    text: 'Tindakan ini tidak bisa dibatalkan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
 </x-layouts::app>

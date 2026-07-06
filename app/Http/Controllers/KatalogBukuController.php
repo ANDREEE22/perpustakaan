@@ -92,7 +92,13 @@ class KatalogBukuController extends Controller
             $this->generateQrForBuku($buku);
         }
 
-        return redirect()->route('katalog')->with('success', 'Buku "'.$validated['judul'].'" berhasil ditambahkan!');
+        return redirect()->route('katalog')->with('swal', [
+            'title' => 'Buku berhasil ditambahkan',
+            'text' => 'Buku "'.$validated['judul'].'" berhasil ditambahkan.',
+            'icon' => 'success',
+            'timer' => 2200,
+            'showConfirmButton' => false,
+        ]);
     }
 
     /**
@@ -157,10 +163,22 @@ class KatalogBukuController extends Controller
 
         $msg = "$created buku berhasil diimpor.";
         if (! empty($errors)) {
-            return redirect()->route('katalog.create')->with('error', $msg.' Beberapa baris gagal: '.implode('; ', array_slice($errors, 0, 5)));
+            return redirect()->route('katalog.create')->with('swal', [
+                'title' => 'Impor selesai dengan catatan',
+                'text' => $msg.' Beberapa baris gagal: '.implode('; ', array_slice($errors, 0, 5)),
+                'icon' => 'warning',
+                'timer' => 3000,
+                'showConfirmButton' => false,
+            ]);
         }
 
-        return redirect()->route('katalog')->with('success', $msg);
+        return redirect()->route('katalog')->with('swal', [
+            'title' => 'Impor berhasil',
+            'text' => $msg,
+            'icon' => 'success',
+            'timer' => 2200,
+            'showConfirmButton' => false,
+        ]);
     }
 
     /**
@@ -285,7 +303,13 @@ class KatalogBukuController extends Controller
             }
         }
 
-        return redirect()->route('katalog')->with('success', 'Buku "'.$buku->judul.'" berhasil diperbarui!');
+        return redirect()->route('katalog')->with('swal', [
+            'title' => 'Buku berhasil diperbarui',
+            'text' => 'Buku "'.$buku->judul.'" berhasil diperbarui.',
+            'icon' => 'success',
+            'timer' => 2200,
+            'showConfirmButton' => false,
+        ]);
     }
 
     /**
@@ -309,7 +333,13 @@ class KatalogBukuController extends Controller
         $judulBuku = $buku->judul;
         $buku->delete();
 
-        return redirect()->route('katalog')->with('success', 'Buku "'.$judulBuku.'" berhasil dihapus.');
+        return redirect()->route('katalog')->with('swal', [
+            'title' => 'Buku berhasil dihapus',
+            'text' => 'Buku "'.$judulBuku.'" berhasil dihapus.',
+            'icon' => 'success',
+            'timer' => 2200,
+            'showConfirmButton' => false,
+        ]);
     }
 
     /**

@@ -18,12 +18,6 @@
 
     <flux:separator />
 
-    @if(session('success'))
-        <div class="flex items-center gap-3 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span class="text-sm font-medium">{{ session('success') }}</span>
-        </div>
-    @endif
 
     <flux:table>
         <flux:table.columns>
@@ -62,12 +56,10 @@
                 <flux:table.cell align="end">
                     <div class="flex justify-end items-center gap-2">
                         <flux:button variant="ghost" size="sm" icon="pencil-square" href="{{ route('info.edit', $item->id) }}" title="Edit" />
-                        <form action="{{ route('info.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus pengumuman ini?')">
+                        <form action="{{ route('info.destroy', $item->id) }}" method="POST" class="delete-info-form">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="w-8 h-8 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center">
-                                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                            </button>
+                            <flux:button type="submit" variant="ghost" size="sm" icon="trash" title="Hapus" />
                         </form>
                     </div>
                 </flux:table.cell>
@@ -82,4 +74,28 @@
         </flux:table.rows>
     </flux:table>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.delete-info-form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                Swal.fire({
+                    title: 'Hapus pengumuman?',
+                    text: 'Tindakan ini tidak bisa dibatalkan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
 </x-layouts::app>

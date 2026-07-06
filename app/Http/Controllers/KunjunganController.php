@@ -98,6 +98,13 @@ class KunjunganController extends Controller
             'jam_masuk'    => Carbon::now()->format('H:i'),
             'keperluan'    => $kunjungan->keperluan,
             'jumlah_hari_ini' => Kunjungan::whereDate('tanggal', $today)->count(),
+            'swal'         => [
+                'title' => 'Berhasil check-in',
+                'text' => 'Tamu berhasil dicatat ke buku tamu.',
+                'icon' => 'success',
+                'timer' => 2200,
+                'showConfirmButton' => false,
+            ],
         ]);
     }
 
@@ -108,6 +115,12 @@ class KunjunganController extends Controller
     {
         Kunjungan::findOrFail($id)->delete();
 
-        return redirect()->back()->with('success', 'Data kunjungan berhasil dihapus.');
+        return redirect()->back()->with('swal', [
+            'title' => 'Berhasil dihapus',
+            'text' => 'Data kunjungan berhasil dihapus.',
+            'icon' => 'success',
+            'timer' => 2200,
+            'showConfirmButton' => false,
+        ]);
     }
 }

@@ -115,8 +115,7 @@
             <p class="text-xs text-red-500 dark:text-red-400 mb-4">
                 Kategori ini tidak memiliki buku sehingga dapat dihapus. Tindakan ini tidak bisa dibatalkan.
             </p>
-            <form action="{{ route('kategori.destroy', $kategori->id) }}" method="POST"
-                  onsubmit="return confirm('Hapus kategori \'{{ addslashes($kategori->nama) }}\'? Tindakan ini tidak bisa dibatalkan.')">
+            <form action="{{ route('kategori.destroy', $kategori->id) }}" method="POST" class="delete-kategori-form">
                 @csrf
                 @method('DELETE')
                 <flux:button type="submit" variant="danger" icon="trash" size="sm">
@@ -127,4 +126,29 @@
     @endif
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.delete-kategori-form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                Swal.fire({
+                    title: 'Hapus kategori?',
+                    text: 'Tindakan ini tidak bisa dibatalkan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
 </x-layouts::app>

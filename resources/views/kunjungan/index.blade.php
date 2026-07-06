@@ -401,7 +401,7 @@
 
                         {{-- Action Hapus Kunjungan --}}
                         <form action="{{ route('kunjungan.destroy', $kv->id) }}" method="POST"
-                              onsubmit="return confirm('Hapus rekaman kunjungan tamu ini?')" class="shrink-0 m-0">
+                              onsubmit="event.preventDefault(); hapusKunjungan(this)" class="shrink-0 m-0">
                             @csrf @method('DELETE')
                             <button type="submit" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-400 hover:text-red-500 hover:bg-red-50 transition-colors border-none bg-transparent cursor-pointer">
                                 <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -423,22 +423,6 @@
         </div>
     </div>
 
-</div>
-
-{{-- POPUP MODAL NOTIFIKASI SUKSES PREMIUM --}}
-<div id="modal-sukses"
-     class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
-     onclick="if(event.target===this)this.classList.add('hidden')">
-    <div class="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 w-full max-w-xs text-center shadow-2xl"
-         style="animation: libFadeUp 0.2s ease">
-        <div class="text-4xl mb-2"></div>
-        <h3 class="text-base font-bold mb-1" style="font-family:'Lora',serif;">Berhasil Check-In!</h3>
-        <p class="text-xs mb-4 leading-relaxed" id="ms-desc" style="color: var(--lib-muted);"></p>
-        <button onclick="document.getElementById('modal-sukses').classList.add('hidden')"
-            class="w-full py-2.5 rounded-xl text-white text-xs font-semibold transition-colors bg-emerald-500 hover:bg-emerald-600 border-none cursor-pointer">
-            Selesai
-        </button>
-    </div>
 </div>
 
 <script>
@@ -547,6 +531,23 @@ function pilihKeperluan(btn, nilai) {
     document.getElementById('kt-keperluan').value = nilai;
 }
 
+function hapusKunjungan(form) {
+    Swal.fire({
+        title: 'Hapus data kunjungan?',
+        text: 'Rekaman ini akan dihapus permanen.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, hapus',
+        cancelButtonText: 'Batal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
+}
+
 async function doCheckIn() {
     if (!selectedAnggotaId) return;
 
@@ -573,6 +574,12 @@ async function doCheckIn() {
         const data = await res.json();
 
         if (!res.ok) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal check-in',
+                text: data.message ?? 'Gagal memproses.',
+                confirmButtonText: 'Tutup',
+            });
             msg.textContent = data.message ?? 'Gagal memproses.';
             msg.className   = 'text-xs text-center font-semibold rounded-xl py-2 px-3 bg-red-50 text-red-600';
             msg.classList.remove('hidden');
@@ -621,10 +628,21 @@ async function doCheckIn() {
         clearPilihan();
         document.querySelectorAll('.keperluan-btn').forEach(b => b.classList.remove('aktif'));
 
-        document.getElementById('ms-desc').innerHTML = `Tamu <strong>${data.nama}</strong> berhasil disimpan pada jam <strong>${data.jam_masuk}</strong>.`;
-        document.getElementById('modal-sukses').classList.remove('hidden');
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil check-in',
+            html: `Tamu <strong>${data.nama}</strong> berhasil dicatat pada jam <strong>${data.jam_masuk}</strong>.`,
+            timer: 2400,
+            showConfirmButton: false,
+        });
 
     } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Koneksi error',
+            text: 'Tidak dapat terhubung ke server. Silakan coba lagi.',
+            confirmButtonText: 'Tutup',
+        });
         msg.textContent = 'Koneksi error.';
         msg.className   = 'text-xs text-center bg-red-50 text-red-600';
         msg.classList.remove('hidden');

@@ -20,24 +20,6 @@
 
     <flux:separator />
 
-    {{-- Flash Message --}}
-    @if(session('success'))
-        <div class="flex items-center gap-3 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span class="text-sm font-medium">{{ session('success') }}</span>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400">
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
-            <span class="text-sm font-medium">{{ session('error') }}</span>
-        </div>
-    @endif
 
     {{-- Filter & Search --}}
     <form method="GET" action="{{ route('katalog') }}" class="flex flex-wrap gap-3 items-end">
@@ -174,11 +156,17 @@
                             href="{{ route('katalog.edit', $buku->id) }}"
                             title="Edit"
                         />
-                        <form action="{{ route('katalog.destroy', $buku->id) }}" method="POST"
-                              onsubmit="return confirm('Hapus buku \'{{ addslashes($buku->judul) }}\'? Tindakan ini tidak bisa dibatalkan.')">
+                        <form action="{{ route('katalog.destroy', $buku->id) }}" method="POST" class="m-0">
                             @csrf
                             @method('DELETE')
-                            <flux:button type="submit" variant="ghost" size="sm" icon="trash" title="Hapus" />
+                            <flux:button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                icon="trash"
+                                title="Hapus"
+                                onclick="hapusBuku(this.closest('form'), '{{ addslashes($buku->judul) }}')"
+                            />
                         </form>
                     </div>
                 </flux:table.cell>
@@ -221,4 +209,23 @@
     </p>
 
 </div>
+
+<script>
+function hapusBuku(form, judul) {
+    Swal.fire({
+        title: 'Hapus buku?',
+        text: `Yakin ingin menghapus buku "${judul}"? Tindakan ini tidak bisa dibatalkan.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, hapus',
+        cancelButtonText: 'Batal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
+}
+</script>
 </x-layouts::app>
