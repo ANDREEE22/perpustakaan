@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Kunjungan;
 use App\Models\Anggota;
+use App\Models\Kunjungan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -20,17 +20,18 @@ class KunjunganController extends Controller
 
         // Daftar kunjungan di tanggal yang dipilih
         $kunjungan = Kunjungan::with('anggota')
+            ->whereHas('anggota')
             ->whereDate('tanggal', $tanggal)
             ->latest()
             ->get();
 
         // Statistik
         $stats = [
-            'hari_ini'  => Kunjungan::whereDate('tanggal', Carbon::today())->count(),
+            'hari_ini' => Kunjungan::whereDate('tanggal', Carbon::today())->count(),
             'bulan_ini' => Kunjungan::whereMonth('tanggal', Carbon::today()->month)
-                                    ->whereYear('tanggal', Carbon::today()->year)
-                                    ->count(),
-            'total'     => Kunjungan::count(),
+                ->whereYear('tanggal', Carbon::today()->year)
+                ->count(),
+            'total' => Kunjungan::count(),
         ];
 
         return view('kunjungan.index', compact('kunjungan', 'tanggal', 'stats'));
@@ -63,42 +64,42 @@ class KunjunganController extends Controller
     {
         $request->validate([
             'anggota_id' => 'required|exists:anggotas,id',
-            'keperluan'  => 'nullable|string|max:100',
+            'keperluan' => 'nullable|string|max:100',
         ]);
 
-        $anggota   = Anggota::findOrFail($request->anggota_id);
-        $today     = Carbon::today();
+        $anggota = Anggota::findOrFail($request->anggota_id);
+        $today = Carbon::today();
 
         // Cek sudah pernah check-in hari ini
         $sudahMasuk = Kunjungan::where('anggota_id', $anggota->id)
-                                ->whereDate('tanggal', $today)
-                                ->exists();
+            ->whereDate('tanggal', $today)
+            ->exists();
 
         if ($sudahMasuk) {
             return response()->json([
                 'error' => 'duplicate',
-                'message' => $anggota->nama_lengkap . ' sudah tercatat berkunjung hari ini.',
+                'message' => $anggota->nama_lengkap.' sudah tercatat berkunjung hari ini.',
             ], 422);
         }
 
         $kunjungan = Kunjungan::create([
             'anggota_id' => $anggota->id,
-            'tanggal'    => $today,
-            'jam_masuk'  => Carbon::now()->format('H:i:s'),
-            'keperluan'  => $request->keperluan ?: 'Umum',
+            'tanggal' => $today,
+            'jam_masuk' => Carbon::now()->format('H:i:s'),
+            'keperluan' => $request->keperluan ?: 'Umum',
         ]);
 
         return response()->json([
-            'success'      => true,
-            'id'           => $kunjungan->id,
-            'nama'         => $anggota->nama_lengkap,
-            'nomor_induk'  => $anggota->nomor_induk,
-            'kelas'        => $anggota->kelas ?? 'Guru/Staf',
-            'foto'         => $anggota->foto ? asset('storage/' . $anggota->foto) : null,
-            'jam_masuk'    => Carbon::now()->format('H:i'),
-            'keperluan'    => $kunjungan->keperluan,
+            'success' => true,
+            'id' => $kunjungan->id,
+            'nama' => $anggota->nama_lengkap,
+            'nomor_induk' => $anggota->nomor_induk,
+            'kelas' => $anggota->kelas ?? 'Guru/Staf',
+            'foto' => $anggota->foto ? asset('storage/'.$anggota->foto) : null,
+            'jam_masuk' => Carbon::now()->format('H:i'),
+            'keperluan' => $kunjungan->keperluan,
             'jumlah_hari_ini' => Kunjungan::whereDate('tanggal', $today)->count(),
-            'swal'         => [
+            'swal' => [
                 'title' => 'Berhasil check-in',
                 'text' => 'Tamu berhasil dicatat ke buku tamu.',
                 'icon' => 'success',

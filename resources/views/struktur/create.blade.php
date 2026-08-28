@@ -21,7 +21,7 @@
         
         <flux:input name="jabatan" label="Jabatan" placeholder="Contoh: Pustakawan Utama" required />
         
-        <flux:input type="number" name="level" value="1" min="1" label="Level Tingkatan Hirarki" description="Petunjuk: 1 = Tertinggi (Kepala), 2 = Wakil, 3 = Staf, dst." required />
+        <flux:input type="number" name="level" value="1" min="1" label="Level Tingkatan Hirarki" description="Petunjuk: 1 = Tertinggi (Kepala), 2 = Wakil, 3 = Staf." required />
         
         <flux:field>
             <flux:label>Foto Profil (Opsional)</flux:label>

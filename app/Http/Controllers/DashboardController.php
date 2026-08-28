@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Buku;
-use App\Models\Anggota;
-use App\Models\Kategori;
-use App\Models\Peminjaman;
 use App\Models\Kunjungan;
+use App\Models\Peminjaman;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -17,13 +15,13 @@ class DashboardController extends Controller
         $today = Carbon::today();
 
         // ── Stat Cards ──────────────────────────────────────────
-        $totalBuku       = Buku::sum('stok');                              // total eksemplar
-        $totalJudul      = Buku::count();                                  // jumlah judul
-        $sedangDipinjam  = Peminjaman::where('status', 'dipinjam')->count();
+        $totalBuku = Buku::sum('stok');                              // total eksemplar
+        $totalJudul = Buku::count();                                  // jumlah judul
+        $sedangDipinjam = Peminjaman::where('status', 'dipinjam')->count();
         $pengunjungHariIni = Kunjungan::whereDate('tanggal', $today)->count();
-        $totalTerlambat  = Peminjaman::where('status', 'dipinjam')
-                                     ->where('tgl_harus_kembali', '<', $today)
-                                     ->count();
+        $totalTerlambat = Peminjaman::where('status', 'dipinjam')
+            ->where('tgl_harus_kembali', '<', $today)
+            ->count();
 
         // ── Peminjaman Terbaru (5 data) ──────────────────────────
         $peminjamanTerbaru = Peminjaman::with(['anggota', 'buku'])
@@ -47,13 +45,13 @@ class DashboardController extends Controller
         for ($i = 6; $i >= 0; $i--) {
             $tgl = $today->copy()->subDays($i);
             $kunjunganMingguan->push([
-                'label'  => $tgl->isoFormat('ddd'),   // Sen, Sel, ...
+                'label' => $tgl->isoFormat('ddd'),   // Sen, Sel, ...
                 'jumlah' => Kunjungan::whereDate('tanggal', $tgl)->count(),
-                'isToday'=> $i === 0,
+                'isToday' => $i === 0,
             ]);
         }
         $totalMingguIni = $kunjunganMingguan->sum('jumlah');
-        $maxKunjungan   = $kunjunganMingguan->max('jumlah') ?: 1;
+        $maxKunjungan = $kunjunganMingguan->max('jumlah') ?: 1;
 
         // ── Denda Aktif (dipinjam & terlambat) ───────────────────
         $dendaAktif = Peminjaman::with(['anggota', 'buku'])
@@ -62,28 +60,16 @@ class DashboardController extends Controller
             ->orderBy('tgl_harus_kembali')
             ->limit(5)
             ->get()
-            ->map(function ($p) use ($today) {
-                $hariTelat = $p->tgl_harus_kembali->diffInDays($today);
-                $denda     = $hariTelat * 500;
-                return [
-                    'nama'       => $p->anggota->nama_lengkap,
-                    'kelas'      => $p->anggota->kelas ?? 'Guru',
-                    'buku'       => $p->buku->judul,
-                    'hari'       => $hariTelat,
-                    'denda'      => 'Rp ' . number_format($denda, 0, ',', '.'),
-                    'clr'        => $hariTelat >= 7 ? '#dc2626' : '#d97706',
-                    'foto'       => $p->anggota->foto,
-                    'inisial'    => strtoupper(substr($p->anggota->nama_lengkap, 0, 1)),
-                ];
-            });
+            ->map(fn (Peminjaman $p) => $this->mapDendaAktifItem($p, $today));
 
         $totalDenda = Peminjaman::where('status', 'dipinjam')
             ->where('tgl_harus_kembali', '<', $today)
             ->get()
-            ->sum(fn($p) => $p->tgl_harus_kembali->diffInDays($today) * 500);
+            ->sum(fn ($p) => ($p->tgl_harus_kembali?->copy()->startOfDay()->diffInDays($today->copy()->startOfDay()) ?? 0) * 500);
 
         // ── Pengunjung hari ini (buku tamu terbaru) ───────────────
         $kunjunganHariIni = Kunjungan::with('anggota')
+            ->whereHas('anggota')
             ->whereDate('tanggal', $today)
             ->latest()
             ->limit(5)
@@ -105,5 +91,24 @@ class DashboardController extends Controller
             'totalDenda',
             'kunjunganHariIni',
         ));
+    }
+
+    public function mapDendaAktifItem(Peminjaman $p, Carbon $today): array
+    {
+        $anggota = $p->anggota;
+        $buku = $p->buku;
+        $hariTelat = (int) ($p->tgl_harus_kembali?->copy()->startOfDay()->diffInDays($today->copy()->startOfDay()) ?? 0);
+        $denda = $hariTelat * 500;
+
+        return [
+            'nama' => $anggota?->nama_lengkap ?? 'Anggota tidak tersedia',
+            'kelas' => $anggota?->kelas ?? 'Guru',
+            'buku' => $buku?->judul ?? 'Judul tidak tersedia',
+            'hari' => $hariTelat,
+            'denda' => 'Rp '.number_format($denda, 0, ',', '.'),
+            'clr' => $hariTelat >= 7 ? '#dc2626' : '#d97706',
+            'foto' => $anggota?->foto,
+            'inisial' => $anggota?->nama_lengkap ? strtoupper(substr($anggota->nama_lengkap, 0, 1)) : '?',
+        ];
     }
 }

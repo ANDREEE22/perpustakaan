@@ -246,50 +246,51 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.delete-kelas-action').forEach(function (button) {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
-                const form = button.closest('form');
+    (function () {
+        // Delegate click for delete-kelas-action buttons
+        document.addEventListener('click', function (event) {
+            const button = event.target.closest('.delete-kelas-action');
+            if (!button) return;
+            event.preventDefault();
+            const form = button.closest('form');
 
-                Swal.fire({
-                    title: button.dataset.title || 'Yakin ingin melanjutkan?',
-                    text: button.dataset.text || 'Tindakan ini tidak bisa dibatalkan.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Ya, lanjutkan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed && form) {
-                        form.submit();
-                    }
-                });
+            Swal.fire({
+                title: button.dataset.title || 'Yakin ingin melanjutkan?',
+                text: button.dataset.text || 'Tindakan ini tidak bisa dibatalkan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, lanjutkan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed && form) {
+                    form.submit();
+                }
             });
         });
 
-        document.querySelectorAll('.delete-anggota-form').forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                event.preventDefault();
-                const name = form.dataset.name || 'anggota ini';
+        // Delegate submit for delete-anggota-form forms
+        document.addEventListener('submit', function (event) {
+            const form = event.target.closest('.delete-anggota-form');
+            if (!form) return;
+            event.preventDefault();
 
-                Swal.fire({
-                    title: 'Hapus anggota?',
-                    text: 'Tindakan ini tidak bisa dibatalkan.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Ya, hapus',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
+            Swal.fire({
+                title: 'Hapus anggota?',
+                text: 'Tindakan ini tidak bisa dibatalkan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
             });
         });
-    });
+    })();
 </script>
 </x-layouts::app>

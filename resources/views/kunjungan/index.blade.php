@@ -362,20 +362,20 @@
 
                         {{-- Avatar --}}
                         <div class="tamu-avatar">
-                            @if($kv->anggota->foto)
+                            @if($kv->anggota && $kv->anggota->foto)
                                 <img src="{{ asset('storage/' . $kv->anggota->foto) }}" class="w-full h-full object-cover" alt="">
                             @else
-                                {{ strtoupper(substr($kv->anggota->nama_lengkap, 0, 1)) }}
+                                {{ $kv->anggota ? strtoupper(substr($kv->anggota->nama_lengkap, 0, 1)) : '?' }}
                             @endif
                         </div>
 
                         {{-- Profil --}}
                         <div class="flex-1 min-w-0">
                             <div class="text-sm font-bold truncate" style="color: var(--lib-ink)">
-                                {{ $kv->anggota->nama_lengkap }}
+                                {{ $kv->anggota?->nama_lengkap ?? 'Anggota' }}
                             </div>
                             <div class="text-xs" style="color: var(--lib-muted)">
-                                {{ $kv->anggota->nomor_induk }} @if($kv->anggota->kelas) &bull; Kelas {{ $kv->anggota->kelas }} @else &bull; Guru/Staf @endif
+                                {{ $kv->anggota?->nomor_induk ?? '-' }} @if($kv->anggota?->kelas) &bull; Kelas {{ $kv->anggota->kelas }} @else &bull; Guru/Staf @endif
                             </div>
                         </div>
 

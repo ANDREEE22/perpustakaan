@@ -412,15 +412,15 @@
                     @foreach($kunjunganHariIni as $kh)
                     <div class="tamu-item">
                         <div class="tamu-avatar">
-                            @if($kh->anggota->foto)
+                            @if($kh->anggota && $kh->anggota->foto)
                                 <img src="{{ asset('storage/' . $kh->anggota->foto) }}" class="w-full h-full object-cover" alt="">
                             @else
-                                {{ strtoupper(substr($kh->anggota->nama_lengkap, 0, 1)) }}
+                                {{ $kh->anggota ? strtoupper(substr($kh->anggota->nama_lengkap, 0, 1)) : '?' }}
                             @endif
                         </div>
                         <div style="flex:1;min-width:0">
-                            <div style="font-size:0.85rem;font-weight:600;color:var(--lib-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $kh->anggota->nama_lengkap }}</div>
-                            <div style="font-size:0.75rem;color:var(--lib-muted)">{{ $kh->anggota->kelas ?? 'Guru' }} &bull; {{ $kh->keperluan }}</div>
+                            <div style="font-size:0.85rem;font-weight:600;color:var(--lib-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $kh->anggota?->nama_lengkap ?? 'Anggota' }}</div>
+                            <div style="font-size:0.75rem;color:var(--lib-muted)">{{ $kh->anggota?->kelas ?? 'Guru' }} &bull; {{ $kh->keperluan }}</div>
                         </div>
                         <div style="font-size:0.72rem;font-family:monospace;color:var(--lib-muted);font-weight:500">{{ substr($kh->jam_masuk, 0, 5) }}</div>
                     </div>
