@@ -13,6 +13,8 @@ class Anggota extends Model
         'nama_lengkap',
         'jenis_kelamin',
         'kelas',
+        'status_anggota',
+        'tahun_keluar',
         'tempat_lahir',
         'tanggal_lahir',
         'no_telepon',
@@ -21,6 +23,7 @@ class Anggota extends Model
     ];
     
     protected $casts = [
-        'tanggal_lahir' => 'date'
+        'tanggal_lahir' => 'date',
+        'tahun_keluar' => 'integer',
     ];
 }

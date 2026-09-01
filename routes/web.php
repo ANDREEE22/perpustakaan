@@ -108,6 +108,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/anggota/import', [AnggotaController::class, 'importForm'])->name('anggota.import.form');
     Route::post('/anggota/import', [AnggotaController::class, 'import'])->name('anggota.import');
     Route::post('/anggota/hapus-kelas', [AnggotaController::class, 'hapusKelas'])->name('anggota.hapus-kelas');
+    Route::get('/alumni', [AnggotaController::class, 'alumni'])->name('alumni.index');
 
     Route::resource('anggota', AnggotaController::class)->names([
         'index' => 'anggota.index',

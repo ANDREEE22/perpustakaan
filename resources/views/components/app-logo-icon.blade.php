@@ -1,1 +1,1 @@
-<img src="{{ asset('images/smp.png') }}" alt="{{ config('app.name') }}" {{ $attributes->merge(['class' => 'object-contain']) }}>
+<img src="{{ asset('images/logo_sekolah.png') }}" alt="{{ config('app.name') }}" {{ $attributes->merge(['class' => 'object-contain']) }}>

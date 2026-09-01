@@ -15,7 +15,7 @@ class AnggotaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Anggota::query();
+        $query = Anggota::query()->where('status_anggota', '!=', 'alumni');
 
         // Cari berdasarkan nama, nomor induk, atau kelas
         if ($request->filled('search')) {
@@ -49,7 +49,32 @@ class AnggotaController extends Controller
     }
 
     /**
-     * Hapus seluruh anggota pada satu kelas dan promosikan kelas di bawahnya.
+     * Daftar alumni yang sudah lulus / tidak aktif.
+     */
+    public function alumni(Request $request)
+    {
+        $query = Anggota::query()->where('status_anggota', 'alumni');
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_lengkap', 'like', "%{$search}%")
+                    ->orWhere('nomor_induk', 'like', "%{$search}%")
+                    ->orWhere('kelas', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('jenis_kelamin')) {
+            $query->where('jenis_kelamin', $request->jenis_kelamin);
+        }
+
+        $alumni = $query->orderByDesc('tahun_keluar')->orderBy('nama_lengkap')->paginate(10)->withQueryString();
+
+        return view('alumni.index', compact('alumni'));
+    }
+
+    /**
+     * Tutup kelas dan promosikan kelas di bawahnya tanpa menghapus data anggota.
      */
     public function hapusKelas(Request $request)
     {
@@ -58,36 +83,42 @@ class AnggotaController extends Controller
         ]);
 
         $selectedGrade = (int) $validated['kelas_tahun'];
-
         $selectedPatterns = $this->kelasPatterns($selectedGrade);
 
         Anggota::where(function ($query) use ($selectedPatterns) {
             foreach ($selectedPatterns as $pattern) {
                 $query->orWhere('kelas', 'like', $pattern);
             }
-        })->delete();
+        })
+            ->where('status_anggota', '!=', 'alumni')
+            ->update([
+                'status_anggota' => 'alumni',
+                'tahun_keluar' => now()->year,
+            ]);
 
         for ($grade = $selectedGrade - 1; $grade >= 7; $grade--) {
-            $nextGrade = $grade + 1;
             $patterns = $this->kelasPatterns($grade);
 
             $anggotas = Anggota::where(function ($query) use ($patterns) {
                 foreach ($patterns as $pattern) {
                     $query->orWhere('kelas', 'like', $pattern);
                 }
-            })->get();
+            })
+                ->where('status_anggota', '!=', 'alumni')
+                ->get();
 
             foreach ($anggotas as $anggota) {
                 $updated = $this->promoteKelas($anggota->kelas);
 
                 if ($updated !== null) {
                     $anggota->kelas = $updated;
+                    $anggota->status_anggota = 'aktif';
                     $anggota->save();
                 }
             }
         }
 
-        $message = "Semua anggota kelas {$selectedGrade} berhasil dihapus.";
+        $message = "Semua anggota kelas {$selectedGrade} berhasil ditutup dan dijadikan alumni.";
 
         if ($selectedGrade > 7) {
             $message .= ' Kelas di bawahnya telah dipromosikan satu tingkat.';

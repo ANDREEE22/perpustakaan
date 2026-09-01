@@ -59,6 +59,15 @@
                     </flux:sidebar.item>
 
                     <flux:sidebar.item
+                        icon="user-group"
+                        :href="route('alumni.index')"
+                        :current="request()->routeIs('alumni*')"
+                        wire:navigate
+                    >
+                        {{ __('Data Alumni') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item
                         icon="bookmark"
                         :href="route('pinjam.index')"
                         :current="request()->routeIs('pinjam*')"

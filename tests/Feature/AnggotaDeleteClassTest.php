@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('menghapus kelas 9 lalu mempromosikan kelas 7 dan 8 satu tingkat', function () {
+test('menutup kelas 9 lalu mempromosikan kelas 7 dan 8 satu tingkat tanpa menghapus data', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
     $this->actingAs($user);
 
@@ -43,21 +43,24 @@ test('menghapus kelas 9 lalu mempromosikan kelas 7 dan 8 satu tingkat', function
     ]);
 
     $response->assertRedirect(route('anggota.index'));
-    $response->assertSessionHas('success');
+    $response->assertSessionHas('swal');
 
-    $this->assertDatabaseMissing('anggotas', [
+    $this->assertDatabaseHas('anggotas', [
         'nomor_induk' => '1003',
         'kelas' => '9A',
+        'status_anggota' => 'alumni',
     ]);
 
     $this->assertDatabaseHas('anggotas', [
         'nomor_induk' => '1001',
         'kelas' => '8A',
+        'status_anggota' => 'aktif',
     ]);
 
     $this->assertDatabaseHas('anggotas', [
         'nomor_induk' => '1002',
         'kelas' => '9A',
+        'status_anggota' => 'aktif',
     ]);
 
     $this->assertDatabaseHas('anggotas', [
