@@ -600,11 +600,23 @@ function startScanner() {
     html5QrScanner = new Html5Qrcode(readerId);
 
     Html5Qrcode.getCameras().then(cameras => {
-        const cameraId = cameras && cameras.length ? cameras[0].id : null;
-        if (!cameraId) {
+        if (!cameras || !cameras.length) {
             scanStatus.textContent = 'Tidak ada kamera terdeteksi.';
             return;
         }
+
+        // Prefer a rear/environment camera when available (mobile devices)
+        let cameraId = null;
+        // Try to find camera by label keywords
+        const rearCam = cameras.find(c => /back|rear|environment|belakang/i.test(c.label || ''));
+        if (rearCam) {
+            cameraId = rearCam.id;
+        } else {
+            // If on mobile, prefer the last camera (often the rear); otherwise keep first
+            const isMobile = /Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent || navigator.vendor || '');
+            cameraId = isMobile ? cameras[cameras.length - 1].id : cameras[0].id;
+        }
+
         const config = { fps: 10, qrbox: { width: 250, height: 250 } };
         html5QrScanner.start(
             { deviceId: { exact: cameraId } },

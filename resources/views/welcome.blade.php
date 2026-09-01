@@ -16,6 +16,11 @@
             --scroll-progress: 0%;
         }
 
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
         .hero-backdrop {
             background-image:
                 linear-gradient(135deg, rgba(12, 10, 9, 0.95), rgba(12, 10, 9, 0.8) 48%, rgba(28, 25, 23, 0.6)),
@@ -23,6 +28,14 @@
             background-position: center;
             background-size: cover;
             background-attachment: fixed;
+        }
+
+        /* background-attachment: fixed renders janky/broken on most touch devices
+           (phones AND tablets), so disable it well before desktop breakpoints */
+        @media (max-width: 1024px), (hover: none) {
+            .hero-backdrop {
+                background-attachment: scroll;
+            }
         }
 
         .book-title {
@@ -103,6 +116,16 @@
             .scroll-stagger > *:nth-child(3) { transition-delay: 0.3s; }
             .scroll-stagger > *:nth-child(4) { transition-delay: 0.4s; }
             .scroll-stagger > *:nth-child(5) { transition-delay: 0.5s; }
+        }
+
+        /* Fallback for browsers without IntersectionObserver: never leave content invisible */
+        .no-js .scroll-fade-in,
+        .no-js .scroll-slide-left,
+        .no-js .scroll-slide-right,
+        .no-js .scroll-scale-up,
+        .no-js .scroll-stagger > * {
+            opacity: 1 !important;
+            transform: none !important;
         }
 
         /* ===== SOCIAL MEDIA SIDEBAR ===== */
@@ -346,6 +369,14 @@
         }
 
         /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .social-sidebar {
+                right: -4px;
+                transform: translateY(-50%) scale(0.9);
+                opacity: 0.95;
+            }
+        }
+
         @media (max-width: 768px) {
             .social-sidebar {
                 right: -60px;
@@ -359,13 +390,8 @@
             footer { padding: 40px 20px; }
             .footer-section { margin-bottom: 32px; }
 
-            .hero-backdrop {
-                min-height: 620px;
-                background-attachment: scroll;
-            }
-
             .hero-title {
-                font-size: clamp(2.5rem, 10vw, 4rem);
+                font-size: clamp(2.25rem, 9vw, 4rem);
             }
 
             .hero-actions {
@@ -392,6 +418,10 @@
         }
 
         @media (max-width: 640px) {
+            .social-sidebar {
+                display: none;
+            }
+
             header .header-logo p:first-child {
                 font-size: 0.75rem;
             }
@@ -404,6 +434,42 @@
             .mobile-menu-panel button {
                 width: 100%;
                 justify-content: center;
+            }
+
+            .footer-bottom .grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-bottom .flex {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #modalOverlay .relative {
+                margin: 0.75rem;
+                max-height: calc(100vh - 1.5rem);
+            }
+
+            #modalOverlay .p-8 {
+                padding: 1.25rem;
+            }
+
+            .stats-grid {
+                gap: 1rem !important;
+            }
+
+            .stats-grid p {
+                font-size: 1.25rem;
+                word-break: break-word;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .stats-grid {
+                grid-template-columns: 1fr !important;
             }
         }
 
@@ -435,7 +501,7 @@
     <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-stone-950/80 text-white backdrop-blur-md shadow-sm">
         <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
             <a href="{{ route('home') }}" class="header-logo flex min-w-0 items-center gap-3 transition hover:opacity-80">
-                <img src="{{ asset('images/logo_sekolah.png') }}" alt="Logo SMP Negeri 4 Jember" class="h-10 w-10 shrink-0 rounded-md bg-white object-contain p-1">
+                <img src="{{ asset('images/logo_sekolah.png') }}" alt="Logo SMP Negeri 4 Jember" class="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-md bg-white object-contain p-1">
                 <div class="min-w-0">
                     <p class="truncate text-sm font-semibold tracking-wide">Perpustakaan Digital</p>
                     <p class="truncate text-xs text-amber-400">SMP Negeri 4 Jember</p>
@@ -451,7 +517,7 @@
             </nav>
 
             <div class="flex items-center gap-2 md:hidden">
-                <button id="mobileMenuButton" type="button" aria-label="Buka menu" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white transition hover:bg-white/10">
+                <button id="mobileMenuButton" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="mobileMenu" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white transition hover:bg-white/10">
                     <i class="fas fa-bars text-lg"></i>
                 </button>
             </div>
@@ -462,7 +528,7 @@
             </a>
         </div>
 
-        <div id="mobileMenu" class="mobile-menu-panel hidden border-t border-white/10 bg-stone-950/95 px-4 py-4 md:hidden">
+        <div id="mobileMenu" class="mobile-menu-panel hidden border-t border-white/10 bg-stone-950/95 px-4 py-4 md:hidden absolute inset-x-0 top-full z-40">
             <nav class="flex flex-col gap-2 text-sm font-medium text-stone-200">
                 <a href="#koleksi" class="rounded-lg px-3 py-2.5 transition hover:bg-white/5 hover:text-amber-400">Koleksi</a>
                 <a href="#layanan" class="rounded-lg px-3 py-2.5 transition hover:bg-white/5 hover:text-amber-400">Layanan</a>
@@ -478,7 +544,7 @@
     </header>
 
     <main>
-        <section class="hero-backdrop relative isolate min-h-[720px] overflow-hidden pt-24 text-white flex items-center">
+        <section class="hero-backdrop relative isolate min-h-[60vh] md:min-h-[720px] overflow-hidden pt-20 sm:pt-24 text-white flex items-center">
             <div class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,transparent,rgba(250,250,249,0.02)_60%,#fafaf9_100%)] backdrop-blur-[2px]"></div>
 
             <div class="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 pb-14 pt-14 sm:px-6 lg:px-8">
@@ -488,19 +554,19 @@
                         Katalog Digital Interaktif Sekolah
                     </div>
 
-                    <h1 class="mt-8 text-5xl font-bold tracking-tight leading-[1.1] sm:text-6xl lg:text-7xl scroll-fade-in drop-shadow-md">
+                    <h1 class="hero-title mt-8 text-4xl font-bold tracking-tight leading-[1.1] sm:text-6xl lg:text-7xl scroll-fade-in drop-shadow-md">
                         Jendela Dunia dalam <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500">Satu Genggaman</span>
                     </h1>
-                    <p class="mt-6 max-w-2xl text-lg leading-relaxed text-stone-300 scroll-fade-in drop-shadow" style="transition-delay: 0.2s;">
+                    <p class="mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-stone-300 scroll-fade-in drop-shadow" style="transition-delay: 0.2s;">
                         Jelajahi ribuan koleksi buku pelajaran, fiksi, sains, hingga referensi sejarah di ruang baca digital SMP Negeri 4 Jember yang rapi dan nyaman.
                     </p>
 
-                    <div class="mt-10 flex flex-col gap-4 sm:flex-row scroll-fade-in" style="transition-delay: 0.3s;">
-                        <a href="#koleksi" class="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-amber-500 px-8 text-base font-bold text-stone-950 transition hover:bg-amber-400 hover:scale-105 hover:shadow-xl hover:shadow-amber-500/30">
+                    <div class="hero-actions mt-10 flex flex-col gap-4 sm:flex-row scroll-fade-in" style="transition-delay: 0.3s;">
+                        <a href="#koleksi" class="inline-flex h-12 sm:h-14 items-center justify-center gap-2 rounded-xl bg-amber-500 px-6 sm:px-8 text-base font-bold text-stone-950 transition hover:bg-amber-400 hover:scale-105 hover:shadow-xl hover:shadow-amber-500/30">
                             <i class="fas fa-search"></i>
                             Jelajahi Koleksi
                         </a>
-                        <a href="#pengumuman" class="inline-flex h-14 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-8 text-base font-semibold text-white backdrop-blur-md transition hover:bg-white/15 hover:border-white/40">
+                        <a href="#pengumuman" class="inline-flex h-12 sm:h-14 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 sm:px-8 text-base font-semibold text-white backdrop-blur-md transition hover:bg-white/15 hover:border-white/40">
                             <i class="far fa-bell"></i>
                             Lihat Pengumuman
                         </a>
@@ -508,13 +574,13 @@
                 </div>
 
                 <div class="mt-4 lg:w-2/3 scroll-scale-up" style="animation-delay: 0.4s">
-                    <div class="rounded-2xl border border-white/10 bg-white/10 p-3 shadow-2xl backdrop-blur-lg">
-                        <div class="flex flex-col gap-3 sm:flex-row">
+                    <div class="search-shell rounded-2xl border border-white/10 bg-white/10 p-3 shadow-2xl backdrop-blur-lg">
+                        <div class="search-row flex flex-col gap-3 sm:flex-row">
                             <div class="flex min-h-[56px] flex-1 items-center gap-3 rounded-xl bg-white px-5 text-stone-600 focus-within:ring-2 focus-within:ring-amber-400 transition-all shadow-inner">
                                 <i class="fas fa-search text-stone-400 text-lg"></i>
                                 <input id="searchInput" type="search" class="h-full w-full bg-transparent text-base text-stone-900 outline-none placeholder:text-stone-400" placeholder="Cari judul buku, nama penulis, atau kategori..." oninput="cariBuku()">
                             </div>
-                            <button type="button" onclick="scrollToCollection()" class="inline-flex h-[56px] items-center justify-center rounded-xl bg-stone-900 px-8 text-base font-semibold text-white transition hover:bg-stone-800 shadow-md">
+                            <button type="button" onclick="scrollToCollection()" class="search-btn inline-flex h-12 sm:h-[56px] items-center justify-center rounded-xl bg-stone-900 px-6 sm:px-8 text-base font-semibold text-white transition hover:bg-stone-800 shadow-md">
                                 Cari Buku
                             </button>
                         </div>
@@ -523,10 +589,10 @@
             </div>
         </section>
 
-        <section id="koleksi" class="scroll-fade-in relative px-4 py-24 sm:px-6 lg:px-8 bg-stone-50">
+        <section id="koleksi" class="scroll-fade-in relative px-4 py-16 sm:py-24 sm:px-6 lg:px-8 bg-stone-50">
             <div class="mx-auto max-w-7xl">
                 <div class="mb-12 scroll-fade-in text-center">
-                    <h2 class="text-3xl font-bold text-stone-900 sm:text-4xl">Koleksi Buku Pilihan</h2>
+                    <h2 class="text-2xl font-bold text-stone-900 sm:text-3xl lg:text-4xl">Koleksi Buku Pilihan</h2>
                     <p class="mt-4 text-stone-500 max-w-2xl mx-auto">
                         Temukan ribuan judul buku yang kami miliki, mulai dari buku pelajaran, literasi, hingga referensi pengetahuan umum
                     </p>
@@ -565,23 +631,23 @@
                     @endforeach
                 </div>
 
-                <div id="bukuGrid" class="grid gap-6 scroll-stagger sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+                <div id="bukuGrid" class="grid gap-4 sm:gap-6 scroll-stagger grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
                 
                 <div id="paginationContainer" class="mt-12 flex flex-wrap justify-center items-center gap-2 scroll-fade-in"></div>
             </div>
         </section>
 
-        <section id="layanan" class="scroll-fade-in relative px-4 py-24 sm:px-6 lg:px-8 bg-stone-100 border-t border-stone-200">
+        <section id="layanan" class="scroll-fade-in relative px-4 py-16 sm:py-24 sm:px-6 lg:px-8 bg-stone-100 border-t border-stone-200">
             <div class="mx-auto max-w-7xl">
                 <div class="text-center mb-16 scroll-fade-in">
-                    <h2 class="text-3xl font-bold text-stone-900 sm:text-4xl">Layanan Perpustakaan</h2>
+                    <h2 class="text-2xl font-bold text-stone-900 sm:text-3xl lg:text-4xl">Layanan Perpustakaan</h2>
                     <p class="mt-4 text-stone-500 max-w-2xl mx-auto">
                         Berbagai fasilitas dan kemudahan yang kami sediakan untuk mendukung kegiatan literasi dan pembelajaran siswa.
                     </p>
                 </div>
 
-                <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4 scroll-stagger">
-                    <div class="group relative overflow-hidden rounded-2xl bg-white p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
+                <div class="grid gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-4 scroll-stagger">
+                    <div class="group relative overflow-hidden rounded-2xl bg-white p-6 sm:p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
                         <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-amber-100 text-amber-600 text-2xl transition-transform group-hover:scale-110 group-hover:rotate-3">
                             <i class="fas fa-book-reader"></i>
                         </div>
@@ -589,7 +655,7 @@
                         <p class="text-sm text-stone-500 leading-relaxed">Akses e-book dan modul pembelajaran secara langsung melalui perangkat Anda tanpa batas waktu.</p>
                     </div>
 
-                    <div class="group relative overflow-hidden rounded-2xl bg-white p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
+                    <div class="group relative overflow-hidden rounded-2xl bg-white p-6 sm:p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
                         <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-sky-100 text-sky-600 text-2xl transition-transform group-hover:scale-110 group-hover:rotate-3">
                             <i class="fas fa-hand-holding-heart"></i>
                         </div>
@@ -597,7 +663,7 @@
                         <p class="text-sm text-stone-500 leading-relaxed">Layanan peminjaman buku fisik secara mandiri untuk mempermudah reservasi sebelum ke perpustakaan.</p>
                     </div>
 
-                    <div class="group relative overflow-hidden rounded-2xl bg-white p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
+                    <div class="group relative overflow-hidden rounded-2xl bg-white p-6 sm:p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
                         <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 text-2xl transition-transform group-hover:scale-110 group-hover:rotate-3">
                             <i class="fas fa-laptop-code"></i>
                         </div>
@@ -605,7 +671,7 @@
                         <p class="text-sm text-stone-500 leading-relaxed">Tersedia unit komputer dengan akses internet cepat untuk keperluan riset dan tugas sekolah siswa.</p>
                     </div>
 
-                    <div class="group relative overflow-hidden rounded-2xl bg-white p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
+                    <div class="group relative overflow-hidden rounded-2xl bg-white p-6 sm:p-8 border border-stone-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 hover:border-amber-200">
                         <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-rose-100 text-rose-600 text-2xl transition-transform group-hover:scale-110 group-hover:rotate-3">
                             <i class="fas fa-chalkboard-teacher"></i>
                         </div>
@@ -616,14 +682,14 @@
             </div>
         </section>
 
-        <section id="pengumuman" class="scroll-fade-in relative bg-white px-4 py-20 sm:px-6 lg:px-8 border-y border-stone-200">
+        <section id="pengumuman" class="scroll-fade-in relative bg-white px-4 py-16 sm:py-20 sm:px-6 lg:px-8 border-y border-stone-200">
             <div class="mx-auto max-w-7xl">
-                <h2 class="text-3xl font-bold text-stone-900 sm:text-4xl scroll-fade-in">Informasi & Pengumuman</h2>
+                <h2 class="text-2xl font-bold text-stone-900 sm:text-3xl lg:text-4xl scroll-fade-in">Informasi & Pengumuman</h2>
                 <p class="mt-4 text-base text-stone-500 scroll-fade-in" style="transition-delay: 0.2s;">
                     Update terbaru mengenai perpustakaan dan koleksi buku
                 </p>
 
-                <div class="mt-12 grid gap-6 scroll-stagger md:grid-cols-2 lg:grid-cols-3">
+                <div class="mt-12 grid gap-6 scroll-stagger sm:grid-cols-2 lg:grid-cols-3">
                     @forelse($pengumumans as $index => $info)
                         @php
                             $gradient = match($info->tipe_warna) {
@@ -650,7 +716,7 @@
                             </div>
                         </article>
                     @empty
-                        <div class="lg:col-span-3 rounded-2xl border border-stone-100 bg-stone-50 p-8 text-center text-stone-500">
+                        <div class="sm:col-span-2 lg:col-span-3 rounded-2xl border border-stone-100 bg-stone-50 p-8 text-center text-stone-500">
                             Belum ada informasi atau pengumuman terbaru.
                         </div>
                     @endforelse
@@ -658,14 +724,18 @@
             </div>
         </section>
 
-        <section id="struktur" class="scroll-fade-in relative px-4 py-24 sm:px-6 lg:px-8 bg-stone-100 border-b border-stone-200">
+        <section id="struktur" class="scroll-fade-in relative px-4 py-16 sm:py-24 sm:px-6 lg:px-8 bg-stone-100 border-b border-stone-200">
             <div class="mx-auto max-w-7xl">
                 <div class="text-center mb-12 scroll-fade-in">
-                    <h2 class="text-3xl font-bold text-stone-900 sm:text-4xl">Struktur Organisasi</h2>
+                    <h2 class="text-2xl font-bold text-stone-900 sm:text-3xl lg:text-4xl">Struktur Organisasi</h2>
                     <p class="mt-4 text-stone-500 max-w-2xl mx-auto">
                         Tim pengelola Perpustakaan Digital SMP Negeri 4 Jember yang berdedikasi melayani kebutuhan literasi Anda.
                     </p>
                 </div>
+
+                <p class="mb-3 text-center text-xs font-medium text-stone-400 lg:hidden">
+                    <i class="fas fa-arrows-left-right mr-1"></i> Geser untuk melihat struktur lengkap
+                </p>
 
                 <div class="org-tree-wrapper overflow-x-auto pb-10 w-full scroll-scale-up">
                     @if($strukturs->isEmpty())
@@ -681,7 +751,7 @@
                             $fourthLevel = $levels->get(4, collect());
                         @endphp
 
-                        <div class="org-tree min-w-[900px] w-full">
+                        <div class="org-tree min-w-[320px] sm:min-w-[900px] w-full">
                             <ul>
                                 @foreach($topLevel as $top)
                                     <li>
@@ -739,11 +809,11 @@
             </div>
         </section>
 
-        <section id="kontak" class="scroll-fade-in relative px-4 py-24 sm:px-6 lg:px-8 bg-stone-50">
+        <section id="kontak" class="scroll-fade-in relative px-4 py-16 sm:py-24 sm:px-6 lg:px-8 bg-stone-50">
             <div class="mx-auto max-w-7xl">
-                <div class="grid gap-16 lg:grid-cols-2">
+                <div class="grid gap-12 lg:gap-16 lg:grid-cols-2">
                     <div class="scroll-slide-left">
-                        <h2 class="text-3xl font-bold text-stone-900 sm:text-4xl">Hubungi Kami</h2>
+                        <h2 class="text-2xl font-bold text-stone-900 sm:text-3xl lg:text-4xl">Hubungi Kami</h2>
                         <p class="mt-4 text-base text-stone-500">
                             Memiliki pertanyaan atau saran untuk perpustakaan? Jangan ragu untuk menghubungi kami melalui berbagai saluran komunikasi di bawah ini.
                         </p>
@@ -753,7 +823,7 @@
                                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600 text-xl">
                                     <i class="fas fa-phone-alt"></i>
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <h3 class="font-bold text-stone-900">Telepon</h3>
                                     <p class="mt-1 text-sm text-stone-500">+62 331 123456</p>
                                 </div>
@@ -763,9 +833,9 @@
                                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600 text-xl">
                                     <i class="fas fa-envelope"></i>
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <h3 class="font-bold text-stone-900">Email</h3>
-                                    <p class="mt-1 text-sm text-stone-500">perpustakaan@smpn4jember.sch.id</p>
+                                    <p class="mt-1 text-sm text-stone-500 break-words">perpustakaan@smpn4jember.sch.id</p>
                                 </div>
                             </div>
 
@@ -773,7 +843,7 @@
                                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600 text-xl">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <h3 class="font-bold text-stone-900">Alamat</h3>
                                     <p class="mt-1 text-sm text-stone-500">Jl. Nusa Indah No.14, Krajan, Jemberlor, Kec. Patrang, Kabupaten Jember, Jawa Timur 68118</p>
                                 </div>
@@ -782,11 +852,11 @@
                     </div>
 
                     <div class="scroll-slide-right">
-                        <div class="rounded-2xl bg-white p-8 border border-stone-200 shadow-lg">
-                            <h3 class="text-2xl font-bold text-stone-900">Statistik Perpustakaan</h3>
+                        <div class="rounded-2xl bg-white p-5 sm:p-8 border border-stone-200 shadow-lg">
+                            <h3 class="text-xl sm:text-2xl font-bold text-stone-900">Statistik Perpustakaan</h3>
                             <p class="text-sm text-stone-500 mt-2">Data perkembangan buku & pengunjung tahun 2026</p>
                             
-                            <div class="relative w-full h-56 mt-8">
+                            <div class="relative w-full h-40 sm:h-56 mt-8">
                                 @php
                                     // Normalize chart values for SVG (0-200 range)
                                     $maxValue = max($chartValues) > 0 ? max($chartValues) : 100;
@@ -837,29 +907,29 @@
                                     @endforeach
                                 </svg>
                                 
-                                <div class="flex justify-between text-xs font-semibold text-stone-400 mt-3 px-2">
+                                <div class="flex justify-between text-[10px] sm:text-xs font-semibold text-stone-400 mt-3 px-2">
                                     @foreach($chartLabels as $label)
                                     <span>{{ $label }}</span>
                                     @endforeach
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-6 mt-8 pt-6 border-t border-stone-100">
+                            <div class="stats-grid grid grid-cols-2 gap-4 sm:gap-6 mt-8 pt-6 border-t border-stone-100">
                                 <div>
                                     <span class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Total Buku</span>
-                                    <p class="text-2xl font-bold text-stone-900 mt-1">{{ number_format($statistics['totalBuku']) }}</p>
+                                    <p class="text-xl sm:text-2xl font-bold text-stone-900 mt-1">{{ number_format($statistics['totalBuku']) }}</p>
                                 </div>
                                 <div>
                                     <span class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Anggota Aktif</span>
-                                    <p class="text-2xl font-bold text-stone-900 mt-1">{{ number_format($statistics['anggotaAktif']) }}</p>
+                                    <p class="text-xl sm:text-2xl font-bold text-stone-900 mt-1">{{ number_format($statistics['anggotaAktif']) }}</p>
                                 </div>
                                 <div>
                                     <span class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Pengunjung</span>
-                                    <p class="text-2xl font-bold text-stone-900 mt-1">{{ number_format($statistics['pengunjungBulanIni']) }} <span class="text-sm font-normal text-amber-500">/Bulan</span></p>
+                                    <p class="text-xl sm:text-2xl font-bold text-stone-900 mt-1">{{ number_format($statistics['pengunjungBulanIni']) }} <span class="text-sm font-normal text-amber-500">/Bulan</span></p>
                                 </div>
                                 <div>
                                     <span class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Kepuasan</span>
-                                    <p class="text-2xl font-bold text-stone-900 mt-1">{{ $statistics['kepuasan'] }}%</p>
+                                    <p class="text-xl sm:text-2xl font-bold text-stone-900 mt-1">{{ $statistics['kepuasan'] }}%</p>
                                 </div>
                             </div>
                         </div>
@@ -870,11 +940,11 @@
     </main>
 
     <footer class="mt-0">
-        <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-            <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+        <div class="mx-auto max-w-7xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
+            <div class="grid gap-10 sm:gap-12 sm:grid-cols-2 lg:grid-cols-4">
                 <div class="footer-section scroll-fade-in">
                     <div class="flex items-center gap-3 mb-6">
-                        <img src="{{ asset('images/smp.png') }}" alt="Logo" class="h-12 w-12 rounded-xl bg-white object-contain p-1.5 shadow-md">
+                        <img src="{{ asset('images/smp.png') }}" alt="Logo" class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white object-contain p-1.5 shadow-md">
                         <div>
                             <h4 class="font-bold text-white text-lg">Perpus Digital</h4>
                             <p class="text-xs font-medium text-amber-400">SMP Negeri 4 Jember</p>
@@ -924,7 +994,7 @@
                     </div>
                     <p class="mt-6 text-sm text-stone-400">
                         <strong>Email Bantuan:</strong><br/>
-                        <a href="mailto:perpustakaan@smpn4jember.sch.id" class="footer-bottom-link mt-1 inline-block">perpustakaan@smpn4jember.sch.id</a>
+                        <a href="mailto:perpustakaan@smpn4jember.sch.id" class="footer-bottom-link mt-1 inline-block break-words">perpustakaan@smpn4jember.sch.id</a>
                     </p>
                 </div>
             </div>
@@ -951,34 +1021,34 @@
                 <i class="fas fa-times text-lg w-6 h-6 flex items-center justify-center"></i>
             </button>
 
-            <div id="modalCover" class="h-56 w-full"></div>
+            <div id="modalCover" class="h-40 sm:h-56 w-full"></div>
 
-            <div class="p-8">
-                <div class="flex gap-6">
-                    <div class="h-32 w-24 shrink-0 rounded-xl border-4 border-white bg-stone-100 shadow-lg -mt-16 overflow-hidden flex items-center justify-center">
+            <div class="p-5 sm:p-8">
+                <div class="flex flex-col sm:flex-row gap-6">
+                    <div class="h-28 w-20 sm:h-32 sm:w-24 shrink-0 rounded-xl border-4 border-white bg-stone-100 shadow-lg -mt-12 sm:-mt-16 overflow-hidden flex items-center justify-center">
                         <img id="modalInitial" src="" alt="Sampul" class="h-full w-full object-cover">
                     </div>
 
-                    <div class="flex-1 -mt-2">
-                        <h2 id="modalJudul" class="text-2xl font-bold text-stone-900"></h2>
+                    <div class="flex-1 sm:-mt-2 min-w-0">
+                        <h2 id="modalJudul" class="text-xl sm:text-2xl font-bold text-stone-900 break-words"></h2>
                         <p id="modalPenulis" class="mt-1 text-sm font-medium text-amber-600"></p>
 
                         <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                            <div class="flex flex-col bg-stone-50 p-3 rounded-xl border border-stone-100">
+                            <div class="flex flex-col bg-stone-50 p-3 rounded-xl border border-stone-100 min-w-0">
                                 <span class="text-xs font-semibold text-stone-400">Kategori</span>
-                                <span id="modalKategori" class="font-bold text-stone-900 text-sm mt-1"></span>
+                                <span id="modalKategori" class="font-bold text-stone-900 text-sm mt-1 truncate"></span>
                             </div>
-                            <div class="flex flex-col bg-stone-50 p-3 rounded-xl border border-stone-100">
+                            <div class="flex flex-col bg-stone-50 p-3 rounded-xl border border-stone-100 min-w-0">
                                 <span class="text-xs font-semibold text-stone-400">Tahun</span>
-                                <span id="modalTahun" class="font-bold text-stone-900 text-sm mt-1"></span>
+                                <span id="modalTahun" class="font-bold text-stone-900 text-sm mt-1 truncate"></span>
                             </div>
-                            <div class="flex flex-col bg-stone-50 p-3 rounded-xl border border-stone-100">
+                            <div class="flex flex-col bg-stone-50 p-3 rounded-xl border border-stone-100 min-w-0">
                                 <span class="text-xs font-semibold text-stone-400">Penerbit</span>
                                 <span id="modalPenerbit" class="font-bold text-stone-900 text-sm mt-1 truncate" title=""></span>
                             </div>
-                            <div class="flex flex-col bg-stone-50 p-3 rounded-xl border border-stone-100">
+                            <div class="flex flex-col bg-stone-50 p-3 rounded-xl border border-stone-100 min-w-0">
                                 <span class="text-xs font-semibold text-stone-400">Status</span>
-                                <span id="modalStatus" class="font-bold text-teal-600 text-sm mt-1"></span>
+                                <span id="modalStatus" class="font-bold text-teal-600 text-sm mt-1 truncate"></span>
                             </div>
                         </div>
                     </div>
@@ -1003,28 +1073,32 @@
         window.addEventListener('scroll', () => {
             const scrollTop = window.scrollY;
             const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = (scrollTop / docHeight) * 100;
+            const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
             document.documentElement.style.setProperty('--scroll-progress', scrollPercent + '%');
         });
 
         // ===== SCROLL ANIMATIONS (1 ARAH) =====
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+        if ('IntersectionObserver' in window) {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
 
-        const observer = new IntersectionObserver(function(entries, observerInstance) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observerInstance.unobserve(entry.target);
-                }
+            const observer = new IntersectionObserver(function(entries, observerInstance) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observerInstance.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.scroll-fade-in, .scroll-slide-left, .scroll-slide-right, .scroll-scale-up, .scroll-stagger').forEach(el => {
+                observer.observe(el);
             });
-        }, observerOptions);
-
-        document.querySelectorAll('.scroll-fade-in, .scroll-slide-left, .scroll-slide-right, .scroll-scale-up, .scroll-stagger').forEach(el => {
-            observer.observe(el);
-        });
+        } else {
+            document.documentElement.classList.add('no-js');
+        }
 
         // ===== WARNA GRADIEN UNTUK SETIAP KATEGORI =====
         const warnaKategori = {
@@ -1061,7 +1135,7 @@
 
             if (filtered.length === 0) {
                 grid.innerHTML = `
-                    <div class="col-span-full rounded-2xl border-2 border-dashed border-stone-200 bg-white p-12 text-center">
+                    <div class="col-span-full rounded-2xl border-2 border-dashed border-stone-200 bg-white p-8 sm:p-12 text-center">
                         <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-stone-50 text-stone-400 text-2xl mb-4">
                             <i class="fas fa-search-minus"></i>
                         </div>
@@ -1094,19 +1168,19 @@
                 return `
                     <article class="group overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-amber-200 scroll-scale-up" style="transition-delay: ${(index % 8) * 0.05}s;">
                         <button type="button" class="block h-full w-full text-left" onclick="bukaModal(${buku.id})">
-                            <div class="relative flex h-56 items-center justify-center p-3 text-white bg-stone-100 overflow-hidden">
+                            <div class="relative flex h-36 sm:h-56 items-center justify-center p-3 text-white bg-stone-100 overflow-hidden">
                                 <img src="${buku.sampul}" alt="${buku.judul}" class="h-full w-full object-cover hover:scale-110 transition-transform duration-300" onerror="this.src='{{ asset('images/placeholder-book.svg') }}'">
-                                <span class="absolute left-4 top-4 rounded-full border ${statusClass} px-3 py-1 text-xs font-bold shadow-sm backdrop-blur-sm bg-white/90">${statusLabel}</span>
+                                <span class="absolute left-2 top-2 sm:left-4 sm:top-4 rounded-full border ${statusClass} px-2 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-bold shadow-sm backdrop-blur-sm bg-white/90">${statusLabel}</span>
                                 <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/30 to-transparent"></div>
                             </div>
-                            <div class="p-5">
-                                <p class="book-title min-h-[48px] text-base font-bold leading-snug text-stone-900 group-hover:text-amber-600 transition-colors">${buku.judul}</p>
-                                <p class="mt-1 truncate text-sm font-medium text-stone-500">${buku.penulis}</p>
-                                <div class="mt-5 flex items-center justify-between gap-3 pt-4 border-t border-stone-100">
-                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-stone-50 px-2.5 py-1 text-xs font-semibold text-stone-600 border border-stone-100">
+                            <div class="p-3 sm:p-5">
+                                <p class="book-title min-h-[40px] sm:min-h-[48px] text-sm sm:text-base font-bold leading-snug text-stone-900 group-hover:text-amber-600 transition-colors">${buku.judul}</p>
+                                <p class="mt-1 truncate text-xs sm:text-sm font-medium text-stone-500">${buku.penulis}</p>
+                                <div class="mt-3 sm:mt-5 flex items-center justify-between gap-2 pt-3 sm:pt-4 border-t border-stone-100">
+                                    <span class="inline-flex items-center gap-1 sm:gap-1.5 rounded-lg bg-stone-50 px-2 py-1 text-[10px] sm:text-xs font-semibold text-stone-600 border border-stone-100 truncate">
                                         <i class="fas fa-tag text-amber-500"></i> ${buku.kategori}
                                     </span>
-                                    <span class="text-xs font-bold text-amber-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                    <span class="text-[10px] sm:text-xs font-bold text-amber-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform shrink-0">
                                         Detail <i class="fas fa-arrow-right"></i>
                                     </span>
                                 </div>
@@ -1132,8 +1206,8 @@
 
             // Tombol Prev
             const prevDisabled = currentPage === 1 ? 'opacity-50 cursor-not-allowed bg-stone-100' : 'hover:bg-amber-400 hover:text-stone-900 transition bg-white';
-            html += `<button onclick="${currentPage === 1 ? '' : `changePage(${currentPage - 1})`}" class="px-4 py-2 rounded-xl border border-stone-200 text-sm font-bold text-stone-600 shadow-sm flex items-center gap-2 ${prevDisabled}">
-                        <i class="fas fa-chevron-left"></i> Prev
+            html += `<button onclick="${currentPage === 1 ? '' : `changePage(${currentPage - 1})`}" class="px-3 sm:px-4 py-2 rounded-xl border border-stone-200 text-sm font-bold text-stone-600 shadow-sm flex items-center gap-1 sm:gap-2 ${prevDisabled}">
+                        <i class="fas fa-chevron-left"></i> <span class="hidden sm:inline">Prev</span>
                      </button>`;
 
             // Angka Halaman
@@ -1141,13 +1215,13 @@
                 const activeClass = i === currentPage 
                     ? 'bg-amber-500 text-stone-950 border-amber-500 shadow-md scale-105' 
                     : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50 transition';
-                html += `<button onclick="changePage(${i})" class="w-10 h-10 rounded-xl border text-sm font-bold shadow-sm flex items-center justify-center transition-all ${activeClass}">${i}</button>`;
+                html += `<button onclick="changePage(${i})" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border text-sm font-bold shadow-sm flex items-center justify-center transition-all ${activeClass}">${i}</button>`;
             }
 
             // Tombol Next
             const nextDisabled = currentPage === totalPages ? 'opacity-50 cursor-not-allowed bg-stone-100' : 'hover:bg-amber-400 hover:text-stone-900 transition bg-white';
-            html += `<button onclick="${currentPage === totalPages ? '' : `changePage(${currentPage + 1})`}" class="px-4 py-2 rounded-xl border border-stone-200 text-sm font-bold text-stone-600 shadow-sm flex items-center gap-2 ${nextDisabled}">
-                        Next <i class="fas fa-chevron-right"></i>
+            html += `<button onclick="${currentPage === totalPages ? '' : `changePage(${currentPage + 1})`}" class="px-3 sm:px-4 py-2 rounded-xl border border-stone-200 text-sm font-bold text-stone-600 shadow-sm flex items-center gap-1 sm:gap-2 ${nextDisabled}">
+                        <span class="hidden sm:inline">Next</span> <i class="fas fa-chevron-right"></i>
                      </button>`;
 
             container.innerHTML = html;
