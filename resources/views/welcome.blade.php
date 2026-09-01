@@ -435,7 +435,7 @@
     <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-stone-950/80 text-white backdrop-blur-md shadow-sm">
         <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
             <a href="{{ route('home') }}" class="header-logo flex min-w-0 items-center gap-3 transition hover:opacity-80">
-                <img src="{{ asset('images/smp.png') }}" alt="Logo SMP Negeri 4 Jember" class="h-10 w-10 shrink-0 rounded-md bg-white object-contain p-1">
+                <img src="{{ asset('images/logo_sekolah.png') }}" alt="Logo SMP Negeri 4 Jember" class="h-10 w-10 shrink-0 rounded-md bg-white object-contain p-1">
                 <div class="min-w-0">
                     <p class="truncate text-sm font-semibold tracking-wide">Perpustakaan Digital</p>
                     <p class="truncate text-xs text-amber-400">SMP Negeri 4 Jember</p>
@@ -1242,6 +1242,51 @@
 
         // Init
         renderBuku();
+
+        // ===== MOBILE MENU TOGGLE =====
+        (function() {
+            const btn = document.getElementById('mobileMenuButton');
+            const panel = document.getElementById('mobileMenu');
+
+            if (!btn || !panel) return;
+
+            const closePanel = () => {
+                panel.classList.add('hidden');
+                panel.classList.remove('block');
+                btn.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            };
+
+            const openPanel = () => {
+                panel.classList.remove('hidden');
+                panel.classList.add('block');
+                btn.setAttribute('aria-expanded', 'true');
+                document.body.style.overflow = 'hidden';
+            };
+
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (panel.classList.contains('hidden')) {
+                    openPanel();
+                } else {
+                    closePanel();
+                }
+            });
+
+            // Close when clicking outside the panel
+            document.addEventListener('click', function(e) {
+                if (!panel.classList.contains('hidden') && !panel.contains(e.target) && !btn.contains(e.target)) {
+                    closePanel();
+                }
+            });
+
+            // Ensure panel is closed when resizing to desktop
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    closePanel();
+                }
+            });
+        })();
     </script>
 </body>
 </html>

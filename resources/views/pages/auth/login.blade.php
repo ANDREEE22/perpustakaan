@@ -30,18 +30,7 @@
                 </div>
 
                 <div class="relative z-10 grid grid-cols-3 gap-3">
-                    <div class="rounded-lg border border-white/10 bg-white/10 p-4 backdrop-blur">
-                        <p class="text-2xl font-semibold">1.2K</p>
-                        <p class="mt-1 text-xs text-white/55">Eksemplar</p>
-                    </div>
-                    <div class="rounded-lg border border-white/10 bg-white/10 p-4 backdrop-blur">
-                        <p class="text-2xl font-semibold">48</p>
-                        <p class="mt-1 text-xs text-white/55">Dipinjam</p>
-                    </div>
-                    <div class="rounded-lg border border-white/10 bg-white/10 p-4 backdrop-blur">
-                        <p class="text-2xl font-semibold">98%</p>
-                        <p class="mt-1 text-xs text-white/55">Tersedia</p>
-                    </div>
+                    
                 </div>
             </aside>
 
@@ -125,4 +114,3 @@
     </div>
 </x-layouts::auth>
 
-login
