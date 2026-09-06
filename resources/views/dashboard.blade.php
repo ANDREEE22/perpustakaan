@@ -21,7 +21,137 @@
     --lib-ink:     #f8fafc;
     --lib-muted:   #94a3b8;
 }
-.lib-root { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--lib-ink); }
+
+.dark .stat-card,
+.dark .lib-card {
+    background: rgba(15, 23, 42, 0.82);
+    border-color: rgba(148, 163, 184, 0.25);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.08);
+}
+
+.dark .stat-label,
+.dark .borrow-meta,
+.dark .denda-kelas,
+.dark .spark-label,
+.dark .clock-date,
+.dark .lib-banner p,
+.dark .lib-link,
+.dark .pop-count,
+.dark .borrow-title,
+.dark .denda-name,
+.dark .denda-kelas,
+.dark .tamu-avatar,
+.dark .lib-card-title {
+    color: var(--lib-ink) !important;
+}
+
+.dark .stat-card .stat-label,
+.dark .stat-card .stat-sub,
+.dark .borrow-item .borrow-meta,
+.dark .popular-item .pop-count {
+    color: var(--lib-muted) !important;
+}
+
+.dark a[style*="background:#f8fafc"],
+.dark a[style*="background:#ffffff"] {
+    background: rgba(15, 23, 42, 0.7) !important;
+    border-color: rgba(148, 163, 184, 0.22) !important;
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.08) !important;
+}
+
+.dark a[style*="background:#f8fafc"] span,
+.dark a[style*="background:#ffffff"] span {
+    color: #f8fafc !important;
+}
+
+.dark .lib-root,
+.dark .stat-number,
+.dark .stat-label,
+.dark .lib-card-title,
+.dark .borrow-title,
+.dark .borrow-meta,
+.dark .denda-name,
+.dark .denda-kelas,
+.dark .denda-amt,
+.dark .popular-item > div,
+.dark .spark-label,
+.dark .lib-link,
+.dark .pop-count,
+.dark .clock-date {
+    color: var(--lib-ink) !important;
+}
+
+.dark .stat-sub,
+.dark .clock-date,
+.dark .spark-label,
+.dark .borrow-meta,
+.dark .pop-count,
+.dark .denda-kelas,
+.dark .lib-link,
+.dark .lib-banner p {
+    color: var(--lib-muted) !important;
+}
+
+.dark .borrow-cover,
+.dark .tamu-avatar,
+.dark .stat-icon-wrap {
+    border-color: rgba(148, 163, 184, 0.18);
+    background: rgba(15, 23, 42, 0.75);
+}
+
+.dark .borrow-badge,
+.dark .badge-dipinjam,
+.dark .badge-kembali,
+.dark .badge-terlambat,
+.dark .stat-sub {
+    filter: saturate(0.95);
+}
+
+.dark a[style*="background:#f8fafc"],
+.dark a[style*="background:#ffffff"],
+.dark a[style*="background: rgb(248, 250, 252)"] {
+    background: rgba(15, 23, 42, 0.7) !important;
+    border-color: rgba(148, 163, 184, 0.25) !important;
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.08) !important;
+}
+
+.dark a[style*="background:#f8fafc"] span,
+.dark a[style*="background:#ffffff"] span,
+.dark a[style*="background: rgb(248, 250, 252)"] span {
+    color: #f8fafc !important;
+}
+
+.dark .pop-bar-wrap,
+.dark .spark-bar {
+    background: rgba(148, 163, 184, 0.2) !important;
+}
+
+.dark .spark-bar.today-bar {
+    background: linear-gradient(180deg, #2dd4bf, #0f766e) !important;
+}
+
+.dark .badge-dipinjam {
+    background: rgba(14, 116, 144, 0.2) !important;
+    color: #bae6fd !important;
+}
+
+.dark .badge-kembali {
+    background: rgba(34, 197, 94, 0.2) !important;
+    color: #bbf7d0 !important;
+}
+
+.dark .badge-terlambat {
+    background: rgba(244, 63, 94, 0.22) !important;
+    color: #fecdd3 !important;
+}
+
+.dark .lib-card-body > div,
+.dark .borrow-item,
+.dark .popular-item,
+.dark .denda-item,
+.dark .tamu-item {
+    border-color: rgba(148, 163, 184, 0.18) !important;
+}
 
 /* ── Banner ── */
 .lib-banner {

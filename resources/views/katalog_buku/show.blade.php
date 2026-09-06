@@ -194,13 +194,13 @@
                 </div>
                 <div class="mt-4 flex justify-center gap-2">
                     @if($buku->qr && $buku->qr->qr_path)
-                        <a href="{{ route('katalog.printqr', $buku->id) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-white hover:bg-zinc-50">Cetak QR</a>
-                        <a href="{{ route('katalog.downloadqr', $buku->id) }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-white hover:bg-zinc-50">Download JPEG</a>
+                        <a href="{{ route('katalog.printqr', $buku->id) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700">Cetak QR</a>
+                        <a href="{{ route('katalog.downloadqr', $buku->id) }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700">Download JPEG</a>
                     @else
                         @if($buku->kode_buku)
                             {{-- Jika ada kode_buku tetapi QR belum terbentuk, print route akan mencoba generate dan menampilkan halaman print --}}
-                            <a href="{{ route('katalog.printqr', $buku->id) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-white hover:bg-zinc-50">Cetak QR</a>
-                            <a href="{{ route('katalog.downloadqr', $buku->id) }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-white hover:bg-zinc-50">Download JPEG</a>
+                            <a href="{{ route('katalog.printqr', $buku->id) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700">Cetak QR</a>
+                            <a href="{{ route('katalog.downloadqr', $buku->id) }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700">Download JPEG</a>
                         @else
                             <span class="text-xs text-zinc-400">Belum ada kode buku — QR tidak tersedia</span>
                         @endif

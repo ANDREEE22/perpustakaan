@@ -94,6 +94,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/katalog-buku/{id}/edit', [KatalogBukuController::class, 'edit'])->name('katalog.edit');
     Route::put('/katalog-buku/{id}', [KatalogBukuController::class, 'update'])->name('katalog.update');
     Route::delete('/katalog-buku/{id}', [KatalogBukuController::class, 'destroy'])->name('katalog.destroy');
+    Route::post('/katalog/print-qr-bulk', [KatalogBukuController::class, 'printQrBulk'])->name('katalog.printqr.bulk');
 
     // ─── Kategori ────────────────────────────────────────────────
     Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');

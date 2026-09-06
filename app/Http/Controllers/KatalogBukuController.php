@@ -92,13 +92,15 @@ class KatalogBukuController extends Controller
             $this->generateQrForBuku($buku);
         }
 
-        return redirect()->route('katalog')->with('swal', [
-            'title' => 'Buku berhasil ditambahkan',
-            'text' => 'Buku "'.$validated['judul'].'" berhasil ditambahkan.',
-            'icon' => 'success',
-            'timer' => 2200,
-            'showConfirmButton' => false,
-        ]);
+        return redirect()->route('katalog')
+            ->with('swal', [
+                'title' => 'Buku berhasil ditambahkan',
+                'text' => 'Buku "'.$validated['judul'].'" berhasil ditambahkan.',
+                'icon' => 'success',
+                'timer' => 2200,
+                'showConfirmButton' => false,
+            ])
+            ->with('new_buku_id', $buku->id);
     }
 
     /**
@@ -247,6 +249,51 @@ class KatalogBukuController extends Controller
         }
 
         return view('katalog_buku.print_qr', compact('buku'));
+    }
+
+    /**
+     * Menampilkan halaman cetak QR untuk banyak buku sekaligus (grid layout, A4, siap cetak/PDF).
+     */
+    public function printQrBulk(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        if (is_string($ids)) {
+            $ids = explode(',', $ids);
+        }
+
+        $ids = array_values(array_unique(array_filter(array_map('intval', (array) $ids))));
+
+        if (empty($ids)) {
+            return redirect()->route('katalog')->with('swal', [
+                'title' => 'Tidak ada buku dipilih',
+                'text' => 'Silakan centang minimal satu buku untuk mencetak QR-nya.',
+                'icon' => 'warning',
+                'timer' => 2500,
+                'showConfirmButton' => false,
+            ]);
+        }
+
+        $bukus = Buku::with('qr')->whereIn('id', $ids)->get();
+
+        // Generate QR untuk buku yang belum punya QR (tapi sudah punya kode_buku)
+        $needsReload = false;
+        foreach ($bukus as $buku) {
+            if ((empty($buku->qr) || empty($buku->qr->qr_path)) && ! empty($buku->kode_buku)) {
+                $this->generateQrForBuku($buku);
+                $needsReload = true;
+            }
+        }
+        if ($needsReload) {
+            $bukus->load('qr');
+        }
+
+        // Pertahankan urutan sesuai urutan buku dicentang/dikirim
+        $bukus = $bukus->sortBy(function ($buku) use ($ids) {
+            return array_search($buku->id, $ids);
+        })->values();
+
+        return view('katalog_buku.print_qr_bulk', compact('bukus'));
     }
 
     /**

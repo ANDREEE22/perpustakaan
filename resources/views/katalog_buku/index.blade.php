@@ -13,10 +13,21 @@
             <flux:heading size="xl" level="1">Katalog Buku</flux:heading>
             <flux:subheading>Kelola koleksi buku perpustakaan SMPN 4 Jember</flux:subheading>
         </div>
-        <flux:button variant="primary" icon="plus" href="{{ route('katalog.create') }}" style="background: var(--lib-teal); border:none; color: #fff;">
-            Tambah Buku
-        </flux:button>
+        <div class="flex gap-2">
+            <flux:button type="button" id="btn-print-selected" variant="primary" icon="printer" style="background: var(--lib-emerald); border:none; color: #fff;">
+                Cetak QR yang Dipilih (PDF)
+            </flux:button>
+            <flux:button variant="primary" icon="plus" href="{{ route('katalog.create') }}" style="background: var(--lib-teal); border:none; color: #fff;">
+                Tambah Buku
+            </flux:button>
+        </div>
     </div>
+
+    {{-- Form tersembunyi untuk mengirim id buku yang dicentang ke halaman cetak QR massal --}}
+    <form id="bulk-print-form" action="{{ route('katalog.printqr.bulk') }}" method="POST" target="_blank" class="hidden">
+        @csrf
+        <div id="bulk-print-ids-container"></div>
+    </form>
 
     <flux:separator />
 
@@ -68,6 +79,9 @@
     {{-- Tabel Buku --}}
     <flux:table>
         <flux:table.columns>
+            <flux:table.column class="w-8">
+                <input type="checkbox" id="select-all-checkbox" class="rounded border-zinc-300 dark:border-zinc-600 cursor-pointer" title="Pilih semua">
+            </flux:table.column>
             <flux:table.column class="w-10">No</flux:table.column>
             <flux:table.column class="w-14">Sampul</flux:table.column>
             <flux:table.column>Judul Buku</flux:table.column>
@@ -81,6 +95,16 @@
         <flux:table.rows>
             @forelse($data_buku as $index => $buku)
             <flux:table.row :key="$buku->id">
+
+                {{-- Checkbox --}}
+                <flux:table.cell>
+                    <input
+                        type="checkbox"
+                        class="buku-checkbox rounded border-zinc-300 dark:border-zinc-600 cursor-pointer"
+                        value="{{ $buku->id }}"
+                        {{ session('new_buku_id') == $buku->id ? 'checked' : '' }}
+                    >
+                </flux:table.cell>
 
                 {{-- No --}}
                 <flux:table.cell class="text-zinc-400 text-sm">
@@ -174,7 +198,7 @@
             </flux:table.row>
             @empty
             <flux:table.row>
-                <flux:table.cell colspan="8" class="text-center py-12">
+                <flux:table.cell colspan="9" class="text-center py-12">
                     <div class="flex flex-col items-center gap-2 text-zinc-400">
                         <span class="text-4xl">📭</span>
                         <p class="font-medium text-zinc-500 dark:text-zinc-400">Tidak ada data buku</p>
@@ -211,6 +235,60 @@
 </div>
 
 <script>
+// ── Select All & sinkronisasi checkbox baris ──
+(function () {
+    const selectAll = document.getElementById('select-all-checkbox');
+    const rowCheckboxes = () => document.querySelectorAll('.buku-checkbox');
+
+    function syncSelectAllState() {
+        const all = rowCheckboxes();
+        const checkedCount = document.querySelectorAll('.buku-checkbox:checked').length;
+        if (all.length === 0) {
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+            return;
+        }
+        selectAll.checked = checkedCount === all.length;
+        selectAll.indeterminate = checkedCount > 0 && checkedCount < all.length;
+    }
+
+    selectAll.addEventListener('change', function () {
+        rowCheckboxes().forEach(cb => { cb.checked = selectAll.checked; });
+    });
+
+    rowCheckboxes().forEach(cb => cb.addEventListener('change', syncSelectAllState));
+
+    // Set state awal saat halaman dimuat (mis. hanya buku baru yang tercentang)
+    syncSelectAllState();
+
+    // ── Tombol Cetak QR yang Dipilih ──
+    document.getElementById('btn-print-selected').addEventListener('click', function () {
+        const checked = document.querySelectorAll('.buku-checkbox:checked');
+
+        if (checked.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Belum ada buku dipilih',
+                text: 'Centang minimal satu buku terlebih dahulu untuk mencetak QR.',
+                confirmButtonColor: '#10b981',
+            });
+            return;
+        }
+
+        const container = document.getElementById('bulk-print-ids-container');
+        container.innerHTML = '';
+        checked.forEach(cb => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ids[]';
+            input.value = cb.value;
+            container.appendChild(input);
+        });
+
+        document.getElementById('bulk-print-form').submit();
+    });
+})();
+
 function hapusBuku(form, judul) {
     Swal.fire({
         title: 'Hapus buku?',
