@@ -104,7 +104,8 @@ class KatalogBukuController extends Controller
     }
 
     /**
-     * Import buku dari file Excel (header: judul, kode_buku, isbn, kategori_id, pengarang, penerbit, tahun_terbit, stok, lokasi_rak, description)
+     * Import buku dari file Excel dengan smart header detection
+     * Expected columns: judul, kode_buku (optional), isbn, kategori_id, pengarang, penerbit, tahun_terbit, stok, lokasi_rak, description
      */
     public function import(Request $request)
     {
@@ -112,33 +113,76 @@ class KatalogBukuController extends Controller
             'file' => 'required|file|mimes:xlsx,xls,csv',
         ]);
 
-        $path = $request->file('file')->getRealPath();
         $sheets = Excel::toArray([], $request->file('file'));
         $rows = $sheets[0] ?? [];
         $created = 0;
         $errors = [];
+        $headerMap = [];
 
         foreach ($rows as $index => $row) {
-            // skip header row if contains non-empty string 'judul' in first cell
-            if ($index === 0 && is_string($row[0]) && Str::lower(trim($row[0])) === 'judul') {
+            // First row: detect headers
+            if ($index === 0) {
+                foreach ($row as $colIndex => $header) {
+                    if (! is_string($header)) {
+                        continue;
+                    }
+                    $normalized = Str::lower(trim($header));
+                    $headerMap[$colIndex] = $normalized;
+                }
+                // If no headers detected, assume standard order
+                if (empty($headerMap)) {
+                    continue;
+                }
                 continue;
             }
 
-            // map columns (assume order provided by user)
+            // Map row data by header names
             $data = [
-                'judul' => $row[0] ?? null,
-                'kode_buku' => $row[1] ?? null,
-                'isbn' => $row[2] ?? null,
-                'kategori_id' => $row[3] ?? null,
-                'pengarang' => $row[4] ?? null,
-                'penerbit' => $row[5] ?? null,
-                'tahun_terbit' => $row[6] ?? null,
-                'stok' => $row[7] ?? 0,
-                'lokasi_rak' => $row[8] ?? null,
-                'description' => $row[9] ?? null,
+                'judul' => null,
+                'kode_buku' => null,
+                'isbn' => null,
+                'kategori_id' => null,
+                'pengarang' => null,
+                'penerbit' => null,
+                'tahun_terbit' => null,
+                'stok' => 0,
+                'lokasi_rak' => null,
+                'description' => null,
             ];
 
-            // basic validation per row
+            foreach ($row as $colIndex => $value) {
+                $header = $headerMap[$colIndex] ?? null;
+                if (! $header || $value === null || $value === '') {
+                    continue;
+                }
+
+                // Match header to data field
+                if (Str::contains($header, ['judul'])) {
+                    $data['judul'] = $value;
+                } elseif (Str::contains($header, ['kode', 'kode_buku'])) {
+                    // Cast to string to handle numeric Excel values
+                    $data['kode_buku'] = (string) $value;
+                } elseif (Str::contains($header, ['isbn'])) {
+                    // Cast to string to handle numeric Excel values
+                    $data['isbn'] = (string) $value;
+                } elseif (Str::contains($header, ['kategori', 'kategori_id', 'kategori_id'])) {
+                    $data['kategori_id'] = $value;
+                } elseif (Str::contains($header, ['pengarang', 'author'])) {
+                    $data['pengarang'] = $value;
+                } elseif (Str::contains($header, ['penerbit', 'publisher'])) {
+                    $data['penerbit'] = $value;
+                } elseif (Str::contains($header, ['tahun', 'tahun_terbit', 'year'])) {
+                    $data['tahun_terbit'] = $value;
+                } elseif (Str::contains($header, ['stok', 'quantity', 'qty'])) {
+                    $data['stok'] = $value ?? 0;
+                } elseif (Str::contains($header, ['lokasi', 'lokasi_rak', 'location', 'rak'])) {
+                    $data['lokasi_rak'] = $value;
+                } elseif (Str::contains($header, ['description', 'deskripsi', 'keterangan', 'description'])) {
+                    $data['description'] = $value;
+                }
+            }
+
+            // Validate and create
             try {
                 $validated = validator($data, [
                     'judul' => 'required|string|max:255',
